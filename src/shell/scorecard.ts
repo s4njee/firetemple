@@ -1,3 +1,4 @@
+import measured from '../effects/measured.json';
 import type { EffectMeta, Scorecard, Tier } from '../effects/types.ts';
 import type { PassTiming } from '../gpu/profiler.ts';
 import type { EffectHost, FrameStats } from './host.ts';
@@ -104,6 +105,24 @@ export function costRows(tier: Tier, gpuMs: Scorecard['gpuMs']): CostRow[] {
   }));
 }
 
+/** What `npm run study` recorded for one effect (src/effects/measured.json). */
+export type Measured = Pick<Scorecard, 'gpuMs' | 'bundleKb'>;
+
+const MEASURED: Readonly<Record<string, Measured>> = measured;
+
+/** The hand-written verdict with the benchmark's numbers laid over it; measurements win. */
+export function withMeasured(
+  card: Scorecard | undefined,
+  numbers: Measured | undefined,
+): Scorecard | undefined {
+  if (!card || !numbers) return card;
+  return {
+    ...card,
+    gpuMs: numbers.gpuMs ?? card.gpuMs,
+    bundleKb: numbers.bundleKb ?? card.bundleKb,
+  };
+}
+
 export function sumPasses(passes: readonly PassTiming[]): number {
   return passes.reduce((total, pass) => total + pass.ms, 0);
 }
@@ -199,7 +218,7 @@ export function mountScorecard(
   root.append(grid);
   container.append(root);
 
-  const card = meta.scorecard;
+  const card = withMeasured(meta.scorecard, MEASURED[meta.id]);
   if (!card) {
     root.append(
       el('p', 'ft-muted', 'No scorecard yet. Add one to this effect’s meta.ts once it is known.'),

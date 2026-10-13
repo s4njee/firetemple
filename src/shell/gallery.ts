@@ -1,4 +1,5 @@
 import { listEffects, onEffectsChanged } from '../effects/registry.ts';
+import { motionAllowed, onMotionChange } from './motion.ts';
 import type { EffectMeta, Tier } from '../effects/types.ts';
 import { mountEffect, type EffectHost } from './host.ts';
 import { hrefFor, onQueryChange, readQuery, updateQuery, type QueryChanges } from './router.ts';
@@ -292,12 +293,13 @@ export function mountGallery(container: HTMLElement, shell: ShellContext): Unmou
     // --- Header -------------------------------------------------------------------------
     const intro = el('header', 'ft-gallery__intro');
     intro.append(
-      el('h1', 'ft-gallery__heading', 'Liquid effects'),
+      el('h1', 'ft-gallery__heading', 'Fire effects'),
       el(
         'p',
         'ft-muted',
-        'A research gallery of WebGPU water and liquid effects, each scored for real-world ' +
-          'practicality: GPU cost, behaviour on phones, and what to show where WebGPU is missing.',
+        'A research gallery of WebGPU fire effects, each scored for real-world practicality: ' +
+          'GPU cost, behaviour on phones and light pages, flash risk, and what to show where ' +
+          'WebGPU is missing.',
       ),
     );
 
@@ -446,7 +448,7 @@ export function mountGallery(container: HTMLElement, shell: ShellContext): Unmou
         focus: hovered ?? focused,
         gpuReady: state.ok,
         hidden: document.hidden,
-        reducedMotion: reducedMotion.matches,
+        reducedMotion: !motionAllowed(reducedMotion.matches),
       });
 
       // Free canvases before making new ones so the cap holds at every instant.
@@ -524,6 +526,7 @@ export function mountGallery(container: HTMLElement, shell: ShellContext): Unmou
     addEventListener('resize', schedule);
     document.addEventListener('visibilitychange', schedule);
     reducedMotion.addEventListener('change', schedule);
+    const stopMotionChoice = onMotionChange(schedule);
     const stopSession = shell.session.onChange(schedule);
     const stopQuery = onQueryChange(applyFilters);
 
@@ -543,6 +546,7 @@ export function mountGallery(container: HTMLElement, shell: ShellContext): Unmou
       removeEventListener('resize', schedule);
       document.removeEventListener('visibilitychange', schedule);
       reducedMotion.removeEventListener('change', schedule);
+      stopMotionChoice();
       stopSession();
       stopQuery();
       teardown = undefined;

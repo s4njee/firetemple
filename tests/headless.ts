@@ -36,6 +36,8 @@ export interface HeadlessOptions {
   /** Format of the stand-in canvas texture. Default rgba8unorm. */
   format?: GPUTextureFormat;
   profiler?: PassProfiler;
+  /** Default: the shared test device. The benchmark passes one with `timestamp-query`. */
+  device?: GPUDevice;
   /** Simulated frame rate. Default 60. */
   fps?: number;
 }
@@ -50,6 +52,8 @@ export interface HeadlessEffect {
   /** Stands in for the canvas texture. */
   target: GPUTexture;
   readonly time: FrameTime;
+  /** Encodes one frame into `encoder` without submitting, and advances time by 1/fps. */
+  encode(encoder: GPUCommandEncoder): void;
   /** Encodes and submits `frames` frames (default 1), advancing time by 1/fps each. */
   step(frames?: number): void;
   /** Steps until `seconds` of simulated time have passed, then waits for the GPU. */
@@ -61,7 +65,7 @@ export interface HeadlessEffect {
 
 export async function mountHeadless(id: string, options: HeadlessOptions): Promise<HeadlessEffect> {
   const { width, height } = options;
-  const device = await getTestDevice();
+  const device = options.device ?? (await getTestDevice());
   const effect = await loadEffect(id);
   if (options.preset !== undefined && !effect.presets?.[options.preset]) {
     throw new Error(
@@ -95,13 +99,16 @@ export async function mountHeadless(id: string, options: HeadlessOptions): Promi
   const delta = 1 / (options.fps ?? 60);
   const time = { time: 0, delta, frame: 0 };
 
+  const encode = (encoder: GPUCommandEncoder) => {
+    instance.frame({ ...time }, encoder, view);
+    time.time += delta;
+    time.frame++;
+  };
   const step = (frames = 1) => {
     for (let i = 0; i < frames; i++) {
       const encoder = device.createCommandEncoder();
-      instance.frame({ ...time }, encoder, view);
+      encode(encoder);
       device.queue.submit([encoder.finish()]);
-      time.time += delta;
-      time.frame++;
     }
   };
 
@@ -113,6 +120,7 @@ export async function mountHeadless(id: string, options: HeadlessOptions): Promi
     canvas,
     target,
     time,
+    encode,
     step,
     async runTo(seconds) {
       while (time.time < seconds) {

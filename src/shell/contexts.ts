@@ -1,8 +1,10 @@
 // Page contexts an effect can be shown in. The first one is the default.
 //
-// The mock pages are "someone else's website", so they follow the site theme: the shell's
-// tokens are the only colours allowed, and following the theme gives a light page and a
-// dark page for free. Everything on them is placeholder and inert (see `chrome`).
+// The mock pages are "someone else's website". They use the shell's tokens and nothing else, so
+// each one exists as a dark page and a light page: by default they follow the site theme, and
+// the effect page's "Page" control flips the stage on its own (`data-page`, see theme.css),
+// because an emissive effect has to be looked at over both. Everything on them is placeholder
+// and inert (see `chrome`).
 
 import { OBSTACLE_ATTRIBUTE, OBSTACLE_ROOT_ATTRIBUTE } from '../gpu/dom-rects.ts';
 import './contexts.css';
@@ -62,9 +64,9 @@ function chrome(className: string, ...children: Node[]): HTMLElement {
 }
 
 /**
- * Marks mock content as solid for effects that read the page's layout (`ripple-dom`, through
- * src/gpu/dom-rects.ts): water bounces off it. Only the marker is added; nothing about how the
- * element looks or behaves changes.
+ * Marks mock content as solid for effects that read the page's layout through
+ * src/gpu/dom-rects.ts (fire that climbs a card, light that it shadows). Only the marker is
+ * added; nothing about how the element looks or behaves changes.
  */
 function obstacle<T extends HTMLElement>(node: T): T {
   node.setAttribute(OBSTACLE_ATTRIBUTE, '');

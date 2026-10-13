@@ -8,7 +8,7 @@
       // Before first paint, so a stored theme never flashes the other one.
       try {
         const theme = localStorage.getItem('ft-theme');
-        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+        if (theme === 'light' || theme === 'auto') document.documentElement.dataset.theme = theme;
       } catch {}
     </script>
   </head>

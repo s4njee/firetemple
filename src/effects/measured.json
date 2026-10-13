@@ -1,0 +1,11 @@
+{
+  "hello": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "ms": 2.77
+      }
+    ],
+    "bundleKb": 21.5
+  }
+}

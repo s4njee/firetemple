@@ -17,7 +17,7 @@ import { showFallback } from '../gpu/fallback.ts';
 import { createFrameLoop } from '../gpu/loop.ts';
 import { createGpuProfiler, type GpuProfiler, type PassTiming } from '../gpu/profiler.ts';
 import { trackTextureMemory } from '../gpu/texture-memory.ts';
-import { observeMotionEligibility } from './motion.ts';
+import { getIntensity, observeMotionEligibility, onMotionChange } from './motion.ts';
 import './host.css';
 
 export interface EffectHostOptions {
@@ -267,6 +267,14 @@ export function mountEffect(
     for (const listener of [...loadListeners]) listener(loaded);
   }
 
+  // The visitor's intensity cap, applied where every effect ends up: its canvas.
+  const applyIntensity = () => {
+    const cap = getIntensity();
+    canvas.style.filter = cap < 1 ? `brightness(${cap})` : '';
+  };
+  applyIntensity();
+  const stopIntensity = onMotionChange(applyIntensity);
+
   const stopMotion = observeMotionEligibility(element, (eligible) => {
     suspended = !eligible;
     if (suspended || paused) loop.stop();
@@ -275,6 +283,7 @@ export function mountEffect(
 
   const unsubscribe = [
     stopMotion,
+    stopIntensity,
     session.onChange(() => void mount()),
     onEffectsChanged(() => void mount()),
   ];

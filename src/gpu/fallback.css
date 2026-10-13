@@ -8,7 +8,7 @@
   min-height: 12rem;
   padding: 1.5rem;
   overflow: hidden;
-  background: var(--ft-fallback-bg, #06121c);
+  background: var(--ft-fallback-bg, #0c0a09);
   color: var(--ft-fallback-fg, #d8eef7);
   font: inherit;
   line-height: 1.5;
@@ -29,7 +29,7 @@
   border: 1px solid rgb(216 238 247 / 0.2);
   border-radius: 0.75rem;
   /* Opaque enough that the text keeps its contrast over any poster. */
-  background: rgb(6 18 28 / 0.85);
+  background: rgb(12 10 9 / 0.85);
 }
 
 .ft-fallback__title {

@@ -2,10 +2,15 @@
  * Design tokens and the few primitives every shell component shares.
  * The effects carry the page: chrome stays quiet, flat, and low-contrast against them.
  * Components use these tokens only; no new colours, radii, or font sizes elsewhere.
+ *
+ * Dark first: fire is light, and it needs a dark page to add to. The light theme is real and
+ * complete, because a light page is the hard test every overlay effect has to be shown against.
+ * Neutrals are warm (charcoal and paper, not blue-black and white) so nothing in the chrome is a
+ * cooler white than the flames. The accent is the only orange; tier colours stay away from it.
  */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
   --ft-font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --ft-font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
@@ -27,20 +32,20 @@
   --ft-radius-m: 8px;
   --ft-radius-l: 14px;
 
-  --ft-bg: light-dark(#f3f6f7, #06121c);
-  --ft-surface: light-dark(#ffffff, #0b1c29);
-  --ft-surface-2: light-dark(#e8eef0, #122838);
-  --ft-border: light-dark(#d3dde1, #1d384a);
-  --ft-text: light-dark(#0d1b22, #d8eef7);
-  --ft-text-muted: light-dark(#51656f, #86a7b6);
-  --ft-accent: light-dark(#0a6c7e, #5fd4e2);
-  --ft-on-accent: light-dark(#ffffff, #04212a);
-  --ft-focus: light-dark(#0a6c7e, #9be7f0);
+  --ft-bg: light-dark(#f7f4ef, #0c0a09);
+  --ft-surface: light-dark(#fffdfa, #161210);
+  --ft-surface-2: light-dark(#ede7df, #221b17);
+  --ft-border: light-dark(#dcd2c6, #362b23);
+  --ft-text: light-dark(#1c1511, #f2e9df);
+  --ft-text-muted: light-dark(#6a5b4f, #a99a8b);
+  --ft-accent: light-dark(#ad3a08, #ff8a3d);
+  --ft-on-accent: light-dark(#fffdfa, #1d0c02);
+  --ft-focus: light-dark(#ad3a08, #ffb680);
 
-  /* Practicality tiers: A drop-in, B feature, C showpiece. */
+  /* Practicality tiers: A drop-in, B feature, C showpiece. Cool hues, clear of the accent. */
   --ft-tier-a: light-dark(#1f7a4d, #6fd6a0);
-  --ft-tier-b: light-dark(#8a6100, #e7c15a);
-  --ft-tier-c: light-dark(#a8432f, #f0907a);
+  --ft-tier-b: light-dark(#255f9e, #86b8f2);
+  --ft-tier-c: light-dark(#7440a6, #c9a2f2);
 
   --ft-header-height: 52px;
 }
@@ -49,7 +54,19 @@
   color-scheme: light;
 }
 
-:root[data-theme='dark'] {
+:root[data-theme='auto'] {
+  color-scheme: light dark;
+}
+
+/*
+ * A subtree can be shown as the other kind of page (the effect stage does this, story 2.7): the
+ * tokens are light-dark() values, so they follow whatever colour scheme the element has.
+ */
+[data-page='light'] {
+  color-scheme: light;
+}
+
+[data-page='dark'] {
   color-scheme: dark;
 }
 

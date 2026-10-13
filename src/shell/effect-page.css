@@ -21,7 +21,8 @@
   overflow: hidden;
   border: 1px solid var(--ft-border);
   border-radius: var(--ft-radius-l);
-  background: var(--ft-surface);
+  /* The page colour, not a panel colour: a see-through effect is judged against this. */
+  background: var(--ft-bg);
 }
 
 .ft-effect__stage:fullscreen {

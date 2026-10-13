@@ -76,6 +76,21 @@ export function mountEffectPage(container: HTMLElement, shell: ShellContext, id:
     layoutGroup.append(node);
     return node;
   });
+  // An emissive effect has to be judged over both kinds of page, whatever the site theme is.
+  const PAGE_TONES = ['site', 'dark', 'light'] as const;
+  const pageButton = button('Page: site');
+  pageButton.title = 'Show the effect over a dark or a light page, independent of the site theme.';
+  pageButton.addEventListener('click', () => {
+    const current = PAGE_TONES.find((tone) => tone === readQuery().get('page')) ?? 'site';
+    const next = PAGE_TONES[(PAGE_TONES.indexOf(current) + 1) % PAGE_TONES.length]!;
+    updateQuery({ page: next === 'site' ? null : next }, { replace: true });
+  });
+  const showPageTone = (query: URLSearchParams) => {
+    const tone = PAGE_TONES.find((candidate) => candidate === query.get('page')) ?? 'site';
+    if (tone === 'site') delete stage.dataset.page;
+    else stage.dataset.page = tone;
+    pageButton.textContent = `Page: ${tone}`;
+  };
   const hudButton = button('Performance');
   hudButton.addEventListener('click', () =>
     updateQuery({ hud: readQuery().has('hud') ? null : '1' }, { replace: true }),
@@ -85,7 +100,13 @@ export function mountEffectPage(container: HTMLElement, shell: ShellContext, id:
     if (document.fullscreenElement) void document.exitFullscreen();
     else void stage.requestFullscreen();
   });
-  toolbar.append(layoutGroup, el('span', 'ft-effect__spacer'), hudButton, fullscreenButton);
+  toolbar.append(
+    layoutGroup,
+    pageButton,
+    el('span', 'ft-effect__spacer'),
+    hudButton,
+    fullscreenButton,
+  );
 
   const tabButtons = TABS.map((tab) => {
     const node = el('button', 'ft-tab', tab.title);
@@ -151,6 +172,7 @@ export function mountEffectPage(container: HTMLElement, shell: ShellContext, id:
   }
 
   function show(query: URLSearchParams) {
+    showPageTone(query);
     showLayout(query);
     showHud(query);
     showTab(query);
