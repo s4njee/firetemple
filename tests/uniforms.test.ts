@@ -542,5 +542,7 @@ describe('layout against Dawn', () => {
       const struct = defineUniformStruct(`Fuzz${n}`, fields);
       await roundTrip(device, struct, rng);
     }
-  });
+    // A pipeline per generated struct: quick on a GPU, well past the default 5 s on a slow
+    // software rasteriser (it timed out in an emulated container).
+  }, 60_000);
 });
