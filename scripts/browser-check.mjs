@@ -1,7 +1,7 @@
 // Looks at every effect in a real browser, without anyone having to click through them.
 //
 //   npm run browser-check -- [--base http://localhost:5373] [--effects a,b] [--out output/browser]
-//                            [--report docs/studies/browser-check.md]
+//                            [--report docs/studies/browser-check.md] [--query "preset=name"]
 //                            [--device "Apple M1 Max" --class apple-silicon]
 //                            [--chrome "/path/to/Google Chrome"]
 //
@@ -44,6 +44,8 @@ const option = (name, fallback) => {
 const base = option('base', 'http://localhost:5373').replace(/\/$/, '');
 const out = option('out', 'output/browser');
 const chromePath = option('chrome', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome');
+// Extra query for every view, e.g. --query "preset=roaring" or --query "p.noise=voronoi".
+const extraQuery = option('query', '');
 const effects = (
   option('effects', undefined)?.split(',') ??
   readdirSync('src/effects').filter((name) => existsSync(join('src/effects', name, 'index.ts')))
@@ -265,7 +267,9 @@ try {
         mobile: view.width < 768,
       });
       const started = Date.now();
-      await page('Page.navigate', { url: `${base}/?effect=${effect}&${view.query}` });
+      await page('Page.navigate', {
+        url: `${base}/?effect=${effect}&${view.query}${extraQuery ? `&${extraQuery}` : ''}`,
+      });
 
       // The effect is up once its canvas has a real drawing buffer, or a fallback notice shows.
       let state = 'timeout';

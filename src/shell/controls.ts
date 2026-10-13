@@ -18,6 +18,9 @@ import './controls.css';
 
 /** Trailing delay for URL writes while a slider moves: browsers rate-limit history calls. */
 const URL_DELAY_MS = 250;
+const FLASH_WARNING =
+  'This preset flashes more than three times a second over a large area. Avoid it if flashing light affects you.';
+
 /** Up to this many presets are buttons; more become a dropdown. */
 const MAX_PRESET_BUTTONS = 5;
 
@@ -194,6 +197,8 @@ export function mountControls(container: HTMLElement, host: EffectHost): Unmount
     presetUi = undefined;
     const names = Object.keys(current.presets);
     if (names.length === 0) return;
+    // Presets measured over the WCAG flash threshold are labelled, so choosing one is informed.
+    const flashing = new Set(current.effect.meta.scorecard?.flashPresets ?? []);
     const apply = (name: string) => {
       setValues(presetValues(current.schema, current.presets[name]!));
       writeNow();
@@ -204,7 +209,8 @@ export function mountControls(container: HTMLElement, host: EffectHost): Unmount
       group.setAttribute('role', 'group');
       group.setAttribute('aria-label', 'Presets');
       const buttons = names.map((name) => {
-        const node = button(humanize(name));
+        const node = button(humanize(name) + (flashing.has(name) ? ' (flashes)' : ''));
+        if (flashing.has(name)) node.title = FLASH_WARNING;
         node.addEventListener('click', () => apply(name));
         group.append(node);
         return node;
@@ -221,7 +227,12 @@ export function mountControls(container: HTMLElement, host: EffectHost): Unmount
       select.id = 'ft-controls-preset';
       const none = new Option('Custom', '', true, true);
       none.disabled = true;
-      select.append(none, ...names.map((name) => new Option(humanize(name), name)));
+      select.append(
+        none,
+        ...names.map(
+          (name) => new Option(humanize(name) + (flashing.has(name) ? ' (flashes)' : ''), name),
+        ),
+      );
       select.addEventListener('change', () => apply(select.value));
       const label = el('label', 'ft-label', 'Preset');
       label.htmlFor = select.id;

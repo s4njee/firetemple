@@ -31,6 +31,8 @@ directory; nothing else needs registering. `meta.epic` is the epic number in pla
 - Use `time.delta` to advance your own phase (see hello) so a `speed` parameter never makes the
   picture jump. Simulations step with `createFixedStepper` from `src/gpu/loop.ts`.
 - Colours in `params` are linear RGB.
+- A `vec2f` / `vec3f` uniform field takes a tuple (`[number, number]`), not a `number[]`: type
+  accumulators accordingly or strict typecheck fails.
 - There is no DOM in the tests: guard any use of `window`, `document` or `matchMedia`, and take
   input only through the `canvas` you are given.
 
@@ -115,10 +117,14 @@ anything pixel-thin.
 Fire flickers, and flicker is a photosensitivity risk. WCAG 2.3.1 allows no more than three
 flashes in any second over a large area, and treats saturated red as worse. Keep whole-frame
 brightness changes slow (below about 3 Hz) and small (well under 10% of full white per swing),
-let fast motion be local, and fill in `scorecard.flash`. `tests/flash.test.ts` measures every
+let fast motion be local, and fill in `scorecard.flash`. For a wall of flame the thing that trips
+the analyser is rise speed, through the saturated-red rim: about one noise cell a second was safe,
+about two was not. `tests/flash.test.ts` measures every
 effect at its defaults (`tests/flash.ts` explains how) and fails when an effect is flashier than
 its scorecard says: `none` means no cell of the picture ever completes a flash, `low` means local
-flicker under the threshold, `high` is over it. Under `prefers-reduced-motion` the shell
+flicker under the threshold, `high` is over it. Every preset is measured too. Bring an
+over-threshold preset under the limit if you can; if it cannot be what it is meant to be without
+flashing, name it in `scorecard.flashPresets`, which makes the controls label it. Under `prefers-reduced-motion` the shell
 holds a still frame; an effect must look right as one.
 
 ## Helpers (use these before writing your own)

@@ -20,6 +20,7 @@
 //   NOISETEX_CELLS                              8.0
 //   noisetex_uv(p: vec2f) -> vec2f              cells -> texture coordinate
 //   noisetex_sample(tex, smp, p) -> vec4f       all four channels, 0..1. One fetch.
+//   noisetex_sample_lod(tex, smp, p, lod) -> vec4f   the same at an explicit mip level (0 = full detail)
 //   noisetex_fbm(tex, smp, p) -> f32            [-1, 1], the r channel: a stand-in for fbm_2d(p, 4, 2, 0.5)
 //   noisetex_fbm2(tex, smp, p) -> vec2f         [-1, 1] each, r and g: two fields in one fetch, for a warp
 //   noisetex_flame(tex, smp, p, rise) -> f32    [-1, 1]. Two fetches: the coarse field scrolled by `rise`
@@ -28,8 +29,10 @@
 //                                               change instead of sliding as one sheet.
 //
 // Level of detail: the fetches use textureSampleLevel at level 0, so they are legal inside
-// non-uniform control flow (after an early-out). Minification aliasing only appears when one
-// tile covers fewer than about 256 pixels; pass a coarser `p` scale rather than a tiny tile.
+// non-uniform control flow (after an early-out). Level 0 aliases into crawling jitter once one
+// tile covers fewer than about 256 pixels (a small canvas, or a fine `p` scale): there, work out
+// the level on the CPU as log2(256 / pixels per tile) and use noisetex_sample_lod. The other way,
+// the tile is 32 texels per cell, so it goes soft once a cell is wider than about 300 pixels.
 //
 // Cost: one fetch per call (noisetex_flame: two), no arithmetic worth counting.
 
@@ -41,6 +44,10 @@ fn noisetex_uv(p: vec2f) -> vec2f {
 
 fn noisetex_sample(tex: texture_2d<f32>, smp: sampler, p: vec2f) -> vec4f {
   return textureSampleLevel(tex, smp, noisetex_uv(p), 0.0);
+}
+
+fn noisetex_sample_lod(tex: texture_2d<f32>, smp: sampler, p: vec2f, lod: f32) -> vec4f {
+  return textureSampleLevel(tex, smp, noisetex_uv(p), lod);
 }
 
 fn noisetex_fbm(tex: texture_2d<f32>, smp: sampler, p: vec2f) -> f32 {

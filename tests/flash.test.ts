@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { listEffects } from '../src/effects/registry.ts';
+import { listEffects, loadEffect } from '../src/effects/registry.ts';
 import {
   analyseFlashes,
   findTransitions,
@@ -10,7 +10,7 @@ import {
   type CellSample,
 } from './flash.ts';
 
-vi.setConfig({ testTimeout: 180_000 });
+vi.setConfig({ testTimeout: 600_000 });
 
 const cell = (luminance: number, red = 0, saturation = 0): CellSample => ({
   luminance,
@@ -131,6 +131,24 @@ describe.skipIf(process.env.FLASH_SWEEP === '0')('registered effects against WCA
         ORDER[report.verdict],
         `${id} measured "${report.verdict}": ${JSON.stringify(report)}`,
       ).toBeLessThanOrEqual(ORDER[claimed]);
+    },
+  );
+});
+
+// A preset may be livelier than the defaults, but one that goes over the threshold has to be
+// named in `scorecard.flashPresets`, which is what makes the controls label it.
+describe.skipIf(process.env.FLASH_SWEEP === '0')('presets against WCAG 2.3.1', () => {
+  it.each(listEffects().map((meta) => [meta.id, meta.scorecard?.flashPresets ?? []] as const))(
+    '%s declares every preset that goes over the threshold (%j)',
+    async (id, declared) => {
+      const effect = await loadEffect(id);
+      const over: string[] = [];
+      for (const preset of Object.keys(effect.presets ?? {})) {
+        const report = await measureFlashes(id, { preset, seconds: 3, settle: 0.5 });
+        if (report.verdict === 'high') over.push(preset);
+      }
+      expect(over.filter((preset) => !declared.includes(preset))).toEqual([]);
+      for (const preset of declared) expect(Object.keys(effect.presets ?? {})).toContain(preset);
     },
   );
 });

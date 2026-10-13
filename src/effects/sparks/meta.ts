@@ -12,6 +12,7 @@ export const meta: EffectMeta = {
     compute: false,
     mobile: 'untested',
     flash: 'low',
+    flashPresets: ['welding spray', 'grinder'],
     lightPage: 'no',
     features: { required: [] },
     fallback:

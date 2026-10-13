@@ -33,6 +33,12 @@ export interface Scorecard {
    */
   flash?: 'none' | 'low' | 'high' | 'unmeasured';
   /**
+   * Presets that go over the flash threshold even though the defaults do not. The controls label
+   * them, and `tests/flash.test.ts` fails if a preset measures over the threshold without being
+   * named here.
+   */
+  flashPresets?: readonly string[];
+  /**
    * Whether it reads over a light page: `yes` as it is, `underlay` only with a dark underlay or
    * backplate behind it, `no` when it needs a dark region of its own.
    */

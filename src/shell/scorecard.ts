@@ -247,7 +247,14 @@ export function mountScorecard(
   );
   row(verdict.list, 'Needs compute', computeText(card.compute));
   row(verdict.list, 'Mobile-safe', mobileText(card.mobile));
-  row(verdict.list, 'Flash risk', flashText(card.flash));
+  row(
+    verdict.list,
+    'Flash risk',
+    flashText(card.flash) +
+      (card.flashPresets?.length
+        ? `. These presets go over the threshold: ${card.flashPresets.join(', ')}`
+        : ''),
+  );
   row(verdict.list, 'Light pages', lightPageText(card.lightPage));
   row(verdict.list, 'Fallback', card.fallback);
   const uses = el('ul', 'ft-scorecard__uses');
