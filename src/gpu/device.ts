@@ -31,6 +31,11 @@ export interface GpuOptions {
   powerPreference?: GPUPowerPreference;
   /** Requested only when the adapter has them; a missing one never fails init. Replaces the default list. */
   optionalFeatures?: readonly GPUFeatureName[];
+  /**
+   * Behave as a browser without WebGPU would, so the fallback path (poster and notice) can be
+   * looked at on a machine that has it. The site turns this on with `?nogpu`.
+   */
+  simulateUnsupported?: boolean;
 }
 
 export const DEFAULT_OPTIONAL_FEATURES: readonly GPUFeatureName[] = [
@@ -69,7 +74,8 @@ function snapshotInfo(adapter: GPUAdapter, device: GPUDevice): GpuInfo {
 
 /** Never throws. */
 export async function initGpu(options: GpuOptions = {}): Promise<GpuInitResult> {
-  const gpu = typeof navigator === 'undefined' ? undefined : navigator.gpu;
+  const gpu =
+    typeof navigator === 'undefined' || options.simulateUnsupported ? undefined : navigator.gpu;
   if (!gpu) {
     return {
       ok: false,

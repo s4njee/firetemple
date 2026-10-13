@@ -6,6 +6,9 @@ if (import.meta.env.DEV) {
   installShaderOverlay();
 }
 
-// A single device is shared by every canvas on the page.
-const session = await createGpuSession();
+// A single device is shared by every canvas on the page. `?nogpu` shows the site as a browser
+// without WebGPU would see it: posters and a notice instead of canvases.
+const session = await createGpuSession({
+  simulateUnsupported: new URLSearchParams(location.search).has('nogpu'),
+});
 mountApp(document.querySelector<HTMLElement>('#app')!, { session });
