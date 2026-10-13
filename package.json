@@ -12,7 +12,8 @@
     "format": "prettier --write --ignore-unknown \"src/**\" \"tests/**\" \"scripts/**\" \"*.{ts,js,json,html}\"",
     "format:check": "prettier --check --ignore-unknown \"src/**\" \"tests/**\" \"scripts/**\" \"*.{ts,js,json,html}\"",
     "test": "vitest run",
-    "study": "node scripts/study.mjs"
+    "study": "node scripts/study.mjs",
+    "shot": "node scripts/shot.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
