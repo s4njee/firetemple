@@ -27,5 +27,8 @@ export default defineConfig({
     environment: 'node',
     include: ['tests/**/*.test.ts'],
     setupFiles: ['tests/setup.ts'],
+    // Most tests compile shaders and read pixels back. That is milliseconds on a GPU and can be
+    // seconds on CI's software rasteriser, where the default 5 s made unrelated tests time out.
+    testTimeout: 30_000,
   },
 });
