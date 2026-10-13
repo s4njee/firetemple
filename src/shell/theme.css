@@ -1,0 +1,236 @@
+/*
+ * Design tokens and the few primitives every shell component shares.
+ * The effects carry the page: chrome stays quiet, flat, and low-contrast against them.
+ * Components use these tokens only; no new colours, radii, or font sizes elsewhere.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  --ft-font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ft-font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --ft-text-xs: 0.75rem;
+  --ft-text-s: 0.8125rem;
+  --ft-text-m: 0.9375rem;
+  --ft-text-l: 1.25rem;
+  --ft-text-xl: 1.75rem;
+
+  --ft-space-1: 4px;
+  --ft-space-2: 8px;
+  --ft-space-3: 12px;
+  --ft-space-4: 16px;
+  --ft-space-5: 24px;
+  --ft-space-6: 40px;
+
+  --ft-radius-s: 4px;
+  --ft-radius-m: 8px;
+  --ft-radius-l: 14px;
+
+  --ft-bg: light-dark(#f3f6f7, #06121c);
+  --ft-surface: light-dark(#ffffff, #0b1c29);
+  --ft-surface-2: light-dark(#e8eef0, #122838);
+  --ft-border: light-dark(#d3dde1, #1d384a);
+  --ft-text: light-dark(#0d1b22, #d8eef7);
+  --ft-text-muted: light-dark(#51656f, #86a7b6);
+  --ft-accent: light-dark(#0a6c7e, #5fd4e2);
+  --ft-on-accent: light-dark(#ffffff, #04212a);
+  --ft-focus: light-dark(#0a6c7e, #9be7f0);
+
+  /* Practicality tiers: A drop-in, B feature, C showpiece. */
+  --ft-tier-a: light-dark(#1f7a4d, #6fd6a0);
+  --ft-tier-b: light-dark(#8a6100, #e7c15a);
+  --ft-tier-c: light-dark(#a8432f, #f0907a);
+
+  --ft-header-height: 52px;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--ft-bg);
+  color: var(--ft-text);
+  font: var(--ft-text-m) / 1.5 var(--ft-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--ft-accent);
+  text-underline-offset: 0.15em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ft-focus);
+  outline-offset: 2px;
+}
+
+/* Numbers and code: tabular so readouts do not jitter as they update. */
+.ft-data {
+  font-family: var(--ft-font-mono);
+  font-size: var(--ft-text-s);
+  font-variant-numeric: tabular-nums;
+}
+
+.ft-muted {
+  color: var(--ft-text-muted);
+}
+
+.ft-label {
+  color: var(--ft-text-muted);
+  font-size: var(--ft-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ft-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ft-space-2);
+  min-height: 32px;
+  padding: 0 var(--ft-space-3);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-m);
+  background: var(--ft-surface);
+  color: var(--ft-text);
+  font: inherit;
+  font-size: var(--ft-text-s);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ft-button:hover {
+  background: var(--ft-surface-2);
+}
+
+.ft-button[aria-pressed='true'],
+.ft-button--primary {
+  border-color: var(--ft-accent);
+  background: var(--ft-accent);
+  color: var(--ft-on-accent);
+}
+
+.ft-button--quiet {
+  border-color: transparent;
+  background: transparent;
+}
+
+.ft-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--ft-space-2);
+  border: 1px solid var(--ft-border);
+  border-radius: 999px;
+  color: var(--ft-text-muted);
+  font-size: var(--ft-text-xs);
+  white-space: nowrap;
+}
+
+/* Tier chips: add data-tier="A" | "B" | "C". */
+.ft-chip[data-tier] {
+  border-color: currentColor;
+  font-weight: 600;
+}
+
+.ft-chip[data-tier='A'] {
+  color: var(--ft-tier-a);
+}
+
+.ft-chip[data-tier='B'] {
+  color: var(--ft-tier-b);
+}
+
+.ft-chip[data-tier='C'] {
+  color: var(--ft-tier-c);
+}
+
+.ft-panel {
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-l);
+  background: var(--ft-surface);
+}
+
+.ft-tabs {
+  display: flex;
+  gap: var(--ft-space-4);
+  border-bottom: 1px solid var(--ft-border);
+}
+
+.ft-tab {
+  margin-bottom: -1px;
+  padding: var(--ft-space-2) 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--ft-text-muted);
+  font: inherit;
+  font-size: var(--ft-text-s);
+  cursor: pointer;
+}
+
+.ft-tab[aria-selected='true'] {
+  border-bottom-color: var(--ft-accent);
+  color: var(--ft-text);
+}
+
+/* Long-form text: write-ups and notes. */
+.ft-prose {
+  max-width: 68ch;
+  line-height: 1.65;
+}
+
+.ft-prose > * + * {
+  margin-top: var(--ft-space-4);
+}
+
+.ft-prose h2 {
+  margin-top: var(--ft-space-5);
+  font-size: var(--ft-text-l);
+}
+
+.ft-prose h3 {
+  font-size: var(--ft-text-m);
+}
+
+.ft-prose code {
+  padding: 0.1em 0.3em;
+  border-radius: var(--ft-radius-s);
+  background: var(--ft-surface-2);
+  font-family: var(--ft-font-mono);
+  font-size: 0.9em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

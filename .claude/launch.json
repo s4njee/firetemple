@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "firetemple",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5373", "--strictPort"],
+      "port": 5373
+    },
+    {
+      "name": "firetemple-alt",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5383", "--strictPort"],
+      "port": 5383
+    },
+    {
+      "name": "firetemple-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview", "--", "--port", "5374", "--strictPort"],
+      "port": 5374
+    }
+  ]
+}

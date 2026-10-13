@@ -1,0 +1,104 @@
+.ft-effect {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--ft-space-5);
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: var(--ft-space-5);
+}
+
+.ft-effect__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-3);
+  min-width: 0;
+}
+
+.ft-effect__stage {
+  position: relative;
+  height: min(64vh, 720px);
+  min-height: 320px;
+  overflow: hidden;
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-l);
+  background: var(--ft-surface);
+}
+
+.ft-effect__stage:fullscreen {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.ft-effect__hud {
+  position: absolute;
+  z-index: 2;
+  top: var(--ft-space-3);
+  left: var(--ft-space-3);
+}
+
+.ft-effect__hud:empty {
+  display: none;
+}
+
+.ft-effect__toolbar,
+.ft-effect__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ft-space-2);
+}
+
+.ft-effect__spacer {
+  flex: 1;
+}
+
+.ft-effect__tabpanel {
+  min-height: 240px;
+  padding: var(--ft-space-4) 0 var(--ft-space-6);
+}
+
+.ft-effect__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-5);
+  min-width: 0;
+}
+
+.ft-effect__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-3);
+}
+
+.ft-effect__title {
+  font-size: var(--ft-text-xl);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.ft-effect__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ft-space-2);
+}
+
+@media (max-width: 900px) {
+  .ft-effect {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--ft-space-4);
+  }
+
+  /* Title first, then the effect, then its controls. */
+  .ft-effect__side {
+    display: contents;
+  }
+
+  .ft-effect__intro {
+    order: -1;
+  }
+
+  .ft-effect__stage {
+    height: 52vh;
+  }
+}

@@ -1,0 +1,309 @@
+/*
+ * Mock page layouts. Each page is its own container, so queries follow the stage size
+ * rather than the viewport. Text that sits over the effect always sits on a plate (a
+ * mostly opaque surface), so legibility never depends on what the effect draws.
+ */
+
+.ft-context--bare {
+  height: 100%;
+}
+
+.ft-context__page {
+  position: absolute;
+  inset: 0;
+  container: ft-context / size;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--ft-bg);
+  color: var(--ft-text);
+}
+
+.ft-context__page:focus-visible {
+  outline-offset: -2px;
+}
+
+.ft-context__page .ft-button {
+  cursor: default;
+}
+
+.ft-context__page .ft-button:hover:not(.ft-button--primary) {
+  background: var(--ft-surface);
+}
+
+.ft-context__stage {
+  position: relative;
+  min-width: 0;
+}
+
+.ft-context__plate {
+  padding: var(--ft-space-4);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-m);
+  background: color-mix(in srgb, var(--ft-surface) 90%, transparent);
+}
+
+.ft-context__section-title,
+.ft-context__card-title {
+  font-size: var(--ft-text-l);
+  line-height: 1.25;
+}
+
+.ft-context__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-3);
+  padding: var(--ft-space-5);
+}
+
+.ft-context__link,
+.ft-context__nav-link {
+  color: var(--ft-text-muted);
+  font-size: var(--ft-text-s);
+}
+
+/* Hero: the stage is the whole page background. */
+
+.ft-context--hero .ft-context__stage {
+  position: absolute;
+  inset: 0;
+}
+
+.ft-context__hero-chrome {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.ft-context__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ft-space-4);
+  padding: var(--ft-space-2) var(--ft-space-4);
+  border-bottom: 1px solid var(--ft-border);
+  background: color-mix(in srgb, var(--ft-surface) 90%, transparent);
+}
+
+.ft-context__brand {
+  font-weight: 600;
+}
+
+.ft-context__nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--ft-space-4);
+}
+
+.ft-context__hero-body {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  min-height: 0;
+  padding: var(--ft-space-4);
+}
+
+.ft-context__hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-3);
+  width: 100%;
+  max-width: 30rem;
+}
+
+.ft-context__headline {
+  font-size: var(--ft-text-xl);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.ft-context__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ft-space-2);
+  padding-top: var(--ft-space-1);
+}
+
+@container ft-context (max-width: 520px) {
+  .ft-context__nav-link {
+    display: none;
+  }
+
+  .ft-context__headline {
+    font-size: var(--ft-text-l);
+  }
+}
+
+@container ft-context (max-height: 460px) {
+  .ft-context__lede {
+    display: none;
+  }
+}
+
+@container ft-context (min-width: 1000px) {
+  .ft-context__hero-body {
+    padding: var(--ft-space-6);
+  }
+
+  .ft-context__headline {
+    font-size: calc(var(--ft-text-xl) * 1.4);
+  }
+}
+
+/* Cards: the page scrolls; the effect is the backdrop of one card. */
+
+.ft-context--cards,
+.ft-context--band,
+.ft-context--backdrop {
+  overflow: hidden auto;
+}
+
+.ft-context__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-3);
+}
+
+.ft-context__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ft-space-3);
+}
+
+.ft-context__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-2);
+  min-width: 0;
+  padding: var(--ft-space-4);
+}
+
+.ft-context__card-title {
+  font-size: var(--ft-text-m);
+}
+
+.ft-context__card--feature {
+  position: relative;
+  order: -1;
+  justify-content: flex-end;
+  min-height: 15rem;
+  overflow: hidden;
+  padding: 0;
+}
+
+.ft-context__card--feature .ft-context__stage {
+  position: absolute;
+  inset: 0;
+}
+
+.ft-context__card--feature .ft-context__plate {
+  position: relative;
+  margin: var(--ft-space-2);
+}
+
+@container ft-context (min-width: 420px) {
+  .ft-context__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ft-context__card--feature {
+    grid-column: 1 / -1;
+  }
+}
+
+@container ft-context (min-width: 720px) {
+  .ft-context__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ft-context__card--feature {
+    order: 0;
+    grid-column: 2;
+    grid-row: span 2;
+  }
+}
+
+/* Band: ordinary sections with the effect as a short band between them. */
+
+.ft-context--band {
+  display: flex;
+  flex-direction: column;
+}
+
+.ft-context--band > * {
+  flex: none;
+}
+
+.ft-context__band {
+  /* No border: a divider effect has to run straight into the section below it. */
+  height: clamp(96px, 28cqh, 200px);
+}
+
+.ft-context__band-below {
+  flex: 1 0 auto;
+  background: var(--ft-surface);
+}
+
+.ft-context__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  gap: var(--ft-space-4);
+}
+
+.ft-context__column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-2);
+}
+
+.ft-context__small {
+  font-size: var(--ft-text-xs);
+}
+
+/* Backdrop: the effect and its veil stay put while the article scrolls over them. */
+
+.ft-context--backdrop {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+}
+
+.ft-context--backdrop > * {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.ft-context--backdrop .ft-context__stage,
+.ft-context__veil {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100cqh;
+}
+
+.ft-context__veil {
+  pointer-events: none;
+}
+
+.ft-context__article-chrome {
+  position: relative;
+  padding: var(--ft-space-5);
+  pointer-events: none;
+}
+
+.ft-context__article {
+  margin-inline: auto;
+  padding: var(--ft-space-5);
+  background: color-mix(in srgb, var(--ft-surface) 82%, transparent);
+}
+
+@container ft-context (max-width: 520px) {
+  .ft-context__article-chrome {
+    padding: var(--ft-space-3);
+  }
+
+  .ft-context__article {
+    padding: var(--ft-space-4);
+  }
+}
