@@ -9,8 +9,9 @@ of `OVERLAY_PARAMS`. Pure additive output, and every CSS blend mode that only li
 on a light page by construction.
 
 Everything here was rendered headlessly on Dawn and composited numerically
-(`experiments/compositing.test.ts`). **Nothing was checked in a browser.** The CSS blend-mode rows
-are simulated from the W3C formulas. The open points to verify in real browsers are listed under
+(`experiments/compositing.test.ts`). One browser has been looked at since (see
+[Risks](#risks-to-verify-in-a-browser)); the CSS blend-mode rows are still only simulated from the
+W3C formulas. The open points to verify in real browsers are listed under
 [Risks](#risks-to-verify-in-a-browser).
 
 Regenerate the images and tables with:
@@ -263,6 +264,17 @@ page:
 page" section should be updated to match this page.
 
 ## Risks to verify in a browser
+
+**One browser check so far (2026-10-13).** In the Claude desktop app's built-in Chromium pane, on
+macOS, with the `compositing` effect over a light and a dark stage:
+
+- The default (`luminance`, underlay 0.3) looks as the headless composite predicted, on both.
+- `additive` (alpha 0 everywhere) showed **nothing at all**, over the dark stage as well as the
+  light one. The headless arithmetic says it should be the brightest result over dark.
+
+That was seen through the pane's screenshots, so it does not separate the page compositor from the
+capture path; either way it is the undefined case of risk 1 turning out badly rather than well.
+Safari, Firefox, Chrome proper and the CSS blend presets are still unchecked.
 
 1. **Colour brighter than alpha.** `additive` writes `rgb > alpha` in every pixel, and `coverage`
    in every flame pixel. For a premultiplied WebGPU canvas shown on screen the specification says
