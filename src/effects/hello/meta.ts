@@ -11,7 +11,7 @@ export const meta: EffectMeta = {
   scorecard: {
     compute: false,
     mobile: 'untested',
-    flash: 'none',
+    flash: 'low',
     lightPage: 'yes',
     features: { required: [] },
     fallback: 'A static image in the same palette, or a dark CSS gradient.',

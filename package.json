@@ -13,7 +13,8 @@
     "format:check": "prettier --check --ignore-unknown \"src/**\" \"tests/**\" \"scripts/**\" \"*.{ts,js,json,html}\"",
     "test": "vitest run",
     "study": "node scripts/study.mjs",
-    "shot": "node scripts/shot.mjs"
+    "shot": "node scripts/shot.mjs",
+    "posters": "node scripts/posters.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
