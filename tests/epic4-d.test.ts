@@ -27,10 +27,12 @@ describe('fire ring geometry (ring-math.wgsl)', () => {
       ]),
       0,
     );
-    expect(out[0]).toBeCloseTo(0, 6);
-    expect(out[1]).toBeCloseTo(0.25, 6);
-    expect(out[2]).toBeCloseTo(-0.25, 6);
-    expect(out[3]).toBeCloseTo(0.125, 6);
+    // Five places, not six: this is atan2 in single precision on the GPU, and drivers round it
+    // differently (Mesa's software rasteriser is 5e-7 off where Metal is exact).
+    expect(out[0]).toBeCloseTo(0, 5);
+    expect(out[1]).toBeCloseTo(0.25, 5);
+    expect(out[2]).toBeCloseTo(-0.25, 5);
+    expect(out[3]).toBeCloseTo(0.125, 5);
     // The jump is at six o'clock: just clockwise of it is +0.5, just past it -0.5.
     expect(out[4]).toBeCloseTo(0.5, 3);
     expect(out[5]).toBeCloseTo(-0.5, 3);
