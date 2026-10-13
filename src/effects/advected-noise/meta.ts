@@ -4,7 +4,7 @@ export const meta: EffectMeta = {
   id: 'advected-noise',
   title: 'Advected noise',
   epic: '3',
-  tier: 'A',
+  tier: 'B',
   tags: ['building-block', 'noise', 'motion'],
   summary:
     'Ways to make noise look carried by rising gas instead of sliding past as one texture, side by side on the same heat field: scroll, domain warp, flow noise, curl displacement, a two-phase flow blend, and the combination that measures best.',

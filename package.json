@@ -15,7 +15,8 @@
     "study": "node scripts/study.mjs",
     "shot": "node scripts/shot.mjs",
     "posters": "node scripts/posters.mjs",
-    "deploy": "npm run build && wrangler pages deploy dist --project-name firetemple --branch main"
+    "deploy": "npm run build && wrangler pages deploy dist --project-name firetemple --branch main",
+    "browser-check": "node scripts/browser-check.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

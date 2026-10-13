@@ -28,13 +28,13 @@ The ember bed and the low flames are a stand-in heat source with a small local c
 
 ## Cost
 
-GPU time, measured: 1.2 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. What can be counted from the code:
+GPU time, measured: 1.2 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 4.2 ms for one frame at 1080p and 60 fps (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. What can be counted from the code:
 
 - **Passes per frame:** one fullscreen pass, then the tail (bloom chain and output). The backdrop pass and its mip chain run only on a resize or a change of backdrop.
 - **Per pixel, above the heat:** one texture tap, no noise.
 - **Per pixel, in heated air:** 4 gradient-noise evaluations (2 for the mask, 2 with derivatives for the offset, roughly 5 plain evaluations of work) and 3 trilinear taps.
 - **Flame band** (the bottom quarter): 4 more noise evaluations. **Ember bed** (the bottom tenth): 5 two-dimensional noise evaluations and one Voronoi lookup (9 hashes), and no haze where a coal covers the backdrop.
-- With `heat height` at its default the mask is evaluated over about 60% of the picture, so the average over the whole frame is about 4 noise evaluations and 2 to 3 taps per pixel. That count is inside the Tier A rule of thumb (about six noise evaluations per pixel), which is why the tier is A; it has not been confirmed by a benchmark.
+- With `heat height` at its default the mask is evaluated over about 60% of the picture, so the average over the whole frame is about 4 noise evaluations and 2 to 3 taps per pixel. That count is inside the Tier A rule of thumb (about six noise evaluations per pixel), which is why it was first marked Tier A. Measured in Chrome, a 1080p frame of this scene reads 4.2 ms on the M1 Max, so it is marked Tier B; the backdrop it draws is part of that.
 
 Texture memory, beyond the tail's own targets: the backdrop, 4 bytes per pixel plus a third for mips. At 1920 × 1080 that is 11.1 MB. Cost scales with the canvas area and with `heat height`; `scale`, `strength` and `rise speed` do not change it. Setting `colour split` to 0 does not save the two extra taps in this shader; call `haze_sample` instead of `haze_sample_soft` if you do not want them.
 
@@ -54,7 +54,7 @@ Texture memory, beyond the tail's own targets: the backdrop, 4 bytes per pixel p
 
 ## When to use it
 
-Use it for the air above anything hot that the canvas already draws: a flame, an ember bed, an exhaust, a sunlit road in a hero illustration. It is the cheapest way to make a fire feel hot rather than merely bright, and at Tier A cost by count it can sit on top of most other effects. It also works over a photograph or a video frame uploaded as a texture.
+Use it for the air above anything hot that the canvas already draws: a flame, an ember bed, an exhaust, a sunlit road in a hero illustration. It is the cheapest way to make a fire feel hot rather than merely bright, and at a few noise evaluations per pixel it can sit on top of most other effects. It also works over a photograph or a video frame uploaded as a texture.
 
 Keep it subtle. The default preset is close to what a real fire does; the furnace preset is as far as it goes before it stops looking like air.
 

@@ -127,9 +127,15 @@ for (const row of report.rows) {
   const sample = {
     device: report.device,
     deviceClass: report.deviceClass,
+    method: 'marginal',
     ms: Math.max(0.01, +row.slopeMs.toFixed(2)),
   };
-  entry.gpuMs = [...(entry.gpuMs ?? []).filter((s) => s.device !== report.device), sample];
+  entry.gpuMs = [
+    ...(entry.gpuMs ?? []).filter(
+      (s) => s.device !== report.device || (s.method ?? 'marginal') !== 'marginal',
+    ),
+    sample,
+  ];
 }
 if (bundles) {
   for (const [id, entry] of Object.entries(bundles.effects)) {

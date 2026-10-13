@@ -18,7 +18,16 @@ export default defineConfig(
   {
     // Build and study scripts run in Node.
     files: ['scripts/**/*.mjs'],
-    languageOptions: { globals: { process: 'readonly', console: 'readonly' } },
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        WebSocket: 'readonly',
+      },
+    },
   },
   prettier,
 );

@@ -44,7 +44,7 @@ Measured on the GPU for one card (`tests/smoke-light.test.ts`): the analytic sha
 
 ## Cost
 
-GPU time, measured: 1.7 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. By shadow method: none 1.6 ms, hard 1.7 ms, soft 1.8 ms, traced 3.3 ms, traced-classic 3.3 ms.
+GPU time, measured: 1.7 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 4.7 ms for one frame at 1080p and 60 fps (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. By shadow method: none 1.6 ms, hard 1.7 ms, soft 1.8 ms, traced 3.3 ms, traced-classic 3.3 ms.
 
 Passes per frame: one fullscreen light pass at canvas resolution, then the tail (bloom chain from half resolution, output pass). The ground bake is one more fullscreen pass, run only when the canvas is resized.
 
@@ -75,7 +75,7 @@ The flicker is a per-light constant computed per pixel. It is there so the share
 
 ## When to use it
 
-Tier A in intent: one fullscreen pass with no per-pixel noise and, with `soft`, no loops over distance, but the A budget is set for an integrated GPU and only an M1 Max has been measured (see Cost). Reach for it when fire shares the screen with things it should light: cards on a dark page, a top-down scene, a cursor that carries a torch. The chunk is the reusable part: take `firelight_disc` or `firelight_point` for the falloff, `firelight_shadow_soft` with the page's own cards, `firelight_tint` for the colour.
+Tier A in intent (one fullscreen pass with no per-pixel noise and, with `soft`, no loops over distance) but marked Tier B: in Chrome its frame reads 4.7 ms at 1080p on the M1 Max, over the A budget even there. Reach for it when fire shares the screen with things it should light: cards on a dark page, a top-down scene, a cursor that carries a torch. The chunk is the reusable part: take `firelight_disc` or `firelight_point` for the falloff, `firelight_shadow_soft` with the page's own cards, `firelight_tint` for the colour.
 
 It does not fit when the occluders are not rectangles (use the per-step functions and march your own SDF, at the traced cost), when there are more than 8 of them in view (cull to the nearest 8, or bake an occluder mask), or when the page is light, where a multiply or underlay pass is the missing piece. Where WebGPU is unavailable, a radial-gradient glow and CSS drop shadows offset away from it carry most of the idea.
 

@@ -4,7 +4,7 @@ export const meta: EffectMeta = {
   id: 'heat-haze',
   title: 'Heat haze',
   epic: '3',
-  tier: 'A',
+  tier: 'B',
   tags: ['building-block', 'refraction', 'distortion'],
   summary:
     'Rising hot air bends what is behind it: a noise-driven refraction of a backdrop texture, masked by heat, with a faint colour fringe and softening where it is hottest.',

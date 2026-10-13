@@ -31,7 +31,7 @@ One fullscreen fragment pass into the `rgba16float` scene target, then the tail 
 
 Per pixel the flame costs six noise evaluations (2 for the sway, 4 for the erosion) and about 50 arithmetic operations, one square root and four `pow` for the shaping. Pixels outside `flame_reach` (a box around the silhouette widened by the sway) skip the noise entirely; the shape panel never evaluates noise. In the unit test a box of 2.4 by 2.2 flame heights around the default flame is 91% outside the reach. In the three-panel view at 16:9 the two reach boxes cover roughly a fifth of the canvas by area (calculated from the layout, not counted).
 
-GPU time, measured: 1.0 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. Texture memory is one `rgba16float` target at canvas size plus the bloom levels.
+GPU time, measured: 1.0 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 2.1 ms for one frame at 1080p and 60 fps (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. Texture memory is one `rgba16float` target at canvas size plus the bloom levels.
 
 What scales the cost: canvas area, and the fraction of it inside the reach box, which grows with `width` and `turbulence`. The single-stage `flame` view at a large `height` is the expensive case.
 
@@ -51,7 +51,7 @@ Whole-frame brightness, measured from headless renders at 480 by 270 over three 
 
 ## When to use it
 
-As a reference, and as a tuning bench. Pick a shape, set width, turbulence, erosion and falloff until the silhouette is right, then carry the numbers into `FlameParams` in the effect you are building. The `flame` view on its own is a serviceable single flame for a card or a hero (Tier A: six noise evaluations inside a small box), but the candle, torch and fireplace effects built on this chunk are the ones to ship.
+As a reference, and as a tuning bench. Pick a shape, set width, turbulence, erosion and falloff until the silhouette is right, then carry the numbers into `FlameParams` in the effect you are building. The `flame` view on its own is a serviceable single flame for a card or a hero (Tier A by count: six noise evaluations inside a small box; the three-panel scene as a whole is marked Tier B, since in Chrome it reads 2.1 ms at 1080p on the M1 Max), but the candle, torch and fireplace effects built on this chunk are the ones to ship.
 
 Starting points: `flame_params_default()` (teardrop, half-width 0.19) for a single flame of the candle or lighter kind; the taper with `base_soft = 0`, `hot = 0` for anything that leaves a burner, a torch head or a row of jets. When the flame should spread, roll and never repeat, a simulation is the right tool and this is not.
 

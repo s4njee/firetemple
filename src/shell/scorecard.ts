@@ -98,7 +98,7 @@ export interface CostRow {
 /** One row per measured reference device; empty when nothing has been measured. */
 export function costRows(tier: Tier, gpuMs: Scorecard['gpuMs']): CostRow[] {
   const { budgetMs, reference } = TIERS[tier];
-  return (gpuMs ?? []).map(({ device, ms, deviceClass }) => {
+  return (gpuMs ?? []).map(({ device, ms, deviceClass, method }) => {
     // The A and B budgets are for an integrated GPU. A time from a faster kind of GPU can show
     // an effect is over budget, but it cannot show that it fits.
     const faster = tier !== 'C' && (deviceClass === 'apple-silicon' || deviceClass === 'discrete');
@@ -109,14 +109,16 @@ export function costRows(tier: Tier, gpuMs: Scorecard['gpuMs']): CostRow[] {
       : ms <= budgetMs
         ? `under ${budgetMs} ms here, but the budget is for ${reference}, which this is not`
         : `over the ${budgetMs} ms budget even on this faster GPU`;
-    return { device, value: formatMs(ms), verdict };
+    const how = method === 'browser-span' ? 'one frame, in the browser' : 'per frame, on Dawn';
+    return { device: method ? `${device} (${how})` : device, value: formatMs(ms), verdict };
   });
 }
 
 /** What `npm run study` recorded for one effect (src/effects/measured.json). */
 export type Measured = Pick<Scorecard, 'gpuMs' | 'bundleKb'>;
 
-const MEASURED: Readonly<Record<string, Measured>> = measured;
+// JSON widens `method` to string; the two scripts that write the file only use the two values.
+const MEASURED = measured as Readonly<Record<string, Measured>>;
 
 /** The hand-written verdict with the benchmark's numbers laid over it; measurements win. */
 export function withMeasured(

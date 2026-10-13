@@ -28,7 +28,7 @@ Two stages: the scene pass at full resolution, then the tail (bloom and output).
 
 Per pixel the scene evaluates up to 15 octaves of gradient noise: 9 for the flame (2 for the lean, 3 for the wobble, 4 for the edge) and 6 for the smoke (2 for the drift, 4 for the density). Pixels inside the logs add 5 more. Pixels outside the flame's box and below the smoke return early.
 
-GPU time, measured: 1.5 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. Texture memory is one `rgba16float` target at canvas size plus the bloom levels, about a third as much again.
+GPU time, measured: 1.5 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 4.2 ms for one frame at 1080p and 60 fps (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. Texture memory is one `rgba16float` target at canvas size plus the bloom levels, about a third as much again.
 
 ## Pitfalls
 
@@ -45,7 +45,7 @@ GPU time, measured: 1.5 ms per frame at 1920 × 1080 with the default settings, 
 
 As a reference when making any effect that sits on the page instead of in a box: spread `OVERLAY_PARAMS`, keep the defaults, write coverage into scene alpha for whatever should block the page, then look at it over the light theme and fill in `scorecard.lightPage` honestly. The study lists when an effect should be marked dark-theme-only: light with little hue, effects that are mostly glow, and anything that depends on being brighter than paper white.
 
-As decoration it is a small Tier A campfire. A transparent animated image would do the same job; the shader earns its place only if the flame has to respond to something.
+As decoration it is a small campfire, marked Tier B because in Chrome a full 1080p canvas of it reads 4.2 ms on the M1 Max; at the size of a card it would be far less. A transparent animated image would do the same job; the shader earns its place only if the flame has to respond to something.
 
 ## References
 

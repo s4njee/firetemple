@@ -4,7 +4,7 @@ export const meta: EffectMeta = {
   id: 'flame-shape',
   title: 'Flame shaping',
   epic: '3',
-  tier: 'A',
+  tier: 'B',
   tags: ['building-block', 'flame', 'sdf'],
   summary:
     'One flame at three stages: a teardrop or taper distance field, the heat left after turbulence and erosion, and that heat through the fire ramp.',

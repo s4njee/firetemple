@@ -52,7 +52,7 @@ The argument also holds for a weighted mix of lights that share one `rate` (ever
 
 ## Cost
 
-GPU time, measured: 1.2 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`.
+GPU time, measured: 1.2 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 1.6 ms for one frame at 1080p and 60 fps (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`.
 
 What the cost is made of: one `flicker_intensity` is 9 `pcg_2d` hashes and three quadratic polynomials; one `flicker_offset` is 6 hashes. No textures, no branches. This scene evaluates two intensities and one or two offsets per texel of the signal texture, which is three rows of at most 2048 texels, so the noise work is a few thousand evaluations a frame however large the canvas is. The scene pass does up to five texel loads per pixel and no noise; the tail is the same as on every effect.
 

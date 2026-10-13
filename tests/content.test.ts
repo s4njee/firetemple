@@ -278,6 +278,14 @@ describe('scorecard formatting', () => {
       'under 2 ms here, but the budget is for an integrated GPU, which this is not',
     );
     expect(over?.verdict).toBe('over the 2 ms budget even on this faster GPU');
+    // The device is labelled with how the time was taken, when that is known.
+    const [dawn, chrome] = costRows('A', [
+      { ...fast, ms: 1.2, method: 'marginal' },
+      { ...fast, ms: 3.7, method: 'browser-span' },
+    ]);
+    expect(dawn?.device).toBe('M1 Max (per frame, on Dawn)');
+    expect(chrome?.device).toBe('M1 Max (one frame, in the browser)');
+    expect(chrome?.verdict).toBe('over the 2 ms budget even on this faster GPU');
     // Tier C's budget is defined on this class of GPU, and an integrated GPU is the reference
     // for A and B, so both are judged directly.
     expect(costRows('C', [{ ...fast, ms: 9 }])[0]?.verdict).toBe('within the 12 ms budget');

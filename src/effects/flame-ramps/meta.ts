@@ -4,7 +4,7 @@ export const meta: EffectMeta = {
   id: 'flame-ramps',
   title: 'Flame colour ramps',
   epic: '3',
-  tier: 'A',
+  tier: 'B',
   tags: ['building-block', 'colour'],
   summary:
     'One flame through eight colour ramps: blackbody, an authored fire gradient, a banded toon ramp, a blue gas flame and four chemical tints, each as a formula and as a baked texture.',

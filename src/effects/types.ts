@@ -55,6 +55,13 @@ export interface Scorecard {
      * budgets are set for an integrated GPU, so a time from a faster class does not settle them.
      */
     deviceClass?: string;
+    /**
+     * How the time was taken. `marginal` (the default) is the cost of one more frame of the same
+     * work, measured on Dawn by `npm run study`. `browser-span` is one frame alone as a browser
+     * reports it (`npm run browser-check`): it includes the browser's timing floor and is what a
+     * visitor's machine actually does.
+     */
+    method?: 'marginal' | 'browser-span';
   }[];
 }
 

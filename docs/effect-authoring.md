@@ -166,11 +166,16 @@ holds a still frame; an effect must look right as one.
 
 1. Two or more presets, and parameters that are worth exposing (not every constant).
 2. `meta.scorecard` filled in honestly, including `flash` and `lightPage`. Leave `gpuMs` and
-   `bundleKb` out: they come from benchmark runs (`npm run study`), not from a glance at the HUD.
+   `bundleKb` out: they come from `npm run study` (per-frame cost on Dawn) and
+   `npm run browser-check -- --device <name> --class <kind>` (one frame as Chrome reports it), not
+   from a glance at the HUD. The tier is the lowest one whose budget neither number exceeds; an A
+   or B label stays provisional until an integrated GPU has been measured.
 3. `notes.md` follows the template. Put rough HUD readings in "Cost", labelled with the device,
    resolution and "indicative".
 4. Works in the page contexts (`&layout=hero`, `cards`, `band`, `backdrop`) at their sizes, at
-   phone width, and in both themes.
+   phone width, and over both page tones. `npm run browser-check -- --effects <id>` (with the dev
+   server running) loads all of them in headless Chrome, fails on a view that does not start,
+   logs an error or draws nothing, and writes screenshots to `output/browser/<id>/`: look at them.
 5. `npx vitest run` passes: `tests/effects.test.ts` runs every effect headlessly for three frames
    and fails on any validation error or a blank result; `tests/content.test.ts` checks the notes,
    scorecard and presets.

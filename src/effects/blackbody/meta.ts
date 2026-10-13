@@ -4,7 +4,7 @@ export const meta: EffectMeta = {
   id: 'blackbody',
   title: 'Blackbody colour',
   epic: '3',
-  tier: 'B',
+  tier: 'C',
   tags: ['building-block', 'colour'],
   summary:
     'Temperature to colour three ways (Planck integral, polynomial fit, lookup texture) with their error, and a brightness mapping tamed enough to use.',

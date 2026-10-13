@@ -56,7 +56,7 @@ In the other modes: `coverage` looks the same for the smoke and leaves the flame
 
 ## Cost
 
-GPU time, measured: 4.7 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. By self-shadowing option: none 3.4 ms, gradient 4.3 ms, march 6.6 ms. By step count: 16 2.6 ms, 32 4.7 ms, 64 8.8 ms.
+GPU time, measured: 4.7 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 8.0 ms for one frame at 1080p and 60 fps (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. By self-shadowing option: none 3.4 ms, gradient 4.3 ms, march 6.6 ms. By step count: 16 2.6 ms, 32 4.7 ms, 64 8.8 ms.
 
 - Passes: the march, an upsample when the march ran at reduced size, then the tail (bloom chain and output).
 - Resolution: the march never runs taller than 540 px. On a taller canvas it renders into its own `rgba16float` target at `540 / height` of the size (no less than a third) and is stretched bilinearly, so at 1080p it shades a quarter of the pixels. That target is 8 bytes per pixel, about 4 MB at 1080p, on top of the tail's.
