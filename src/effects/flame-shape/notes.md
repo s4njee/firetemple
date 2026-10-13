@@ -31,7 +31,7 @@ One fullscreen fragment pass into the `rgba16float` scene target, then the tail 
 
 Per pixel the flame costs six noise evaluations (2 for the sway, 4 for the erosion) and about 50 arithmetic operations, one square root and four `pow` for the shaping. Pixels outside `flame_reach` (a box around the silhouette widened by the sway) skip the noise entirely; the shape panel never evaluates noise. In the unit test a box of 2.4 by 2.2 flame heights around the default flame is 91% outside the reach. In the three-panel view at 16:9 the two reach boxes cover roughly a fifth of the canvas by area (calculated from the layout, not counted).
 
-GPU time per device: not measured yet. Texture memory is one `rgba16float` target at canvas size plus the bloom levels.
+GPU time, measured: 1.0 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. Texture memory is one `rgba16float` target at canvas size plus the bloom levels.
 
 What scales the cost: canvas area, and the fraction of it inside the reach box, which grows with `width` and `turbulence`. The single-stage `flame` view at a large `height` is the expensive case.
 

@@ -97,12 +97,20 @@ export interface CostRow {
 
 /** One row per measured reference device; empty when nothing has been measured. */
 export function costRows(tier: Tier, gpuMs: Scorecard['gpuMs']): CostRow[] {
-  const { budgetMs } = TIERS[tier];
-  return (gpuMs ?? []).map(({ device, ms }) => ({
-    device,
-    value: formatMs(ms),
-    verdict: ms <= budgetMs ? `within the ${budgetMs} ms budget` : `over the ${budgetMs} ms budget`,
-  }));
+  const { budgetMs, reference } = TIERS[tier];
+  return (gpuMs ?? []).map(({ device, ms, deviceClass }) => {
+    // The A and B budgets are for an integrated GPU. A time from a faster kind of GPU can show
+    // an effect is over budget, but it cannot show that it fits.
+    const faster = tier !== 'C' && (deviceClass === 'apple-silicon' || deviceClass === 'discrete');
+    const verdict = !faster
+      ? ms <= budgetMs
+        ? `within the ${budgetMs} ms budget`
+        : `over the ${budgetMs} ms budget`
+      : ms <= budgetMs
+        ? `under ${budgetMs} ms here, but the budget is for ${reference}, which this is not`
+        : `over the ${budgetMs} ms budget even on this faster GPU`;
+    return { device, value: formatMs(ms), verdict };
+  });
 }
 
 /** What `npm run study` recorded for one effect (src/effects/measured.json). */

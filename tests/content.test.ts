@@ -268,6 +268,24 @@ describe('scorecard formatting', () => {
     expect(rows[1]?.verdict).toBe('over the 2 ms budget');
   });
 
+  it('does not let a faster GPU settle a budget that is set for an integrated one', () => {
+    const fast = { device: 'M1 Max', deviceClass: 'apple-silicon' };
+    const [fits, over] = costRows('A', [
+      { ...fast, ms: 1.2 },
+      { ...fast, ms: 2.6 },
+    ]);
+    expect(fits?.verdict).toBe(
+      'under 2 ms here, but the budget is for an integrated GPU, which this is not',
+    );
+    expect(over?.verdict).toBe('over the 2 ms budget even on this faster GPU');
+    // Tier C's budget is defined on this class of GPU, and an integrated GPU is the reference
+    // for A and B, so both are judged directly.
+    expect(costRows('C', [{ ...fast, ms: 9 }])[0]?.verdict).toBe('within the 12 ms budget');
+    expect(
+      costRows('B', [{ device: 'UHD 620', deviceClass: 'integrated', ms: 5 }])[0]?.verdict,
+    ).toBe('within the 6 ms budget');
+  });
+
   it('reports whether this device has a feature, or that it is still unknown', () => {
     const set = new Set(['timestamp-query']);
     expect(featureStatus('timestamp-query', set)).toBe('available');

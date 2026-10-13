@@ -1,11 +1,132 @@
 {
+  "advected-noise": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 1.59
+      }
+    ],
+    "bundleKb": 39.2
+  },
+  "blackbody": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 2.69
+      }
+    ],
+    "bundleKb": 26.7
+  },
+  "bloom-tuning": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 0.46
+      }
+    ],
+    "bundleKb": 19.9
+  },
+  "compositing": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 1.53
+      }
+    ],
+    "bundleKb": 26.3
+  },
+  "fire-light": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 1.66
+      }
+    ],
+    "bundleKb": 44.5
+  },
+  "flame-ramps": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 0.72
+      }
+    ],
+    "bundleKb": 40.7
+  },
+  "flame-shape": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 0.98
+      }
+    ],
+    "bundleKb": 38.3
+  },
+  "flicker": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 1.2
+      }
+    ],
+    "bundleKb": 29.4
+  },
+  "heat-haze": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 1.18
+      }
+    ],
+    "bundleKb": 36.2
+  },
   "hello": {
     "gpuMs": [
       {
         "device": "Apple M1 Max",
-        "ms": 2.77
+        "deviceClass": "apple-silicon",
+        "ms": 2.47
       }
     ],
-    "bundleKb": 21.5
+    "bundleKb": 22.7
+  },
+  "smoke-shading": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 4.67
+      }
+    ],
+    "bundleKb": 38.6
+  },
+  "soft-sprites": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 0.48
+      }
+    ],
+    "bundleKb": 41.6
+  },
+  "volume-march": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "ms": 6.73
+      }
+    ],
+    "bundleKb": 56.9
   }
 }

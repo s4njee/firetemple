@@ -4,7 +4,7 @@ export const meta: EffectMeta = {
   id: 'hello',
   title: 'Hello, fire',
   epic: '1',
-  tier: 'A',
+  tier: 'B',
   tags: ['foundation'],
   summary:
     'Rising warped noise through the HDR tail. Exists to exercise the foundation end to end.',

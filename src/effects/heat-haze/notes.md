@@ -28,7 +28,7 @@ The ember bed and the low flames are a stand-in heat source with a small local c
 
 ## Cost
 
-GPU time: not measured yet. What can be counted from the code:
+GPU time, measured: 1.2 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. What can be counted from the code:
 
 - **Passes per frame:** one fullscreen pass, then the tail (bloom chain and output). The backdrop pass and its mip chain run only on a resize or a change of backdrop.
 - **Per pixel, above the heat:** one texture tap, no noise.

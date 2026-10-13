@@ -37,7 +37,7 @@ One fullscreen pass plus the tail. The flame costs six noise evaluations per pix
 | `ramp_blackbody`                          | about 40 ALU ops and 3 `exp`/`log`                |
 | `ramp_lookup`                             | one bilinear fetch; a texture and sampler binding |
 
-The texture is 8 rows of 64 half-float texels: 4 KB. GPU time per device: not measured yet.
+The texture is 8 rows of 64 half-float texels: 4 KB. GPU time, measured: 0.7 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`.
 
 ## Pitfalls
 

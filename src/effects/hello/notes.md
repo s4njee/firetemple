@@ -23,7 +23,7 @@ The tail (`createHdrTail`, `src/gpu/post/tail.ts`) then blooms everything above 
 
 Three stages: the noise pass at full resolution, the bloom chain (starting at half resolution; five levels at 1080p, fewer on a smaller canvas), and the output pass. Per pixel the noise pass evaluates gradient noise about 11 times: 6 for the warp (two 3-octave fields) and 5 for the pattern.
 
-GPU time per device: not measured yet. The Scorecard tab shows a live, indicative reading once the browser reports pass timings. Texture memory is one `rgba16float` target at canvas size plus the bloom levels, about a third as much again.
+GPU time, measured: 2.5 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-1.md`. That is over the Tier A budget of 2 ms even on this GPU, which is why `hello` is marked Tier B. Texture memory is one `rgba16float` target at canvas size plus the bloom levels, about a third as much again.
 
 ## Pitfalls
 

@@ -46,7 +46,16 @@ export interface Scorecard {
    * Measured GPU time per frame, per reference device, from a benchmark run (Epic 13), not from
    * a glance at the HUD. `resolution` is given when it was not measured at 1080p.
    */
-  gpuMs?: readonly { device: string; ms: number; resolution?: string }[];
+  gpuMs?: readonly {
+    device: string;
+    ms: number;
+    resolution?: string;
+    /**
+     * What kind of GPU it is: `integrated`, `apple-silicon`, `discrete`, `phone`. The A and B
+     * budgets are set for an integrated GPU, so a time from a faster class does not settle them.
+     */
+    deviceClass?: string;
+  }[];
 }
 
 export type ParamDef =

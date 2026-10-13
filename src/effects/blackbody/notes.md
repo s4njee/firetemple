@@ -42,7 +42,7 @@ One fullscreen pass plus the tail. Per pixel:
 | `blackbody_lookup`    | one bilinear fetch and about 6 ALU ops; 512 bytes of texture |
 | `blackbody_intensity` | 3 `exp`/`log` on top of any route                            |
 
-GPU time per device: not measured yet. This scene is Tier B only because the reference runs on every pixel of a third of the rows and behind both error rows; nobody would ship that route per pixel. The fit and the lookup are both small enough for a Tier A effect.
+GPU time, measured: 2.7 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. This scene is Tier B only because the reference runs on every pixel of a third of the rows and behind both error rows; nobody would ship that route per pixel. The fit and the lookup are both small enough for a Tier A effect.
 
 ## Pitfalls
 

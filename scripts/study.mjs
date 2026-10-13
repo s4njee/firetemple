@@ -76,6 +76,8 @@ const lines = [
   '',
   report.note,
   '',
+  "Two limits on reading these numbers. Repeated runs of a light effect differ by up to about half a millisecond (see the Range column), and a GPU's clock follows its load, so a light effect can read slower per unit of work than a heavy one: differences under about half a millisecond mean nothing. And the Tier A and B budgets are set for an integrated GPU; a time measured on a faster one can show an effect is over budget but cannot show that it fits.",
+  '',
 ];
 for (const size of sizesMeasured) {
   lines.push(`## ${size.replace('x', ' × ')}`, '');
@@ -122,7 +124,11 @@ for (const row of report.rows) {
   if (row.config !== 'default' || row.width !== 1920 || row.height !== 1080) continue;
   if (!Number.isFinite(row.slopeMs) || row.metric !== 'gpu-timestamp') continue;
   const entry = (measured[row.effect] ??= {});
-  const sample = { device: report.device, ms: Math.max(0.01, +row.slopeMs.toFixed(2)) };
+  const sample = {
+    device: report.device,
+    deviceClass: report.deviceClass,
+    ms: Math.max(0.01, +row.slopeMs.toFixed(2)),
+  };
   entry.gpuMs = [...(entry.gpuMs ?? []).filter((s) => s.device !== report.device), sample];
 }
 if (bundles) {

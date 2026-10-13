@@ -26,7 +26,7 @@ The fade distance here is a multiple of each sprite's own size, not a world dist
 
 ## Cost
 
-GPU time per device: not measured yet. What can be counted:
+GPU time, measured: 0.5 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. What can be counted:
 
 - Passes: the scene, one sprite pass (two half-screen ones in `split`), then the tail.
 - Per sprite pixel: one depth texel load, a divide and a `pow` for the fade, and one `sqrt` or `exp` for the shape. No texture sampling, no loop.

@@ -52,13 +52,13 @@ The argument also holds for a weighted mix of lights that share one `rate` (ever
 
 ## Cost
 
-GPU time: not measured yet.
+GPU time, measured: 1.2 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`.
 
 What the cost is made of: one `flicker_intensity` is 9 `pcg_2d` hashes and three quadratic polynomials; one `flicker_offset` is 6 hashes. No textures, no branches. This scene evaluates two intensities and one or two offsets per texel of the signal texture, which is three rows of at most 2048 texels, so the noise work is a few thousand evaluations a frame however large the canvas is. The scene pass does up to five texel loads per pixel and no noise; the tail is the same as on every effect.
 
 The TypeScript twin took about 0.12 microseconds per intensity in Node 26 on the Apple Silicon development machine (one million evaluations in 117 ms; indicative). This page calls it three times a frame, for the dots.
 
-Texture memory: the signal texture is at most 2048 x 3 `rgba16float` (48 kB), plus the tail's scene target and bloom levels. Bundle size: not measured yet.
+Texture memory: the signal texture is at most 2048 x 3 `rgba16float` (48 kB), plus the tail's scene target and bloom levels. Bundle size: 29.4 kB gzipped for everything the effect loads beyond the first page.
 
 ## Pitfalls
 
