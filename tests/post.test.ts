@@ -3,7 +3,10 @@ import { configureCanvasHdr, displaySupportsHdr } from '../src/gpu/canvas.ts';
 import { blit } from '../src/gpu/passes/blit.ts';
 import {
   bloomLevelSizes,
+  bloomLevelsForSize,
+  bloomWorkload,
   createBloom,
+  createHdrTail,
   createOutputPass,
   createPostChain,
   MAX_BLOOM_LEVELS,
@@ -132,6 +135,78 @@ describe('bloom level sizes', () => {
     expect(bloomLevelSizes(4, 4)).toEqual([[2, 2]]);
     expect(bloomLevelSizes(1, 1)).toEqual([[1, 1]]);
     expect(bloomLevelSizes(64, 64, false)[0]).toEqual([64, 64]);
+  });
+});
+
+describe('automatic bloom level count', () => {
+  it('keeps the coarsest level about the same fraction of the image at every size', () => {
+    expect(bloomLevelsForSize(1920, 1080)).toBe(5);
+    expect(bloomLevelsForSize(960, 540)).toBe(4);
+    expect(bloomLevelsForSize(480, 270)).toBe(3);
+    expect(bloomLevelsForSize(3840, 2160)).toBe(6);
+    // The shorter side decides, so a wide band and a tall phone screen behave alike.
+    expect(bloomLevelsForSize(1920, 270)).toBe(3);
+    expect(bloomLevelsForSize(540, 1170)).toBe(4);
+    // Full resolution needs one more level for the same reach.
+    expect(bloomLevelsForSize(1920, 1080, false)).toBe(6);
+    // Never fewer than one, never more than the image has room for.
+    expect(bloomLevelsForSize(64, 48)).toBe(1);
+    expect(bloomLevelsForSize(1, 1)).toBe(1);
+    expect(bloomLevelsForSize(100000, 100000)).toBe(MAX_BLOOM_LEVELS);
+    for (const [w, h] of [
+      [1920, 1080],
+      [960, 540],
+      [480, 270],
+      [3840, 2160],
+    ] as const) {
+      const side = Math.min(...bloomLevelSizes(w, h)[bloomLevelsForSize(w, h) - 1]!);
+      expect(side).toBeGreaterThanOrEqual(24);
+      expect(side).toBeLessThanOrEqual(48);
+    }
+  });
+
+  it('is what the chain uses when no count is given', async () => {
+    const device = await getTestDevice();
+    const source = halfTexture(device, 256, 256, () => [3, 3, 3]);
+    const bloom = createBloom(device, { width: 256, height: 256 });
+    const labels: string[] = [];
+    const profiler = { pass: (label: string) => (labels.push(label), undefined) };
+    const downPasses = async () => {
+      labels.length = 0;
+      await expectValid(device, () =>
+        submit(device, (e) => bloom.encode(e, source.createView(), { intensity: 1 }, profiler)),
+      );
+      return labels.filter((label) => label === 'bloom-down').length;
+    };
+    expect(await downPasses()).toBe(bloomLevelsForSize(256, 256));
+    expect(bloom.levelSizes().length).toBe(3);
+    // A smaller image gets fewer levels, without being asked.
+    bloom.resize(128, 128);
+    expect(await downPasses()).toBe(2);
+    bloom.destroy();
+    source.destroy();
+  });
+
+  it('counts passes, texels and taps for a level count', () => {
+    const five = bloomWorkload(1920, 1080, 5);
+    expect(five.levels).toBe(5);
+    expect(five.passes).toBe(9);
+    const down = 960 * 540 + 480 * 270 + 240 * 135 + 120 * 68 + 60 * 34;
+    expect(five.texels).toBe(2 * down - 60 * 34);
+    expect(five.taps).toBe(13 * down + 9 * (down - 60 * 34));
+    expect(five.bytes).toBe(down * 8);
+    // Automatic is 5 at 1080p.
+    expect(bloomWorkload(1920, 1080)).toEqual(five);
+    // One level alone is one pass; levels past the first add little to the texel count.
+    const one = bloomWorkload(1920, 1080, 1);
+    expect(one).toMatchObject({ levels: 1, passes: 1, texels: 960 * 540 });
+    expect(bloomWorkload(1920, 1080, 8).texels / bloomWorkload(1920, 1080, 3).texels).toBeLessThan(
+      1.1,
+    );
+    // Full resolution is four times the work for the same count.
+    expect(bloomWorkload(1920, 1080, 5, false).texels / five.texels).toBeCloseTo(4, 1);
+    // Clamped to what the image allows.
+    expect(bloomWorkload(16, 16, 99).levels).toBe(2);
   });
 });
 
@@ -623,6 +698,50 @@ describe('post chain', () => {
       small.destroy();
     });
     await expectValid(device, () => chain.destroy());
+    target.destroy();
+  });
+});
+
+// --- Tail ----------------------------------------------------------------------------------------
+
+describe('HDR tail', () => {
+  const time = { time: 0, delta: 1 / 60, frame: 0 };
+  const values = { exposure: 1, bloom: 0.6, bloomThreshold: 1, bloomRadius: 0.7 };
+
+  it('lets overrides refine the bloom without switching it back on', async () => {
+    const device = await getTestDevice();
+    const labels: string[] = [];
+    const profiler = { pass: (label: string) => (labels.push(label), undefined) };
+    const tail = createHdrTail(device, { format: 'rgba8unorm' });
+    tail.resize(64, 48);
+    const target = device.createTexture({ size: [64, 48], format: 'rgba8unorm', usage: USAGE });
+    const run = (bloom: number, overrides?: Parameters<typeof tail.encode>[5]) => {
+      labels.length = 0;
+      return expectValid(device, () =>
+        submit(device, (encoder) =>
+          tail.encode(
+            encoder,
+            target.createView(),
+            time,
+            { ...values, bloom },
+            profiler,
+            overrides,
+          ),
+        ),
+      ).then(() => labels.filter((label) => label === 'bloom-down').length);
+    };
+
+    // The level count comes from the override; intensity, threshold and radius from the values.
+    expect(await run(0.6, { bloom: { levels: 2 } })).toBe(2);
+    expect(await run(0.6, { bloom: { levels: 1 } })).toBe(1);
+    // Bloom set to 0 stays off when an override only tunes it...
+    expect(await run(0, { bloom: { levels: 3, knee: 0.2 } })).toBe(0);
+    expect(labels).toEqual(['output']);
+    // ...and comes back only if the override names an intensity, or goes away if it says false.
+    expect(await run(0, { bloom: { intensity: 1, levels: 2 } })).toBe(2);
+    expect(await run(0.6, { bloom: false })).toBe(0);
+    expect(await run(0.6)).toBe(1);
+    tail.destroy();
     target.destroy();
   });
 });

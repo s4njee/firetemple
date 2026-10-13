@@ -1,6 +1,9 @@
 export {
+  BLOOM_COARSEST_SIDE,
   BLOOM_FORMAT,
   bloomLevelSizes,
+  bloomLevelsForSize,
+  bloomWorkload,
   createBloom,
   DEFAULT_BLOOM,
   MAX_BLOOM_LEVELS,
@@ -8,6 +11,7 @@ export {
   type Bloom,
   type BloomOptions,
   type BloomSettings,
+  type BloomWorkload,
 } from './bloom.ts';
 export {
   ALPHA_MODES,

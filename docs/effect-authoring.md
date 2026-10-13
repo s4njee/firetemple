@@ -77,7 +77,8 @@ tail.encode(encoder, target, time, params, profiler);
 ```
 
 - Units: 1.0 is SDR white, a paper-white page. Glowing embers are around 1 to 3, flame bodies 3 to
-  15, cores 15 to 50. Bloom takes what is above its threshold (default 1.0). If nothing in the
+  15, cores 15 to 50. Bloom takes what is above its threshold (default 1.0), and its level count
+  follows the canvas size, so the glow reaches the same share of the picture at any resolution. If nothing in the
   scene exceeds 1 the effect will look like orange paint; that is the bug, not the bloom settings.
 - Do not tonemap or sRGB-encode in the effect. The tail does both, once.
 - `tail.scene.view` changes on resize: read it every frame, and rebuild bind groups that hold it.
@@ -87,24 +88,37 @@ tail.encode(encoder, target, time, params, profiler);
 
 An effect that should sit on the page rather than fill its box also spreads `OVERLAY_PARAMS`, which
 adds `alpha`, `alphaGain` and `underlay` and makes the tail write a see-through result for the
-premultiplied canvas (`src/gpu/post/output.ts` documents each mode):
+premultiplied canvas. The canvas shows `rgb + (1 - alpha) * page`, and the tail writes the same
+`rgb` in every mode, so a mode is only a choice of how much page to hide
+([docs/compositing-study.md](compositing-study.md) has the pictures and numbers):
 
-- `additive`: alpha 0, the light is added to the page. Correct over dark pages; invisible over
-  white, which has nothing left to add to.
-- `coverage`: alpha is the scene's alpha. Draw premultiplied colour with real coverage (smoke,
-  char, silhouettes); bloom still lands outside it.
-- `luminance`: bright pixels cover the page instead of adding to it. Reads on any page.
-- `underlay` (0..1, with any mode): darkens the page around the light, using the bloom as a mask.
+- `luminance` (the default, with `underlay: 0.3`): alpha is at least the brightest output channel.
+  Over a dark page it is within a few 8-bit steps of additive light; over a light page the flame
+  still reads, by hue. It is always a valid premultiplied colour.
+- `additive`: alpha 0. Invisible over a light page, and colour brighter than its alpha is
+  something the WebGPU spec leaves undefined when displayed. Use it only knowingly.
+- `coverage`: alpha is the scene's own alpha. For scenes drawn with real coverage (smoke, char,
+  silhouettes). A flame has none, so on its own this shows smoke rising from nothing on a light
+  page; `luminance` already takes the larger of scene alpha and brightness.
+- `underlay` (0..1, with any mode): darkens the page around the light, using the bloom as the
+  mask, so it needs bloom on and reaches only as far as the bloom does.
 
-Check every overlay effect over both a dark and a light page (`&layout=hero` and the theme switch)
-and record the verdict in `scorecard.lightPage`.
+On a light page nothing can be brighter than the paper, so fire there is ink, not light. Check
+every overlay effect over both pages (the "Page" control, or `&page=light`) and record the verdict
+in `scorecard.lightPage`: `yes` for a saturated flame with a shape, `underlay` when the look needs
+the core to be the brightest thing (underlay 0.5 or more, or a backplate), `no` for light with
+little hue (sparks, steam), for effects that are mostly glow or that light the page, and for
+anything pixel-thin.
 
 ## Flicker
 
 Fire flickers, and flicker is a photosensitivity risk. WCAG 2.3.1 allows no more than three
 flashes in any second over a large area, and treats saturated red as worse. Keep whole-frame
 brightness changes slow (below about 3 Hz) and small (well under 10% of full white per swing),
-let fast motion be local, and fill in `scorecard.flash`. Under `prefers-reduced-motion` the shell
+let fast motion be local, and fill in `scorecard.flash`. `tests/flash.test.ts` measures every
+effect at its defaults (`tests/flash.ts` explains how) and fails when an effect is flashier than
+its scorecard says: `none` means no cell of the picture ever completes a flash, `low` means local
+flicker under the threshold, `high` is over it. Under `prefers-reduced-motion` the shell
 holds a still frame; an effect must look right as one.
 
 ## Helpers (use these before writing your own)
@@ -202,6 +216,9 @@ Rules of thumb for a Tier A effect, carried over from Water Temple's measurement
   already gives every effect a soft glow for free; do not compute a second one.
 
 ## Checking in the browser
+
+`npm run shot -- <id> [--preset p] [--times 1,3] [--bg dark,light]` renders an effect without a
+browser and writes PNGs to `output/shots/`, which is the quick way to look at a change.
 
 `npm run dev`, then `?effect=<id>&hud=1`. The HUD shows per-pass GPU time against the tier budget.
 Shader errors appear in an overlay with the original file and line; edits hot-reload without a

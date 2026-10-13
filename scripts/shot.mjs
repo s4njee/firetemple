@@ -2,10 +2,14 @@
 // command line (and by an agent, which can open the image).
 //
 //   npm run shot -- <effect> [--preset name] [--times 1,3] [--size 960x540]
-//                            [--bg dark,light] [--params '{"speed":2}'] [--out output/shots]
+//                            [--bg dark,light] [--params '{"speed":2}'] [--tag name]
+//                            [--out output/shots]
 //
 // --bg composites the (premultiplied) result over a page colour: black, dark, light or white.
-// Give several to check an overlay effect on each. Files are <out>/<effect>[-preset]-<t>s[-bg].png.
+// Give several to check an overlay effect on each. Files are
+// <out>/<effect>[-preset][-tag]-<t>s[-bg].png; the tag defaults to the --params given, so two
+// renders with different parameters do not overwrite each other. A shader that fails to compile
+// is an error, not an empty picture.
 
 import { spawnSync } from 'node:child_process';
 
@@ -26,7 +30,7 @@ const option = (name) => {
 };
 
 const env = { ...process.env, SHOT_EFFECT: effect };
-for (const name of ['preset', 'times', 'size', 'bg', 'params', 'out']) {
+for (const name of ['preset', 'times', 'size', 'bg', 'params', 'out', 'tag']) {
   const value = option(name);
   if (value !== undefined) env[`SHOT_${name.toUpperCase()}`] = value;
 }

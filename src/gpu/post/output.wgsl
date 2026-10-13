@@ -81,17 +81,28 @@ fn post_dither(pixel: vec2f, frame: f32) -> f32 {
   // See-through output for a premultiplied canvas: the page shows wherever alpha is below 1, and
   // the colour is added on top of it (the canvas blends as rgb + (1 - alpha) * page).
   let peak = max(encoded.r, max(encoded.g, encoded.b));
+  // No dither where nothing is drawn: a fully transparent pixel must leave the page untouched.
+  let grain = noise * smoothstep(0.0, 2.0 / 255.0, peak);
+  let rgb = max(encoded + vec3f(grain), vec3f(0.0));
+
   var alpha = 0.0;
   if (post.alpha_mode == ALPHA_COVERAGE) { alpha = clamp(scene_texel.a, 0.0, 1.0); }
   if (post.alpha_mode == ALPHA_LUMINANCE) {
-    alpha = clamp(max(scene_texel.a, peak * post.alpha_gain), 0.0, 1.0);
+    // Taken from the colour that is actually written (dither included), so with a gain of 1 or
+    // more no channel is ever above alpha: a valid premultiplied colour, whatever the browser
+    // does with invalid ones.
+    let written = max(rgb.r, max(rgb.g, rgb.b));
+    alpha = clamp(max(scene_texel.a, written * post.alpha_gain), 0.0, 1.0);
   }
-  // The underlay darkens the page around the light, using the bloom as a soft mask, so an
-  // emissive effect keeps its contrast over a page that is already near white.
+
+  // The underlay is a second, darker layer under the light: it dims the page around the fire,
+  // using the bloom as a soft mask, so the flame stays the brightest thing on a page that is
+  // already near white. `veil` is how much of the page it hides, at most `underlay`; the curve
+  // lets it reach further out than the visible glow does. The two layers multiply (the page is
+  // seen through both), so the underlay adds to every alpha mode instead of hiding behind it.
   let halo = linear_to_srgb(post_map_sdr(max(glow, vec3f(0.0)) * post.exposure, post.tonemap));
-  let shade = clamp(max(halo.r, max(halo.g, halo.b)) * post.underlay, 0.0, 1.0);
-  alpha = max(alpha, shade * clamp(post.underlay, 0.0, 1.0));
-  // No dither where nothing is drawn: a fully transparent pixel must leave the page untouched.
-  let grain = noise * smoothstep(0.0, 2.0 / 255.0, peak);
-  return vec4f(max(encoded + vec3f(grain), vec3f(0.0)), alpha);
+  let reach = 1.0 - clamp(max(halo.r, max(halo.g, halo.b)), 0.0, 1.0);
+  let veil = clamp(post.underlay, 0.0, 1.0) * (1.0 - reach * reach * reach);
+  alpha = 1.0 - (1.0 - alpha) * (1.0 - veil);
+  return vec4f(rgb, alpha);
 }

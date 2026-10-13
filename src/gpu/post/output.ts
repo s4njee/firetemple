@@ -26,15 +26,21 @@ export const POST_VIEWS = ['final', 'scene', 'bloom'] as const;
 export type PostView = (typeof POST_VIEWS)[number];
 
 /**
- * What the output writes to alpha, for a canvas composited over the page (premultiplied):
+ * What the output writes to alpha, for a canvas composited over the page. The canvas is
+ * premultiplied, so the browser shows `rgb + (1 - alpha) * page` (docs/compositing-study.md):
  *
  * - `opaque`: 1. The effect owns its rectangle.
  * - `additive`: 0. The colour is added to the page. Right over dark pages; invisible over white,
- *   which has nothing left to add to.
+ *   which has nothing left to add to. The colour is brighter than its alpha, which the canvas
+ *   spec does not define: prefer `luminance`, which looks the same over a dark page.
  * - `coverage`: the scene's own alpha, for effects that draw premultiplied colour with real
- *   coverage (smoke, char, solid shapes). Bloom still lands outside the coverage, additively.
- * - `luminance`: at least the brightest output channel times `alphaGain`, so bright pixels cover
- *   the page instead of adding to it. Reads on any page, at the cost of a hard-looking edge.
+ *   coverage (smoke, char, solid shapes). Light with no coverage (flame, bloom) stays additive,
+ *   so over a light page the smoke shows and the fire does not.
+ * - `luminance`: the scene's alpha or the brightest written channel times `alphaGain`, whichever
+ *   is larger, so bright pixels cover the page instead of adding to it. With a gain of 1 or more
+ *   the result is always a valid premultiplied colour. Over a dark page it is within a few
+ *   8-bit steps of `additive`; over a light page the fire reads as flame-coloured ink. This is
+ *   the default for overlay effects (`OVERLAY_PARAMS`).
  */
 export const ALPHA_MODES = ['opaque', 'additive', 'coverage', 'luminance'] as const;
 export type AlphaMode = (typeof ALPHA_MODES)[number];
@@ -68,11 +74,18 @@ export interface OutputSettings {
   view?: PostView;
   /** Default 'opaque'. */
   alpha?: AlphaMode;
-  /** `luminance` mode: alpha per unit of output brightness. Default 1; larger hardens the edge. */
+  /**
+   * `luminance` mode: alpha per unit of output brightness. Default 1. Above 1 the dim edges of
+   * the glow turn into a dark fringe (more page hidden than light added); below 1 the colour is
+   * brighter than its alpha again, as in `additive`.
+   */
   alphaGain?: number;
   /**
-   * 0..1, ignored when opaque: darkens the page around bright areas, using the bloom as the mask,
-   * so the effect keeps contrast over a light page. 0 (default) is off. Needs bloom to be on.
+   * 0..1, ignored when opaque: the most the page is dimmed around bright areas. The bloom is the
+   * mask, widened so the dimming reaches past the visible glow, and it multiplies with the mode's
+   * own alpha: `alpha = 1 - (1 - modeAlpha) * (1 - underlay * mask)`. Over a dark page it changes
+   * nothing visible; over a light page it is what keeps the flame brighter than its surroundings.
+   * 0 (default) is off. Needs bloom to be on.
    */
   underlay?: number;
 }

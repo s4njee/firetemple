@@ -1,0 +1,293 @@
+{
+  "note": "Written by experiments/compositing.test.ts. CSS blend rows are simulated.",
+  "size": [
+    320,
+    256
+  ],
+  "pages": {
+    "dark": [
+      14,
+      12,
+      11
+    ],
+    "light": [
+      250,
+      248,
+      245
+    ]
+  },
+  "regions": {
+    "core": 1774,
+    "body": 1550,
+    "near": 1820,
+    "smoke": 1400
+  },
+  "rows": [
+    {
+      "strategy": "additive (alpha 0)",
+      "page": "dark",
+      "flameDeltaE": 93.734,
+      "bodyContrast": 9.683,
+      "coreOverSurround": 14.597,
+      "smokeDeltaE": 13.546,
+      "glowDeltaE": 43.011
+    },
+    {
+      "strategy": "additive (alpha 0)",
+      "page": "light",
+      "flameDeltaE": 2.885,
+      "bodyContrast": 1.06,
+      "coreOverSurround": 1.001,
+      "smokeDeltaE": 2.811,
+      "glowDeltaE": 2.736
+    },
+    {
+      "strategy": "coverage (scene alpha)",
+      "page": "dark",
+      "flameDeltaE": 93.702,
+      "bodyContrast": 9.668,
+      "coreOverSurround": 14.643,
+      "smokeDeltaE": 11.985,
+      "glowDeltaE": 42.978
+    },
+    {
+      "strategy": "coverage (scene alpha)",
+      "page": "light",
+      "flameDeltaE": 3.063,
+      "bodyContrast": 1.057,
+      "coreOverSurround": 1.004,
+      "smokeDeltaE": 21.806,
+      "glowDeltaE": 3.556
+    },
+    {
+      "strategy": "luminance alpha, gain 1",
+      "page": "dark",
+      "flameDeltaE": 91.064,
+      "bodyContrast": 8.64,
+      "coreOverSurround": 15.545,
+      "smokeDeltaE": 11.988,
+      "glowDeltaE": 41.865
+    },
+    {
+      "strategy": "luminance alpha, gain 1",
+      "page": "light",
+      "flameDeltaE": 37.44,
+      "bodyContrast": 1.484,
+      "coreOverSurround": 1.377,
+      "smokeDeltaE": 21.809,
+      "glowDeltaE": 28.798
+    },
+    {
+      "strategy": "luminance alpha, gain 3",
+      "page": "dark",
+      "flameDeltaE": 90.786,
+      "bodyContrast": 8.48,
+      "coreOverSurround": 18.767,
+      "smokeDeltaE": 11.618,
+      "glowDeltaE": 40.023
+    },
+    {
+      "strategy": "luminance alpha, gain 3",
+      "page": "light",
+      "flameDeltaE": 41.679,
+      "bodyContrast": 2.171,
+      "coreOverSurround": 10.204,
+      "smokeDeltaE": 29.373,
+      "glowDeltaE": 71.984
+    },
+    {
+      "strategy": "luminance + underlay 0.3 (default)",
+      "page": "dark",
+      "flameDeltaE": 90.981,
+      "bodyContrast": 8.588,
+      "coreOverSurround": 16.245,
+      "smokeDeltaE": 11.977,
+      "glowDeltaE": 41.451
+    },
+    {
+      "strategy": "luminance + underlay 0.3 (default)",
+      "page": "light",
+      "flameDeltaE": 38.436,
+      "bodyContrast": 1.656,
+      "coreOverSurround": 1.954,
+      "smokeDeltaE": 21.885,
+      "glowDeltaE": 36.275
+    },
+    {
+      "strategy": "luminance + underlay 0.6",
+      "page": "dark",
+      "flameDeltaE": 90.894,
+      "bodyContrast": 8.538,
+      "coreOverSurround": 16.984,
+      "smokeDeltaE": 11.965,
+      "glowDeltaE": 41.025
+    },
+    {
+      "strategy": "luminance + underlay 0.6",
+      "page": "light",
+      "flameDeltaE": 39.598,
+      "bodyContrast": 1.845,
+      "coreOverSurround": 2.938,
+      "smokeDeltaE": 21.968,
+      "glowDeltaE": 45.882
+    },
+    {
+      "strategy": "additive + underlay 0.6",
+      "page": "dark",
+      "flameDeltaE": 92.268,
+      "bodyContrast": 8.993,
+      "coreOverSurround": 16.353,
+      "smokeDeltaE": 13.529,
+      "glowDeltaE": 41.701
+    },
+    {
+      "strategy": "additive + underlay 0.6",
+      "page": "light",
+      "flameDeltaE": 18.925,
+      "bodyContrast": 1.076,
+      "coreOverSurround": 1.758,
+      "smokeDeltaE": 3.008,
+      "glowDeltaE": 31.462
+    },
+    {
+      "strategy": "CSS screen, opaque canvas (simulated)",
+      "page": "dark",
+      "flameDeltaE": 90.528,
+      "bodyContrast": 8.816,
+      "coreOverSurround": 14.988,
+      "smokeDeltaE": 12.768,
+      "glowDeltaE": 40.813
+    },
+    {
+      "strategy": "CSS screen, opaque canvas (simulated)",
+      "page": "light",
+      "flameDeltaE": 2.082,
+      "bodyContrast": 1.036,
+      "coreOverSurround": 1.047,
+      "smokeDeltaE": 0.31,
+      "glowDeltaE": 0.697
+    },
+    {
+      "strategy": "CSS plus-lighter, luminance canvas (simulated)",
+      "page": "dark",
+      "flameDeltaE": 93.73,
+      "bodyContrast": 9.683,
+      "coreOverSurround": 14.589,
+      "smokeDeltaE": 13.554,
+      "glowDeltaE": 43.015
+    },
+    {
+      "strategy": "CSS plus-lighter, luminance canvas (simulated)",
+      "page": "light",
+      "flameDeltaE": 2.885,
+      "bodyContrast": 1.06,
+      "coreOverSurround": 1.001,
+      "smokeDeltaE": 2.809,
+      "glowDeltaE": 2.734
+    },
+    {
+      "strategy": "CSS lighten, opaque canvas (simulated)",
+      "page": "dark",
+      "flameDeltaE": 90.783,
+      "bodyContrast": 8.479,
+      "coreOverSurround": 19.148,
+      "smokeDeltaE": 8.271,
+      "glowDeltaE": 39.185
+    },
+    {
+      "strategy": "CSS lighten, opaque canvas (simulated)",
+      "page": "light",
+      "flameDeltaE": 0.605,
+      "bodyContrast": 1,
+      "coreOverSurround": 1.013,
+      "smokeDeltaE": 0,
+      "glowDeltaE": 0
+    },
+    {
+      "strategy": "CSS multiply, luminance canvas (simulated)",
+      "page": "dark",
+      "flameDeltaE": 1.279,
+      "bodyContrast": 1.014,
+      "coreOverSurround": 1.14,
+      "smokeDeltaE": 0.861,
+      "glowDeltaE": 0.994
+    },
+    {
+      "strategy": "CSS multiply, luminance canvas (simulated)",
+      "page": "light",
+      "flameDeltaE": 37.808,
+      "bodyContrast": 1.549,
+      "coreOverSurround": 1.314,
+      "smokeDeltaE": 21.99,
+      "glowDeltaE": 28.653
+    },
+    {
+      "strategy": "CSS multiply, opaque canvas (simulated)",
+      "page": "dark",
+      "flameDeltaE": 1.403,
+      "bodyContrast": 1.027,
+      "coreOverSurround": 4.668,
+      "smokeDeltaE": 3.19,
+      "glowDeltaE": 2.778
+    },
+    {
+      "strategy": "CSS multiply, opaque canvas (simulated)",
+      "page": "light",
+      "flameDeltaE": 42.222,
+      "bodyContrast": 2.282,
+      "coreOverSurround": 18.918,
+      "smokeDeltaE": 91.252,
+      "glowDeltaE": 82.286
+    }
+  ],
+  "validity": {
+    "additive": {
+      "drawn": 23095,
+      "invalid": 23095,
+      "worst": 255
+    },
+    "coverage": {
+      "drawn": 25551,
+      "invalid": 9339,
+      "worst": 255
+    },
+    "luminance": {
+      "drawn": 25552,
+      "invalid": 0,
+      "worst": 0
+    },
+    "luminance-gain3": {
+      "drawn": 26412,
+      "invalid": 0,
+      "worst": 0
+    },
+    "underlay-0.3": {
+      "drawn": 25885,
+      "invalid": 0,
+      "worst": 0
+    }
+  },
+  "neutralLightOverLightPage": {
+    "luminance": {
+      "flameDeltaE": 2.691,
+      "bodyContrast": 1.049,
+      "coreOverSurround": 1.039,
+      "smokeDeltaE": 16.621,
+      "glowDeltaE": 1.089
+    },
+    "underlay-0.3": {
+      "flameDeltaE": 3.016,
+      "bodyContrast": 1.052,
+      "coreOverSurround": 1.399,
+      "smokeDeltaE": 16.706,
+      "glowDeltaE": 10.231
+    },
+    "underlay-0.6": {
+      "flameDeltaE": 4.508,
+      "bodyContrast": 1.162,
+      "coreOverSurround": 1.964,
+      "smokeDeltaE": 16.795,
+      "glowDeltaE": 21.589
+    }
+  }
+}

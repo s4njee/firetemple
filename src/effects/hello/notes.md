@@ -21,7 +21,7 @@ The tail (`createHdrTail`, `src/gpu/post/tail.ts`) then blooms everything above 
 
 ## Cost
 
-Three stages: the noise pass at full resolution, the bloom chain (five levels starting at half resolution), and the output pass. Per pixel the noise pass evaluates gradient noise about 11 times: 6 for the warp (two 3-octave fields) and 5 for the pattern.
+Three stages: the noise pass at full resolution, the bloom chain (starting at half resolution; five levels at 1080p, fewer on a smaller canvas), and the output pass. Per pixel the noise pass evaluates gradient noise about 11 times: 6 for the warp (two 3-octave fields) and 5 for the pattern.
 
 GPU time per device: not measured yet. The Scorecard tab shows a live, indicative reading once the browser reports pass timings. Texture memory is one `rgba16float` target at canvas size plus the bloom levels, about a third as much again.
 

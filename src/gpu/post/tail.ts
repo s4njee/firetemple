@@ -34,11 +34,18 @@ export const TAIL_PARAMS = {
   bloomRadius: { type: 'number', default: 0.7, min: 0, max: 1, step: 0.01, label: 'bloom radius' },
 } as const satisfies ParamSchema;
 
-/** Extra controls for an effect that is composited over the page instead of filling its box. */
+/**
+ * Extra controls for an effect that is composited over the page instead of filling its box.
+ *
+ * The defaults are the outcome of docs/compositing-study.md: `luminance` alpha looks like additive
+ * light over a dark page (within a few 8-bit steps), still reads over a light one, and is always a
+ * valid premultiplied colour; an underlay of 0.3 is invisible over a dark page and keeps the flame
+ * the brightest thing on a light one.
+ */
 export const OVERLAY_PARAMS = {
-  alpha: { type: 'select', default: 'additive', options: ALPHA_MODES },
+  alpha: { type: 'select', default: 'luminance', options: ALPHA_MODES },
   alphaGain: { type: 'number', default: 1, min: 0, max: 4, step: 0.05, label: 'alpha gain' },
-  underlay: { type: 'number', default: 0, min: 0, max: 1, step: 0.01 },
+  underlay: { type: 'number', default: 0.3, min: 0, max: 1, step: 0.01 },
 } as const satisfies ParamSchema;
 
 export interface TailValues {
@@ -122,16 +129,21 @@ export function createHdrTail(device: GPUDevice, options: HdrTailOptions): HdrTa
     resize: (width, height) => chain.resize(width, height),
     encode(encoder, target, time, values, profiler, overrides) {
       const settings = tailSettings(values, time, hdr);
+      // Bloom overrides refine the bloom the values asked for. When the values turned it off
+      // (intensity 0), an override brings it back only by naming an intensity of its own.
+      const over = overrides?.bloom;
+      const bloom =
+        over === undefined
+          ? settings.bloom
+          : over === false
+            ? false
+            : settings.bloom === false
+              ? over.intensity !== undefined && over
+              : { ...settings.bloom, ...over };
       chain.encode(
         encoder,
         target,
-        {
-          bloom:
-            overrides?.bloom === undefined || settings.bloom === false
-              ? (overrides?.bloom ?? settings.bloom)
-              : overrides.bloom && { ...settings.bloom, ...overrides.bloom },
-          output: { ...settings.output, ...overrides?.output },
-        },
+        { bloom, output: { ...settings.output, ...overrides?.output } },
         profiler,
       );
     },
