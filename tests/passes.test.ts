@@ -500,8 +500,10 @@ describe('blur', () => {
   it('copies when the radius is 0, and clamps absurd radii', async () => {
     const device = await getTestDevice();
     const none = await blurImpulse(device, { radius: 0 });
-    expect(none[CENTER * SIZE + CENTER]).toBeCloseTo(1, 3);
-    expect(none.reduce((sum, value) => sum + value, 0)).toBeCloseTo(1, 3);
+    // Within a couple of half-float steps of 1: a bilinear tap at an exact texel centre comes
+    // back as 1 on Metal and as 1 - 2^-10 on Mesa's software rasteriser.
+    expect(none[CENTER * SIZE + CENTER]).toBeCloseTo(1, 2);
+    expect(none.reduce((sum, value) => sum + value, 0)).toBeCloseTo(1, 2);
 
     const out = await blurImpulse(device, { radius: 100_000 }, 2 * MAX_BLUR_RADIUS + 31);
     expect(Math.abs(out.reduce((sum, value) => sum + value, 0) - 1)).toBeLessThan(0.01);

@@ -655,7 +655,9 @@ describe('firelight.wgsl', () => {
       'firelight_sheen(vec3f(0.0, 0.0, 1.0), normalize(vec3f(1.0, 0.0, -0.2)), 32.0)',
       'firelight_diffuse(vec3f(0.0, 0.0, 1.0), normalize(vec3f(1.0, 0.0, -0.2)))',
     ]);
-    expect(flat).toEqual([0, 0, 1, 1, 1, 0, 0]);
+    // `+ 0` folds -0 into 0: which zero a flat normal's x and y come out as depends on the
+    // driver (Metal gives +0, Mesa's software rasteriser -0), and both are right.
+    expect(flat.map((value) => value + 0)).toEqual([0, 0, 1, 1, 1, 0, 0]);
   });
 
   it('the line light is the average of point lights along it and converges to one', async () => {
