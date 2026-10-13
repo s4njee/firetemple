@@ -136,6 +136,9 @@ holds a still frame; an effect must look right as one.
 | Where DOM elements are, in canvas uv | `src/gpu/dom-rects.ts` |
 | Camera, meshes, a forward pass | `src/gpu/scene/` |
 | Noise, FBM, Voronoi, curl, SDF, colour, maths | `src/wgsl/*.wgsl`; each file's header lists its functions |
+| Noise from a texture fetch (use this in Tier A) | `getNoiseTexture(device)` in `src/gpu/emission/noise-texture.ts` + `#include "noisetex.wgsl"` |
+| Flame colour, shape, motion, flicker | `ramp.wgsl`, `blackbody.wgsl`, `flame.wgsl`, `advect.wgsl`, `flicker.wgsl` (+ `src/gpu/emission/`) |
+| Heat haze, sprites, smoke, firelight, volumes | `haze.wgsl`, `sprite.wgsl` + `src/gpu/sprites.ts`, `smoke.wgsl`, `firelight.wgsl`, `volume.wgsl` + `src/gpu/volume/` |
 
 ## Shared WGSL chunks (`src/wgsl/`)
 
@@ -212,8 +215,10 @@ For anything with persistent state:
 
 Rules of thumb for a Tier A effect, carried over from Water Temple's measurements:
 
-- Per-pixel noise is the budget. Count octaves and warps per pixel and keep the total small
-  (roughly six noise evaluations).
+- Per-pixel noise is the budget. Epic 3's full-canvas procedural-noise scenes read 2 to 5 ms for
+  one frame in Chrome at 1080p on an M1 Max, over the Tier A budget even there. Read noise from
+  the shared baked tile instead (`getNoiseTexture` + `noisetex.wgsl`: one fetch replaces a
+  four-octave fractal sum), and keep whatever procedural noise is left to a couple of evaluations.
 - A texture fetch is far cheaper than noise. Bake what does not need to change every frame: render
   it once into a target in `create` or `resize`.
 - Skip work early for pixels that cannot show it (above the flame, outside a glow radius).
