@@ -44,7 +44,7 @@ Measured on the GPU for one card (`tests/smoke-light.test.ts`): the analytic sha
 
 ## Cost
 
-GPU time, measured: 1.7 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 4.7 ms for one frame at 1080p and 60 fps (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. By shadow method: none 1.6 ms, hard 1.7 ms, soft 1.8 ms, traced 3.3 ms, traced-classic 3.3 ms.
+GPU time, measured: 1.7 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 4.4 ms for one frame at 1080p and 60 fps (median of 3 loads) (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. By shadow method: none 1.6 ms, hard 1.7 ms, soft 1.8 ms, traced 3.3 ms, traced-classic 3.3 ms.
 
 Passes per frame: one fullscreen light pass at canvas resolution, then the tail (bloom chain from half resolution, output pass). The ground bake is one more fullscreen pass, run only when the canvas is resized.
 

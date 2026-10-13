@@ -34,7 +34,7 @@ Both timing columns are indicative single runs on an Apple M1 Max while other wo
 
 ## Cost
 
-GPU time: not measured yet. What can be counted:
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 0.5 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.01 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 0.99 to 1.09), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`. What can be counted:
 
 - Passes: one scene pass at canvas size, then the tail (bloom and output).
 - Per pixel below the flames' reach, with the default source: 2 texture fetches, no procedural noise, no `pow`, about 30 arithmetic operations including the ramp. Above the reach: one comparison.
@@ -62,7 +62,7 @@ A wall of fire along the bottom of a hero, a full-bleed section or a dark landin
 
 It is also the recipe to copy for any other 2D flame: gradient, minus rising noise that grows with height, through a ramp.
 
-Reach for something else when the fire has to have a shape of its own (a candle, a torch, a ring: start from `flame.wgsl`), when it has to respond to the page (the cellular and fluid effects of Epics 5 and 6), or when a short, exactly tiling band is wanted (`flame-strip`). A looping video would do this job at any size the flames are not interactive; the shader's advantages are resolution independence, a see-through canvas over any page colour, and a few kilobytes of code instead of a video file (bundle size not measured yet).
+Reach for something else when the fire has to have a shape of its own (a candle, a torch, a ring: start from `flame.wgsl`), when it has to respond to the page (the cellular and fluid effects of Epics 5 and 6), or when a short, exactly tiling band is wanted (`flame-strip`). A looping video would do this job at any size the flames are not interactive; the shader's advantages are resolution independence, a see-through canvas over any page colour, and 40.2 kB of gzipped code and shaders instead of a video file.
 
 ## References
 

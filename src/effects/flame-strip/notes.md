@@ -17,7 +17,7 @@ The pass writes emission only (scene alpha 0), and the effect spreads `OVERLAY_P
 
 ## Cost
 
-GPU time: not measured yet. What can be counted:
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 0.5 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.08 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 0.98 to 1.18), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`. What can be counted:
 
 - Passes: one scene pass at canvas size, then the tail (bloom and output).
 - Per pixel inside the strip: 2 texture fetches, 2 integer hashes (the two nearest crests), 3 `sin`, 1 `pow`, no procedural noise, a few dozen arithmetic operations including the ramp. Above the strip: one comparison.

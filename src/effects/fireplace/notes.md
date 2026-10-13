@@ -16,7 +16,7 @@ The back flame layer is 1.28 times the size of its own units, slower (0.75 of th
 
 ## Cost
 
-GPU time: not measured yet.
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 0.8 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.37 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.36 to 1.57), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`.
 
 What can be counted, per pixel: the room is arithmetic and one integer hash (wall pixels only), no fetch. A flame layer is two noise-texture fetches, and only inside the box that layer can reach; a pixel in the middle of the fire pays for all three layers, six fetches. The coal mound is one fetch inside its own box, a log is one fetch on the log (up to three where logs cross), and the embers are two small hashes per layer in the column above the fire. No procedural noise and no Voronoi anywhere. A pixel the front log covers skips everything behind it, and the three log distances are only measured inside the box that holds the logs.
 

@@ -17,7 +17,7 @@ The only texture fetch is the fluttering edge: one read of the shared noise tile
 
 ## Cost
 
-GPU time: not measured yet. What was read and counted:
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 0.5 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.03 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.02 to 1.03), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`. What was read and counted:
 
 - Indicative HUD readings, headless Chrome on the Apple M1 Max at 1920 × 1080: 0.99, 1.03 and 1.48 ms for the whole frame over three runs (the `draughty` preset: 0.97 to 1.04 ms), while other work was using the GPU. The tail alone reads 1.1 to 1.3 ms there, so the candle's own pass is below what this machine can resolve. No integrated GPU or phone has been measured; Tier A is provisional.
 - Passes: one scene pass, then the tail.
@@ -26,7 +26,7 @@ GPU time: not measured yet. What was read and counted:
 - Every pixel pays for five comparisons and one `pow`. The halo disc (41% of a 16:9 canvas at the defaults) adds about ten arithmetic operations and no fetch.
 - CPU per frame: the spring (at most 30 steps of a few multiplies) and two flicker evaluations (15 integer hashes).
 - Texture memory at 1080p as the HUD reports it: about 21.8 MB in 8 textures, nearly all of it the tail's scene target and bloom chain. The noise tile is shared with every other effect (0.7 MB).
-- Bundle size: not measured yet.
+- Bundle size: 45.8 kB gzipped for everything the effect loads beyond the first page.
 
 ## Pitfalls
 

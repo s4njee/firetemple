@@ -23,7 +23,7 @@ Both are read from mip level 3 of the tile, where the fine octaves have been ave
 
 ## Cost
 
-GPU time: not measured yet. Indicative readings: the HUD in headless Chrome showed 1.3 to 1.7 ms for one frame at 1920 × 1080 on an Apple M1 Max over five runs, tail included, while other work was using the GPU; the flame pass on its own read about 0.4 ms. The HUD's floor on this machine is about 1.2 ms, so the readings say "a little above the tail alone" and not much more.
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 0.6 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.33 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.26 to 1.33), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`. Indicative readings: the HUD in headless Chrome showed 1.3 to 1.7 ms for one frame at 1920 × 1080 on an Apple M1 Max over five runs, tail included, while other work was using the GPU; the flame pass on its own read about 0.4 ms. The HUD's floor on this machine is about 1.2 ms, so the readings say "a little above the tail alone" and not much more.
 
 Counted from the code, at the defaults on a 1920 × 1080 canvas:
 

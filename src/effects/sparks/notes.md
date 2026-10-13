@@ -23,7 +23,7 @@ let bits = pcg_1d(lane_bits + u32(wrapped) * 0x85ebca6bu);   // this slot's spar
 
 ## Cost
 
-GPU time: not measured yet.
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 0.4 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.79 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.64 to 1.81), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`.
 
 What can be counted, per pixel inside the fan: one noise-texture fetch, one square root and one `atan2` (three square roots with gravity), then per layer two `pcg_1d` hashes (about 7 integer operations each) and roughly 40 arithmetic operations before the pixel is rejected. Only a pixel that is actually on a spark (a few percent of the canvas at most) pays for a third hash, the streak shape and the blackbody colour (one `exp`, one `log`). No procedural noise, no Voronoi, no loops over neighbouring cells: a spark is confined to its lane and its slot, so one cell is looked at per layer.
 

@@ -20,7 +20,7 @@ Where the two agree the bed is hot. Because they move apart, a hot region forms,
 
 ## Cost
 
-GPU time: not measured yet.
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 0.6 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.33 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.29 to 1.38), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`.
 
 Per pixel, per frame: three texture fetches (one `textureLoad` of the baked layout, two of the noise tile), no procedural noise, no Voronoi search, one `sin`, and the blackbody fit (about 40 arithmetic operations, one `exp`, two `log`). There is no early-out because every pixel is a coal. A first HUD reading in headless Chrome on an Apple M1 Max (one frame at 1920 × 1080, tail included, other work on the GPU) was 1.0 to 1.2 ms, with one reading of 1.8: indistinguishable from the tail alone, and indicative only.
 

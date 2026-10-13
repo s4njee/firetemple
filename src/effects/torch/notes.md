@@ -15,7 +15,7 @@ Small flames must not read the tile's finest level: the level of detail is set o
 
 ## Cost
 
-GPU time: not measured yet. The count question was answered by counting, and checked against rough readings.
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 1.3 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.46 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.37 to 1.46), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`. The count question was answered by counting, and checked against rough readings.
 
 **By count.** A pixel costs the same whatever the count: the cell lookup (about 15 arithmetic operations and one uniform-array read), then `flame_reach`. Only pixels that pass it, and for the teardrop a distance test that trims a further third, fetch noise (two fetches, about 50 more operations and four `pow`). So the scene pass follows the **share of the canvas inside some flame**, and that share depends on how well the grid packs the canvas, not on the count. For a 1920 × 1080 canvas at the default `size` and `turbulence` (`flameShare` in `index.ts`; the share is counted on a grid, every flame at full size):
 
@@ -46,7 +46,7 @@ There is no trend with count: the spread between runs (about 0.4 ms) is larger t
 
 **Not measured: many canvases.** The alternative, one small canvas per flame, was not built or timed. Each canvas would run its own tail (a bloom chain and an output pass) and its own context, and the 1 ms floor seen here is per canvas, so it is expected to cost far more than one shared canvas; that is an expectation, not a measurement.
 
-Other counts: one scene pass plus the tail; no procedural noise; CPU per frame is three sines per flame; texture memory at 1080p about 21.8 MB in 8 textures as the HUD reports it, nearly all of it the tail. Bundle size: not measured yet.
+Other counts: one scene pass plus the tail; no procedural noise; CPU per frame is three sines per flame; texture memory at 1080p about 21.8 MB in 8 textures as the HUD reports it, nearly all of it the tail. Bundle size: 43.9 kB gzipped for everything the effect loads beyond the first page.
 
 ## Pitfalls
 

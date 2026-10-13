@@ -25,7 +25,7 @@ Alpha is left at 0: the tail's `luminance` mode turns brightness into coverage, 
 
 ## Cost
 
-GPU time: not measured yet. One indicative reading: the HUD in headless Chrome showed 0.9 to 1.1 ms for one frame at 1920 × 1080 on an Apple M1 Max over five runs, tail included, while other work was using the GPU; the ring pass on its own read about 0.2 ms. That is at the HUD's floor on this machine (a pass that draws almost nothing reads about 1.2 ms), so read it as "too cheap to tell apart from the tail", not as a number.
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 1.1 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.29 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.12 to 1.36), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`. One indicative reading: the HUD in headless Chrome showed 0.9 to 1.1 ms for one frame at 1920 × 1080 on an Apple M1 Max over five runs, tail included, while other work was using the GPU; the ring pass on its own read about 0.2 ms. That is at the HUD's floor on this machine (a pass that draws almost nothing reads about 1.2 ms), so read it as "too cheap to tell apart from the tail", not as a number.
 
 Counted from the code, at the defaults on a 1920 × 1080 canvas:
 

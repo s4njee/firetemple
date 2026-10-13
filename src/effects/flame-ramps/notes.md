@@ -37,7 +37,7 @@ One fullscreen pass plus the tail. The flame costs six noise evaluations per pix
 | `ramp_blackbody`                          | about 40 ALU ops and 3 `exp`/`log`                |
 | `ramp_lookup`                             | one bilinear fetch; a texture and sampler binding |
 
-The texture is 8 rows of 64 half-float texels: 4 KB. GPU time, measured: 0.7 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 3.2 ms for one frame at 1080p and 60 fps (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. In Chrome the frame reads 3.2 ms, which is why this eight-flame scene is marked Tier B; a ramp lookup itself costs almost nothing.
+The texture is 8 rows of 64 half-float texels: 4 KB. GPU time, measured: 0.7 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 2.3 ms for one frame at 1080p and 60 fps (median of 3 loads) (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. In Chrome the frame reads 3.2 ms, which is why this eight-flame scene is marked Tier B; a ramp lookup itself costs almost nothing.
 
 ## Pitfalls
 

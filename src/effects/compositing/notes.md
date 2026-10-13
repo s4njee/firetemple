@@ -28,7 +28,7 @@ Two stages: the scene pass at full resolution, then the tail (bloom and output).
 
 Per pixel the scene evaluates up to 15 octaves of gradient noise: 9 for the flame (2 for the lean, 3 for the wobble, 4 for the edge) and 6 for the smoke (2 for the drift, 4 for the density). Pixels inside the logs add 5 more. Pixels outside the flame's box and below the smoke return early.
 
-GPU time, measured: 1.5 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 4.2 ms for one frame at 1080p and 60 fps (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. Texture memory is one `rgba16float` target at canvas size plus the bloom levels, about a third as much again.
+GPU time, measured: 1.5 ms per frame at 1920 × 1080 with the default settings, tail included (Apple M1 Max, Dawn under Node; the tail alone reads 0.7 ms, and repeated runs differ by up to about half a millisecond). In Chrome 155 on the same machine the HUD reads 4.7 ms for one frame at 1080p and 60 fps (median of 3 loads) (`docs/studies/browser-check.md`); that figure includes the browser's timing floor. No integrated GPU or phone has been measured. The full table is `docs/studies/epic-3.md`. Texture memory is one `rgba16float` target at canvas size plus the bloom levels, about a third as much again.
 
 ## Pitfalls
 

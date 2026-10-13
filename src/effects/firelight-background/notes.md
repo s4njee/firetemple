@@ -15,7 +15,7 @@ The one idea that makes it cheap: nothing in the moving field is finer than a fe
 
 ## Cost
 
-GPU time: not measured yet. What can be counted:
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 0.5 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.35 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.33 to 1.42), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`. What can be counted:
 
 - Passes: the field pass at 1/64 of the canvas area, the glow pass at canvas size, then the tail (bloom and output).
 - Field pass, per texel: 9 evaluations of 3D gradient noise (4 for the warp, 3 for the light, 2 for the colour). At 1080p that is 32 400 texels, about 290 000 noise evaluations a frame; computed at canvas size it would be 18.7 million.

@@ -14,14 +14,14 @@ One fullscreen pass (`jet.wgsl`), then the HDR tail. A jet is drawn in its own f
 
 ## Cost
 
-GPU time: not measured yet. What was read and counted:
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 1.2 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 1.04 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.02 to 1.20), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`. What was read and counted:
 
 - Indicative HUD readings, headless Chrome on the Apple M1 Max at 1920 × 1080, whole frame, three runs while other work was using the GPU: blowtorch (the default) 1.13, 0.94, 0.90 ms; `afterburner` 1.01, 1.07, 1.02 ms; `stove burner` 1.15, 1.07, 1.07 ms. The tail alone reads 1.1 to 1.3 ms there, so the jets' own pass is below what this machine can resolve. No integrated GPU or phone has been measured; Tier A is provisional.
 - Passes: one scene pass, then the tail. Procedural noise: none.
 - Texture fetches: one per pixel, only inside a jet's bounding box (`flame_reach`). That box is 4.2% of a 16:9 canvas for the default blowtorch, 9.7% for the 20 jets of `stove burner`, 11.7% for `afterburner`.
 - Inside the box: the fetch, two taper distance fields (two `sqrt`), six `pow`, three `exp`, one `cos`, both ramps. Diamonds add a `sin`.
 - Outside it: two dot products and the burner's distance function. In `ring` mode every pixel within the ring's reach (24% of a 16:9 canvas for `stove burner`) also pays for an `atan2`, a `sin` and a `cos`.
-- Texture memory at 1080p as the HUD reports it: about 21.8 MB in 8 textures, nearly all of it the tail. Bundle size: not measured yet.
+- Texture memory at 1080p as the HUD reports it: about 21.8 MB in 8 textures, nearly all of it the tail. Bundle size: 43.7 kB gzipped for everything the effect loads beyond the first page.
 
 ## Pitfalls
 

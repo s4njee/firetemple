@@ -2,6 +2,7 @@
 //
 //   npm run browser-check -- [--base http://localhost:5373] [--effects a,b] [--out output/browser]
 //                            [--report docs/studies/browser-check.md] [--query "preset=name"]
+//                            [--views hud-1080p] [--hud-runs 3]
 //                            [--device "Apple M1 Max" --class apple-silicon]
 //                            [--chrome "/path/to/Google Chrome"]
 //
@@ -44,6 +45,7 @@ const option = (name, fallback) => {
 const base = option('base', 'http://localhost:5373').replace(/\/$/, '');
 const out = option('out', 'output/browser');
 const chromePath = option('chrome', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome');
+const hudRuns = Math.max(1, Number(option('hud-runs', '3')));
 // Extra query for every view, e.g. --query "preset=roaring" or --query "p.noise=voronoi".
 const extraQuery = option('query', '');
 const effects = (
@@ -63,6 +65,10 @@ const VIEWS = [
   // A canvas of exactly 1920 x 1080 device pixels, for a HUD reading comparable with the studies.
   { name: 'hud-1080p', query: 'hud=1', width: 1920, height: 1080, dpr: 1, fullscreenStage: true },
 ];
+
+// --views a,b restricts the run, e.g. --views hud-1080p to re-measure without the screenshots.
+const wantedViews = option('views', undefined)?.split(',');
+const views = wantedViews ? VIEWS.filter((view) => wantedViews.includes(view.name)) : VIEWS;
 
 if (!existsSync(chromePath)) {
   console.error(`browser-check: no Chrome at ${chromePath} (pass --chrome).`);
@@ -253,12 +259,41 @@ async function capture() {
   return Buffer.from(data, 'base64');
 }
 
+const hudGpu = (hud) => {
+  const value = /GPU \| ([\d.]+) ms/.exec(hud ?? '')?.[1];
+  return value === undefined ? undefined : Number(value);
+};
+
+/** Loads the 1080p HUD view again and returns the HUD's text once it has settled. */
+async function loadHud(effect, view) {
+  const started = Date.now();
+  await page('Page.navigate', {
+    url: `${base}/?effect=${effect}&${view.query}${extraQuery ? `&${extraQuery}` : ''}`,
+  });
+  while (Date.now() - started < 30_000) {
+    await sleep(200);
+    const ready = await evaluate(`(() => {
+      const canvas = document.querySelector('.ft-host__canvas');
+      return Boolean(canvas && canvas.width > 1 && canvas.height > 1);
+    })()`).catch(() => false);
+    if (ready) break;
+  }
+  await evaluate(`(() => {
+    const stage = document.querySelector('.ft-effect__stage');
+    if (stage) Object.assign(stage.style, { position: 'fixed', inset: '0', width: '100vw', height: '100vh', zIndex: '100', border: '0', borderRadius: '0' });
+  })()`);
+  await sleep(4000);
+  return evaluate(
+    `document.querySelector('.ft-effect__hud')?.innerText.replace(/\\n+/g, ' | ').slice(0, 400) ?? null`,
+  );
+}
+
 const report = [];
 let failures = 0;
 try {
   for (const effect of effects) {
     mkdirSync(join(out, effect), { recursive: true });
-    for (const view of VIEWS) {
+    for (const view of views) {
       errors = [];
       await page('Emulation.setDeviceMetricsOverride', {
         width: view.width,
@@ -323,6 +358,19 @@ try {
         errors: [...new Set(errors)].slice(0, 5),
         ...(view.fullscreenStage ? { hud: info?.hud ?? null } : {}),
       };
+      if (view.fullscreenStage && state === 'running') {
+        // One HUD reading is not enough: a light effect lets the GPU idle, and the same page then
+        // reads either near the timing floor or about twice that, load by load. Load it a few
+        // more times and keep the median.
+        const readings = [hudGpu(info?.hud)];
+        for (let run = 1; run < hudRuns; run++) {
+          await page('Page.navigate', { url: 'about:blank' });
+          readings.push(hudGpu(await loadHud(effect, view)));
+        }
+        const usable = readings.filter((value) => value !== undefined).sort((a, b) => a - b);
+        entry.hudGpuRuns = usable;
+        entry.hudGpuMs = usable.length > 0 ? usable[Math.floor(usable.length / 2)] : null;
+      }
       const bad = state !== 'running' || entry.errors.length > 0 || entry.colours < 3;
       if (bad) failures++;
       report.push(entry);
@@ -357,7 +405,7 @@ if (markdownPath) {
     '',
     '- **Started** counts the views in which the effect got a canvas and drew more than a flat fill, with no fallback notice and no console error.',
     '- **Animates** means two captures a second apart differ by more than dither in at least one view.',
-    '- **HUD** is what the performance HUD showed on a 1920 × 1080 canvas: frames per second, and the GPU time of one frame as the browser reports it (first pass start to last pass end).',
+    '- **HUD** is what the performance HUD showed on a 1920 × 1080 canvas: frames per second, and the GPU time of one frame as the browser reports it (first pass start to last pass end), as the median of several page loads with the range beside it. The range is wide for the lightest effects: when there is little to draw the GPU idles, and the same page reads either near the timing floor or about twice that from one load to the next.',
     '',
     "The HUD time is not the number the cost studies report. It is one frame measured alone, through Chrome's coarse timestamps, on a GPU that idles between frames, so it carries a floor and reads higher than the per-frame cost in `docs/studies/epic-*.md`. It is here because it is what a visitor's browser actually does. This check says nothing about how an effect looks: the screenshots do.",
     '',
@@ -369,9 +417,13 @@ if (markdownPath) {
     const started = views.filter(
       (entry) => entry.state === 'running' && entry.errors.length === 0 && entry.colours >= 3,
     ).length;
-    const hud = views.find((entry) => entry.hud)?.hud ?? '';
-    const fps = /(\d+) fps/.exec(hud)?.[1];
-    const gpu = /GPU \| ([\d.]+ ms)/.exec(hud)?.[1];
+    const hudEntry = views.find((entry) => entry.hud);
+    const fps = /(\d+) fps/.exec(hudEntry?.hud ?? '')?.[1];
+    const runs = hudEntry?.hudGpuRuns ?? [];
+    const gpu =
+      hudEntry?.hudGpuMs == null
+        ? undefined
+        : `${hudEntry.hudGpuMs.toFixed(2)} ms${runs.length > 1 ? ` (${runs[0].toFixed(2)} to ${runs.at(-1).toFixed(2)} over ${runs.length} loads)` : ''}`;
     lines.push(
       `| ${effect} | ${started} of ${views.length} | ${views.some((entry) => entry.animates) ? 'yes' : 'no (a still picture)'} | ${fps ? `${fps} fps` : 'no reading'}${gpu ? `, ${gpu}` : ''} |`,
     );
@@ -396,8 +448,8 @@ if (deviceName) {
   const measuredPath = 'src/effects/measured.json';
   const measured = existsSync(measuredPath) ? JSON.parse(readFileSync(measuredPath, 'utf8')) : {};
   for (const entry of report) {
-    const gpu = /GPU \| ([\d.]+) ms/.exec(entry.hud ?? '')?.[1];
-    if (!gpu) continue;
+    const gpu = entry.hudGpuMs;
+    if (gpu == null) continue;
     const target = (measured[entry.effect] ??= {});
     target.gpuMs = [
       ...(target.gpuMs ?? []).filter(

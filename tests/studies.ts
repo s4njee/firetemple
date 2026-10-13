@@ -46,4 +46,10 @@ export const STUDY_SWEEPS: Readonly<Record<string, readonly StudyConfig[]>> = {
     ...sweep('volume-march', 'steps', [32, 64, 128], { resolution: '1/2' }),
     ...sweep('volume-march', 'upsample', ['bilinear', 'depth-aware'], { resolution: '1/2' }),
   ],
+  '4': [
+    // 4.8: does a grid of small flames cost more as it fills up?
+    ...sweep('torch', 'count', [1, 4, 12, 24, 48]),
+    // 4.9: sparks should not cost more as they get denser.
+    ...sweep('sparks', 'layers', [1, 2, 3, 4]),
+  ],
 };

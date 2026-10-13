@@ -21,7 +21,7 @@ It is the shared haze chunk (`src/wgsl/haze.wgsl`, shown in the `heat-haze` scen
 
 ## Cost
 
-GPU time: not measured yet. One indicative reading: the HUD in headless Chrome showed 0.38 to 0.43 ms (four runs) for one frame at 1920 × 1080 on an Apple M1 Max (haze pass and output pass; no bloom), while other work was using the GPU. That is below the HUD's usual floor on this machine, so read it as "too cheap to measure here". For comparison, the Epic 3 `heat-haze` scene read 4.2 ms the same way.
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, tail included): 0.3 ms per frame on Dawn, where the tail alone reads 0.5 ms and repeated runs differ by about half a millisecond, so this effect cannot be told apart from the tail; and 0.39 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 0.39 to 0.40), which includes the browser's timing floor. Both are inside the Tier A budget of 2 ms on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. Tables: `docs/studies/epic-4.md` and `docs/studies/browser-check.md`. One indicative reading: the HUD in headless Chrome showed 0.38 to 0.43 ms (four runs) for one frame at 1920 × 1080 on an Apple M1 Max (haze pass and output pass; no bloom), while other work was using the GPU. That is below the HUD's usual floor on this machine, so read it as "too cheap to measure here". For comparison, the Epic 3 `heat-haze` scene read 4.2 ms the same way.
 
 Counted from the code:
 
