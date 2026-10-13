@@ -17,8 +17,13 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
+      # Typecheck, bundle, then scripts/check-bundle.mjs: fails if shader text is in the first load.
       - run: npm run build
       # The GPU tests run on Dawn, which needs a Vulkan driver; hosted runners have no GPU,
       # so Mesa's software implementation (lavapipe) stands in.
       - run: sudo apt-get update && sudo apt-get install -y mesa-vulkan-drivers libvulkan1
+      # FLASH_SWEEP=0: rendering seconds of every effect on a software rasteriser is too slow for
+      # CI. The analyser's own tests still run; the per-effect sweep runs locally (`npm test`).
       - run: npm test
+        env:
+          FLASH_SWEEP: '0'

@@ -120,7 +120,8 @@ describe('analyseFlashes', () => {
 // calmer than it measures. `high` is allowed only when the scorecard says so.
 const ORDER = { none: 0, low: 1, high: 2 } as const;
 
-describe('registered effects against WCAG 2.3.1', () => {
+// Seconds of every effect is too much for a software rasteriser, so CI sets FLASH_SWEEP=0.
+describe.skipIf(process.env.FLASH_SWEEP === '0')('registered effects against WCAG 2.3.1', () => {
   it.each(listEffects().map((meta) => [meta.id, meta.scorecard?.flash] as const))(
     '%s is no flashier than its scorecard says (%s)',
     async (id, declared) => {

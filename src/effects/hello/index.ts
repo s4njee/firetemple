@@ -18,6 +18,8 @@ const Params = defineUniformStruct('Params', {
 
 export const effect = defineEffect({
   meta,
+  // Lets a visitor try an extended-range canvas (`&hdr=1`); the tail then writes above SDR white.
+  hdr: true,
   params: {
     speed: { type: 'number', default: 1, min: 0, max: 3, step: 0.01 },
     scale: { type: 'number', default: 3, min: 1, max: 12, step: 0.1 },
