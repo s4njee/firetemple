@@ -10,7 +10,8 @@
 // A smoke plume above a small fire, ray-marched in one fragment pass. World space, +Y up, the fire at the
 // origin, a fixed camera. The density field and the scene are here; everything that shades the smoke is in
 // smoke.wgsl, and the accumulation along the ray in volume.wgsl.
-// Output is PREMULTIPLIED linear radiance, with the coverage of the page in alpha (the tail's `coverage` mode).
+// Output is PREMULTIPLIED linear radiance, with the coverage of the page in alpha (which the tail's `luminance`
+// and `coverage` modes both use).
 
 // `params.shadowing`, in the order of the select in index.ts.
 
@@ -215,10 +216,9 @@ fn page_alpha(radiance: vec3f, transmittance: vec3f) -> f32 {
   let bright = smoke_multi_albedo(albedo);
   let tint = smoke_extinction_tint(params.soot);
   let extinction = EXTINCTION * params.density;
-  // The fire's brightness wanders slowly (about 1 Hz at speed 1) and by a few percent: a flicker, not a flash.
-  // TODO(flicker.wgsl): replace with the shared band-limited flicker signal (story 3.6).
-  let flicker = 1.0 + 0.07 * gnoise_2d(vec2f(params.time * 1.1, 2.5));
-  let fire = FIRE_LIGHT * params.fire_light * (0.3 + 0.7 * params.flame) * flicker;
+  // The fire's brightness wanders by a few percent: the shared flicker signal, evaluated once per
+  // frame in index.ts (src/gpu/emission/flicker.ts) so it runs on real seconds, not on `speed`.
+  let fire = FIRE_LIGHT * params.fire_light * (0.3 + 0.7 * params.flame) * params.flicker;
   let sky = SKY_COLOUR * params.sky;
   let flame_scale = FLAME_HEIGHT * params.flame;
 

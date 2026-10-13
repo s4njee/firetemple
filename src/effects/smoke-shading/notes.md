@@ -48,11 +48,11 @@ The shadow itself is `smoke_shadow_multi`: Beer–Lambert for sooty smoke, and f
 
 ### Coverage
 
-The scene is premultiplied: colour is the radiance gathered along the ray, alpha says how much of the page it hides. That is the tail's `coverage` mode, the default here.
+The scene is premultiplied: colour is the radiance gathered along the ray, alpha says how much of the page it hides. Both of the tail's `coverage` and `luminance` modes use that alpha. `luminance`, the shared default and the default here, also raises it wherever the output is bright, so the flame and its glow cover the page instead of adding to it; `coverage` shows the scene's alpha alone.
 
 In linear light alpha would be `1 − transmittance`. The canvas, though, is blended over the page after tonemapping and sRGB encoding, and there `1 − T` hides far too little of a light page: half-transparent grey smoke over white came out white. `page_alpha` in the shader writes the alpha that makes the blend over a white page equal the linear-light answer; over a black page alpha does not matter. `smoke_coverage` in the chunk is still the plain `1 − luminance(T)`.
 
-In the other modes: `luminance` looks the same for the smoke and gives the flame a firmer, flame-coloured edge on a light page; `additive` ignores coverage, so smoke only adds light, black smoke vanishes and pale smoke turns a light page white; `opaque` draws the plume in a black box.
+In the other modes: `coverage` looks the same for the smoke and leaves the flame a softer edge, with a glow that adds to the page and so fades out over white; `additive` ignores coverage, so smoke only adds light, black smoke vanishes and pale smoke turns a light page white; `opaque` draws the plume in a black box. Over a dark page all but `opaque` look alike.
 
 ## Cost
 
@@ -73,9 +73,10 @@ What scales the cost: the number of pixels the plume covers at march resolution,
 - `gradient` puts a visible band where the fire's light ends; the band follows whichever puff the midpoint sample lands in.
 - The fire's light has no occluder but the smoke: the flame does not shadow it, and nothing lights the ground.
 - `page_alpha` assumes the tail's ACES curve and ignores bloom. Over a mid-grey page it is closer to right than `1 − T` but not exact. If the tail ever un-premultiplies before encoding, remove it.
-- Over a light page the flame core is white on white; the underlay (0.3 by default) and the orange halo are what keep it readable. Pale smoke is faint there, as white smoke on white paper would be.
+- Over a light page the flame core is white on white; its coverage, the orange halo and the shared underlay (0.3) are what keep it readable. That underlay shows as a brown veil around the embers, heaviest in `smoulder`; at 0.1 it looked cleaner.
+- Pale smoke is faint on a light page, as white smoke on white paper would be.
 - In `coverage` mode the bloom and the flame's red channel are brighter than their alpha, which the canvas specification leaves undefined (see `docs/compositing-study.md`). `luminance` does not have that problem.
-- High `g` makes smoke between the camera and the fire very bright (forward scattering peaks at 45 times isotropic at 0.8), which is why the slider stops there.
+- High `g` makes smoke between the camera and the fire very bright (the phase function peaks at about 34 times isotropic at 0.8), which is why the slider stops there.
 - Time is accumulated into the noise coordinates. After a few hours of running, 32-bit floats start to quantise them.
 - The plume is a shaped noise field, not a simulation: nothing in it responds to anything.
 

@@ -500,6 +500,24 @@ describe('output pass', () => {
     },
   );
 
+  it('burns very bright colours to white only when asked, and leaves page-level colours alone', async () => {
+    const device = await getTestDevice();
+    // Flame orange with no blue: dim, at paper white, and 32 times brighter.
+    const scene: Rgb[] = [
+      [0.5, 0.3, 0],
+      [1, 0.6, 0],
+      [32, 20, 0],
+    ];
+    const settings = { tonemap: 'aces', dither: 0 } as const;
+    const off = await renderOutput(device, scene, settings);
+    const on = await renderOutput(device, scene, { ...settings, whiten: 1 });
+    // Without it the per-channel curve leaves the hot pixel a pure yellow: blue stays empty.
+    expect(off.slice(8, 11)).toEqual([255, 255, 0]);
+    // With it the hot pixel is white, and nothing at or below 2x paper white has moved.
+    expect(on.slice(8, 11)).toEqual([255, 255, 255]);
+    expect(on.slice(0, 8)).toEqual(off.slice(0, 8));
+  });
+
   it('multiplies by exposure before tonemapping', async () => {
     const device = await getTestDevice();
     const inputs: Rgb[] = [

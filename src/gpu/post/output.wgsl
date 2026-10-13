@@ -59,6 +59,18 @@ fn post_dither(pixel: vec2f, frame: f32) -> f32 {
   return post_ign(pixel + shift) + post_ign(pixel.yx + vec2f(37.0, 91.0) + shift) - 1.0;
 }
 
+// Burn to white. The tonemap curves work per channel, so a very bright colour with an empty
+// channel (flame orange has almost no blue) saturates to a pure secondary: (16, 12, 0) displays as
+// lemon yellow however bright it gets. Film and eyes do the opposite: the hottest part of a flame
+// goes white. This blends a colour toward a neutral of its own peak as that peak passes 2x paper
+// white, complete by 16x. Colours at or below paper white are untouched.
+fn post_whiten(c: vec3f, amount: f32) -> vec3f {
+  let peak = max(c.r, max(c.g, c.b));
+  let stops_over = log2(max(peak, 1e-4)) - 1.0;
+  let w = amount * smoothstep(0.0, 3.0, stops_over);
+  return mix(c, vec3f(peak), w);
+}
+
 @fragment fn fs(in: FullscreenVarying) -> @location(0) vec4f {
   let scene_texel = textureSampleLevel(scene_tex, samp, in.uv, 0.0);
   let scene = scene_texel.rgb;
@@ -68,7 +80,7 @@ fn post_dither(pixel: vec2f, frame: f32) -> f32 {
   if (post.view == VIEW_SCENE) { radiance = scene; }
   if (post.view == VIEW_BLOOM) { radiance = glow; }
 
-  let exposed = max(radiance, vec3f(0.0)) * post.exposure;
+  let exposed = post_whiten(max(radiance, vec3f(0.0)) * post.exposure, post.whiten);
   var mapped = post_map_sdr(exposed, post.tonemap);
   if (post.hdr == 1u) { mapped = post_map_hdr(exposed, post.tonemap, post.headroom); }
 

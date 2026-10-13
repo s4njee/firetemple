@@ -1,3 +1,4 @@
+import { flickerIntensity, type FlickerSettings } from '../../gpu/emission/flicker.ts';
 import { createFullscreenPipeline, renderFullscreen } from '../../gpu/fullscreen.ts';
 import { linearSampler } from '../../gpu/passes/common.ts';
 import { createHdrTail, OVERLAY_PARAMS, TAIL_PARAMS } from '../../gpu/post/index.ts';
@@ -22,7 +23,12 @@ const Params = defineUniformStruct('Params', {
   shadowing: 'u32',
   frame: 'u32',
   exposure: 'f32',
+  flicker: 'f32',
 });
+
+/** The fire's brightness wanders by a few percent: a flicker, not a flash (see flicker.wgsl). */
+const FIRE_FLICKER: FlickerSettings = { rate: 3, depth: 0.25, shimmer: 0.02, shimmerRate: 13 };
+const FIRE_FLICKER_MEAN = 1 - (FIRE_FLICKER.depth + FIRE_FLICKER.shimmer) / 2;
 
 /**
  * The march never runs taller than this many pixels: on a larger canvas it renders into a smaller
@@ -88,6 +94,8 @@ export const effect = defineEffect({
 
     // Accumulated rather than `time * speed`, so changing speed never makes the plume jump.
     let phase = 0;
+    // The flicker has its own clock, never faster than real time: the flash limit is in seconds.
+    let flickerSeconds = 0;
 
     return {
       resize(width, height) {
@@ -99,8 +107,10 @@ export const effect = defineEffect({
       },
       frame(time, encoder, target) {
         phase += time.delta * params.speed;
+        flickerSeconds += time.delta * Math.min(params.speed, 1);
         uniforms.set({
           time: phase,
+          flicker: flickerIntensity(flickerSeconds, 1, FIRE_FLICKER) / FIRE_FLICKER_MEAN,
           density: params.density,
           soot: params.soot,
           fire_light: params.fireLight,

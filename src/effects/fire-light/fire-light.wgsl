@@ -3,6 +3,7 @@
 #include "noise.wgsl"
 #include "sdf.wgsl"
 #include "firelight.wgsl"
+#include "flicker.wgsl"
 #include "params.wgsl"
 
 // A dark stone page with a few cards on it, lit by one or two small flames. One fullscreen pass:
@@ -17,8 +18,9 @@ const RELIEF_DEPTH: f32 = 0.0075;
 /// Width of the rounded shoulder at a card's edge, page units (capped by the corner radius).
 const BEVEL: f32 = 0.011;
 const BEVEL_SLOPE: f32 = 1.5;
-/// Largest swing of a light's intensity at flicker = 1, as a fraction of it.
-const FLICKER_DEPTH: f32 = 0.24;
+/// Largest slow swing of a light's intensity at flicker = 1, as a fraction of full scale. Typical
+/// swings are about a quarter of it either side of the mean (see flicker.wgsl).
+const FLICKER_DEPTH: f32 = 0.6;
 
 const STONE_A: vec3f = vec3f(0.165, 0.14, 0.12);
 const STONE_B: vec3f = vec3f(0.13, 0.13, 0.142);
@@ -34,12 +36,15 @@ fn slow_noise(x: f32, seed: f32) -> f32 {
   return mix(hash_2to1(vec2f(i, seed)), hash_2to1(vec2f(i + 1.0, seed)), u) * 2.0 - 1.0;
 }
 
-// A light's brightness over time, around 1. Two bands, 1.7 and 4.3 values a second, so the
-// fastest component is about 2 Hz: under the 3 Hz flash limit at any `speed`.
+// A light's brightness over time, around 1: the shared band-limited signal (flicker.wgsl), whose
+// caps keep a light under the WCAG flash limit by construction. `seconds` must be real time or
+// slower (index.ts sees to that), and both lights use the same rate so their sum is covered too.
 fn light_flicker(seconds: f32, seed: f32) -> f32 {
-  // TODO(flicker.wgsl): replace this local noise with the shared flicker chunk once it exists.
-  let n = 0.62 * slow_noise(seconds * 1.7, seed) + 0.38 * slow_noise(seconds * 4.3, seed + 31.0);
-  return 1.0 + params.flicker * FLICKER_DEPTH * n;
+  let s = flicker_clamp(
+    flicker_settings(3.0, params.flicker * FLICKER_DEPTH, 0.03 * params.flicker, 13.0),
+  );
+  let mean = 1.0 - 0.5 * (s.depth + s.shimmer);
+  return flicker_intensity(seconds, u32(abs(seed)), s) / mean;
 }
 
 // Unit vector pointing out of a rounded box at q (relative to its centre): the gradient of its SDF.

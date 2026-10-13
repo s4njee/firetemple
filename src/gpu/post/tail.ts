@@ -53,6 +53,8 @@ export interface TailValues {
   bloom: number;
   bloomThreshold: number;
   bloomRadius: number;
+  /** How far highlights burn to white, 0..1; see `OutputSettings.whiten`. */
+  burn?: number;
   /** Present when the effect spread `OVERLAY_PARAMS`; otherwise the output is opaque. */
   alpha?: string;
   alphaGain?: number;
@@ -109,6 +111,7 @@ export function tailSettings(values: TailValues, time: FrameTime, hdr = false): 
       alpha: isAlphaMode(values.alpha) ? values.alpha : 'opaque',
       alphaGain: values.alphaGain,
       underlay: values.underlay,
+      whiten: values.burn,
     },
   };
 }

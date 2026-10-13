@@ -15,6 +15,7 @@ const OutputParams = defineUniformStruct('OutputParams', {
   alpha_mode: 'u32',
   alpha_gain: 'f32',
   underlay: 'f32',
+  whiten: 'f32',
 });
 
 /** The tonemappers of `color.wgsl`; `none` clamps to [0, 1] on an SDR canvas. */
@@ -72,6 +73,12 @@ export interface OutputSettings {
   headroom?: number;
   /** Show only the scene, or only the bloom. Both still get exposure and tonemapping. */
   view?: PostView;
+  /**
+   * 0..1: how far very bright colours burn toward white before the tonemap (0, the default, is
+   * off). The curves are per channel, so without this a bright flame orange saturates to pure
+   * yellow instead of whitening. Starts at 2x paper white and is complete by 16x.
+   */
+  whiten?: number;
   /** Default 'opaque'. */
   alpha?: AlphaMode;
   /**
@@ -191,6 +198,7 @@ export function createOutputPass(device: GPUDevice, options: OutputPassOptions):
         alpha_mode: ALPHA_ID[settings.alpha ?? 'opaque'],
         alpha_gain: Math.max(0, settings.alphaGain ?? 1),
         underlay: Math.min(1, Math.max(0, settings.underlay ?? 0)),
+        whiten: Math.min(1, Math.max(0, settings.whiten ?? 0)),
       });
       uniforms.upload();
       renderFullscreen(encoder, target, pipeline, [group], { label, timestampWrites });

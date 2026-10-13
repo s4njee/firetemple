@@ -8,6 +8,7 @@ import {
   fitFovY,
   setCameraUniform,
 } from '../../gpu/scene/camera.ts';
+import { flickerIntensity, type FlickerSettings } from '../../gpu/emission/flicker.ts';
 import { createDepthTarget } from '../../gpu/scene/depth.ts';
 import { createForwardRenderer, type SceneObject } from '../../gpu/scene/forward.ts';
 import { cylinderGeometry, planeGeometry, sphereGeometry } from '../../gpu/scene/geometry.ts';
@@ -95,6 +96,10 @@ function place(
   mat4.scale(m, scale, m);
   return m;
 }
+
+/** The whole fire swells by a few percent: typical swings are about a quarter of `depth`. */
+const FIRE_FLICKER: FlickerSettings = { rate: 3, depth: 0.2, shimmer: 0.02, shimmerRate: 13 };
+const FIRE_FLICKER_MEAN = 1 - (FIRE_FLICKER.depth + FIRE_FLICKER.shimmer) / 2;
 
 export const effect = defineEffect({
   meta,
@@ -299,12 +304,11 @@ export const effect = defineEffect({
           camera,
         );
 
-        // A slow, small swell of the whole fire: two sines, +-6% together. Its clock is capped so
-        // that no `speed` setting takes it past 2.7 Hz (WCAG 2.3.1 allows three flashes a second).
-        // TODO(flicker.wgsl): replace with the shared band-limited flicker signal (story 3.6).
-        flickerPhase += time.delta * Math.min(params.speed, 1.5);
-        const flicker =
-          1 + 0.035 * Math.sin(flickerPhase * 7.1) + 0.025 * Math.sin(flickerPhase * 11.3 + 1.7);
+        // A slow, small swell of the whole fire: the shared band-limited flicker signal, which
+        // cannot exceed the WCAG flash limit. Its clock never runs faster than real time, whatever
+        // `speed` says, because the limit is a statement about real seconds.
+        flickerPhase += time.delta * Math.min(params.speed, 1);
+        const flicker = flickerIntensity(flickerPhase, 1, FIRE_FLICKER) / FIRE_FLICKER_MEAN;
 
         // 1. Opaque scene: flat albedo and depth.
         view.update(camera, width, height, {
