@@ -140,6 +140,7 @@ holds a still frame; an effect must look right as one.
 | Pointer position and drags | `src/gpu/pointer.ts` |
 | Scroll position, audio level | `src/gpu/scroll.ts`, `src/gpu/audio.ts` |
 | Where DOM elements are, in canvas uv | `src/gpu/dom-rects.ts` |
+| Pointer and ambient ignition, scroll and audio drive (simulations) | `src/gpu/sim/ignition.ts` + `ignite.wgsl`, `src/gpu/sim/excitation.ts` |
 | Camera, meshes, a forward pass | `src/gpu/scene/` |
 | Noise, FBM, Voronoi, curl, SDF, colour, maths | `src/wgsl/*.wgsl`; each file's header lists its functions |
 | Noise from a texture fetch (use this in Tier A) | `getNoiseTexture(device)` in `src/gpu/emission/noise-texture.ts` + `#include "noisetex.wgsl"` |
@@ -193,6 +194,18 @@ holds a still frame; an effect must look right as one.
 ## Simulations
 
 For anything with persistent state:
+
+- State lives in a `createPingPongTarget` (`src/gpu/targets.ts`); steps come from
+  `createFixedStepper` (`src/gpu/loop.ts`). Shared simulation modules go in `src/gpu/sim/`.
+- Heat comes in through the shared ignition layer (`src/gpu/sim/ignition.ts` + `ignite.wgsl`):
+  `createPointerIgnition` (tap, drag, multi-touch) and `createAmbientIgnition` (stray embers, so a
+  scene nobody touches is never dead), combined with `collectIgniters` and written with
+  `writeIgniters`. Do not hand-roll pointer splats.
+- An outside drive is a 0..1 level from `createExcitation('scroll' | 'audio' | 'none', canvas)`
+  (`src/gpu/sim/excitation.ts`), exposed as a `drive` parameter. Feed it into fuel or ember rate
+  as a share of the calm level, never into the simulation's clock.
+- A cell that flips every step flickers at the step rate. Keep the step rate and the speed of a
+  bright front low enough for the flash analyser, or blur the state before it is shown.
 
 - Keep the grid independent of the canvas size and step it with a fixed timestep, so it behaves
   the same at 60 Hz, 120 Hz and after the tab was in the background.
