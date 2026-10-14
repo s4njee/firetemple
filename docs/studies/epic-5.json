@@ -1,0 +1,1406 @@
+{
+  "epic": "5",
+  "measuredAt": "2026-10-14T03:57:11.508Z",
+  "device": "Apple M1 Max",
+  "deviceClass": "apple-silicon",
+  "adapter": {
+    "vendor": "apple",
+    "architecture": "metal-3",
+    "device": "apple-m1-max",
+    "description": "Metal driver on macOS Version 26.6.2 (Build 25G83)"
+  },
+  "runtime": "Dawn (node webgpu bindings)",
+  "method": {
+    "metric": "GPU timestamps: frame span (first pass start to last pass end) and marginal cost per extra frame",
+    "warmupFrames": 12,
+    "rounds": 11,
+    "repeats": 4
+  },
+  "note": "Only this adapter was measured. spanMs includes the timing floor (see the \"(floor)\" rows); slopeMs is the cost of one more frame of the same work and is the number to compare by. A slope at or below zero means the work is below what this method can resolve.",
+  "rows": [
+    {
+      "effect": "(floor)",
+      "config": "one constant-colour pass",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.065536,
+      "slopeMs": 0.065536,
+      "slopeMinMs": -0.043690666666666676,
+      "slopeMaxMs": 0.17476266666666665,
+      "passes": 1,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "(tail)",
+      "config": "constant scene + bloom + output",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.65536,
+      "slopeMs": 0.6990506666666668,
+      "slopeMinMs": 0.17476266666666662,
+      "slopeMaxMs": 1.0048853333333334,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.179648,
+      "slopeMs": 0.9830399999999999,
+      "slopeMinMs": 0.917504,
+      "slopeMaxMs": 1.1578026666666668,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "preset slow paper",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.851968,
+      "slopeMs": 0.6553599999999999,
+      "slopeMinMs": 0.4587519999999999,
+      "slopeMaxMs": 1.6165546666666666,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "preset flash paper",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.917504,
+      "slopeMs": 1.1578026666666668,
+      "slopeMinMs": 0.524288,
+      "slopeMaxMs": 1.507328,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "preset hole",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.245184,
+      "slopeMs": 1.2888746666666666,
+      "slopeMinMs": 0.65536,
+      "slopeMaxMs": 1.507328,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "preset from below",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.179648,
+      "slopeMs": 1.0922666666666665,
+      "slopeMinMs": 0.8738133333333332,
+      "slopeMaxMs": 1.8786986666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "preset ash",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.179648,
+      "slopeMs": 1.2670293333333331,
+      "slopeMinMs": 0.7427413333333331,
+      "slopeMaxMs": 1.5291733333333333,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.179648,
+      "slopeMs": 0.9830399999999999,
+      "slopeMinMs": 0.6335146666666668,
+      "slopeMaxMs": 1.1359573333333333,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "preset burn",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.179648,
+      "slopeMs": 1.048576,
+      "slopeMinMs": 0.8738133333333332,
+      "slopeMaxMs": 1.4417920000000002,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "preset steady creep",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.114112,
+      "slopeMs": 0.9393493333333334,
+      "slopeMinMs": 0.41506133333333334,
+      "slopeMaxMs": 1.419946666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "preset patchy smoulder",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.851968,
+      "slopeMs": 0.851968,
+      "slopeMinMs": 0.3713706666666667,
+      "slopeMaxMs": 0.98304,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "preset fast cycle",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.179648,
+      "slopeMs": 0.8082773333333333,
+      "slopeMinMs": 0.5024426666666667,
+      "slopeMaxMs": 1.5291733333333333,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "dom-fuel",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.114112,
+      "slopeMs": 0.6772053333333333,
+      "slopeMinMs": 0.5461333333333332,
+      "slopeMaxMs": 0.9611946666666666,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "dom-fuel",
+      "config": "preset slow creep",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.507328,
+      "slopeMs": 0.7645866666666666,
+      "slopeMinMs": 0.4805973333333335,
+      "slopeMaxMs": 0.8301226666666667,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "dom-fuel",
+      "config": "preset fast spread",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.048576,
+      "slopeMs": 1.1359573333333335,
+      "slopeMinMs": 0.851968,
+      "slopeMaxMs": 1.3981013333333332,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "dom-fuel",
+      "config": "preset embers only",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.048576,
+      "slopeMs": 0.9611946666666666,
+      "slopeMinMs": 0.5024426666666667,
+      "slopeMaxMs": 1.1578026666666668,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.65536,
+      "slopeMs": 0.6990506666666666,
+      "slopeMinMs": 0.4805973333333334,
+      "slopeMaxMs": 0.8956586666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset hearth",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.65536,
+      "slopeMs": 0.45875200000000005,
+      "slopeMinMs": 0.41506133333333334,
+      "slopeMaxMs": 0.7645866666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset classic doom",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.65536,
+      "slopeMs": 0.4805973333333333,
+      "slopeMinMs": 0.3713706666666667,
+      "slopeMaxMs": 0.7208960000000001,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset footer",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.589824,
+      "slopeMs": 0.524288,
+      "slopeMinMs": 0.4369066666666666,
+      "slopeMaxMs": 0.851968,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset draw with the pointer",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.589824,
+      "slopeMs": 0.4805973333333333,
+      "slopeMinMs": 0.32768,
+      "slopeMaxMs": 0.6990506666666666,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset burnt out",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.589824,
+      "slopeMs": 0.4805973333333333,
+      "slopeMinMs": 0.19660799999999998,
+      "slopeMaxMs": 0.6990506666666666,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset fed by scrolling",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.589824,
+      "slopeMs": 0.45875200000000005,
+      "slopeMinMs": 0.41506133333333334,
+      "slopeMaxMs": 0.6116693333333334,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset gas blue",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.589824,
+      "slopeMs": 0.45875200000000005,
+      "slopeMinMs": 0.39321599999999995,
+      "slopeMaxMs": 0.7645866666666666,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset compute backend",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.589824,
+      "slopeMs": 0.5024426666666666,
+      "slopeMinMs": 0.45875200000000005,
+      "slopeMaxMs": 0.8082773333333333,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.048576,
+      "slopeMs": 1.0922666666666665,
+      "slopeMinMs": 0.5679786666666666,
+      "slopeMaxMs": 1.3325653333333334,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "preset living forest",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.114112,
+      "slopeMs": 1.245184,
+      "slopeMinMs": 1.179648,
+      "slopeMaxMs": 1.2670293333333333,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "preset quiet valley",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.114112,
+      "slopeMs": 1.2233386666666668,
+      "slopeMinMs": 1.2014933333333335,
+      "slopeMaxMs": 1.31072,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "preset windy day",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.114112,
+      "slopeMs": 1.2451839999999998,
+      "slopeMinMs": 0.8082773333333334,
+      "slopeMaxMs": 1.4636373333333335,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "preset all sizes",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.65536,
+      "slopeMs": 0.5679786666666665,
+      "slopeMinMs": 0.32767999999999997,
+      "slopeMaxMs": 1.048576,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "preset embers",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.65536,
+      "slopeMs": 0.5461333333333332,
+      "slopeMinMs": 0.393216,
+      "slopeMaxMs": 1.0267306666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=render resolution=48",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "backend": "render",
+        "resolution": 48
+      },
+      "spanMs": 0.917504,
+      "slopeMs": 1.0922666666666665,
+      "slopeMinMs": 0.5679786666666667,
+      "slopeMaxMs": 1.2233386666666668,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=render resolution=96",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "backend": "render",
+        "resolution": 96
+      },
+      "spanMs": 0.917504,
+      "slopeMs": 0.7864319999999999,
+      "slopeMinMs": 0.48059733333333327,
+      "slopeMaxMs": 0.98304,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=render resolution=192",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "backend": "render",
+        "resolution": 192
+      },
+      "spanMs": 0.720896,
+      "slopeMs": 0.524288,
+      "slopeMinMs": 0.2621440000000001,
+      "slopeMaxMs": 0.7645866666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=render resolution=256",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "backend": "render",
+        "resolution": 256
+      },
+      "spanMs": 0.589824,
+      "slopeMs": 0.4369066666666666,
+      "slopeMinMs": 0.26214399999999993,
+      "slopeMaxMs": 0.7208959999999999,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=compute resolution=48",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "backend": "compute",
+        "resolution": 48
+      },
+      "spanMs": 0.65536,
+      "slopeMs": 0.4805973333333333,
+      "slopeMinMs": 0.3276799999999999,
+      "slopeMaxMs": 0.9611946666666666,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=compute resolution=96",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "backend": "compute",
+        "resolution": 96
+      },
+      "spanMs": 0.65536,
+      "slopeMs": 0.5461333333333332,
+      "slopeMinMs": 0.24029866666666666,
+      "slopeMaxMs": 0.8082773333333334,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=compute resolution=192",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "backend": "compute",
+        "resolution": 192
+      },
+      "spanMs": 0.589824,
+      "slopeMs": 0.5024426666666666,
+      "slopeMinMs": 0.4369066666666666,
+      "slopeMaxMs": 0.6772053333333332,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=compute resolution=256",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "backend": "compute",
+        "resolution": 256
+      },
+      "spanMs": 0.589824,
+      "slopeMs": 0.4369066666666666,
+      "slopeMinMs": 0.39321599999999995,
+      "slopeMaxMs": 0.6990506666666666,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "resolution=64",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "resolution": 64
+      },
+      "spanMs": 0.917504,
+      "slopeMs": 0.9393493333333334,
+      "slopeMinMs": 0.7427413333333334,
+      "slopeMaxMs": 1.507328,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "resolution=128",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "resolution": 128
+      },
+      "spanMs": 0.98304,
+      "slopeMs": 0.8956586666666667,
+      "slopeMinMs": 0.5461333333333334,
+      "slopeMaxMs": 1.3325653333333332,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "resolution=256",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "resolution": 256
+      },
+      "spanMs": 1.179648,
+      "slopeMs": 1.048576,
+      "slopeMinMs": 0.41506133333333334,
+      "slopeMaxMs": 1.4854826666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "resolution=512",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "resolution": 512
+      },
+      "spanMs": 0.720896,
+      "slopeMs": 0.7208959999999999,
+      "slopeMinMs": 0.4805973333333333,
+      "slopeMaxMs": 1.1359573333333335,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "resolution=48",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "resolution": 48
+      },
+      "spanMs": 0.720896,
+      "slopeMs": 0.7427413333333334,
+      "slopeMinMs": 0.4369066666666666,
+      "slopeMaxMs": 0.9611946666666666,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "resolution=90",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "resolution": 90
+      },
+      "spanMs": 0.851968,
+      "slopeMs": 0.6990506666666666,
+      "slopeMinMs": 0.524288,
+      "slopeMaxMs": 1.4636373333333335,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "resolution=180",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "resolution": 180
+      },
+      "spanMs": 0.786432,
+      "slopeMs": 0.7427413333333334,
+      "slopeMinMs": 0.5461333333333334,
+      "slopeMaxMs": 1.1578026666666665,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "resolution=360",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "resolution": 360
+      },
+      "spanMs": 0.917504,
+      "slopeMs": 0.8082773333333333,
+      "slopeMinMs": 0.65536,
+      "slopeMaxMs": 1.0704213333333332,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "grid=192",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "grid": 192
+      },
+      "spanMs": 0.65536,
+      "slopeMs": 0.6116693333333334,
+      "slopeMinMs": 0.41506133333333334,
+      "slopeMaxMs": 1.419946666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "grid=256",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "grid": 256
+      },
+      "spanMs": 0.917504,
+      "slopeMs": 0.7427413333333334,
+      "slopeMinMs": 0.589824,
+      "slopeMaxMs": 1.114112,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "grid=384",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "grid": 384
+      },
+      "spanMs": 1.114112,
+      "slopeMs": 1.1359573333333333,
+      "slopeMinMs": 0.7645866666666666,
+      "slopeMaxMs": 1.2670293333333333,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "grid=512",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "grid": 512
+      },
+      "spanMs": 1.179648,
+      "slopeMs": 1.0267306666666665,
+      "slopeMinMs": 0.7864319999999999,
+      "slopeMaxMs": 1.245184,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "(floor)",
+      "config": "one constant-colour pass",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.065536,
+      "slopeMs": 0.065536,
+      "slopeMinMs": 0,
+      "slopeMaxMs": 0.10922666666666668,
+      "passes": 1,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "(tail)",
+      "config": "constant scene + bloom + output",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.3495253333333334,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.4150613333333333,
+      "passes": 9,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.524288,
+      "slopeMinMs": 0.41506133333333334,
+      "slopeMaxMs": 0.8956586666666667,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "preset slow paper",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.524288,
+      "slopeMinMs": 0.32768,
+      "slopeMaxMs": 0.786432,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "preset flash paper",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.524288,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.7208960000000001,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "preset hole",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.524288,
+      "slopeMinMs": 0.3495253333333333,
+      "slopeMaxMs": 0.851968,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "preset from below",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.45875200000000005,
+      "slopeMinMs": 0.17476266666666662,
+      "slopeMaxMs": 0.8738133333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "preset ash",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.589824,
+      "slopeMs": 0.5461333333333332,
+      "slopeMinMs": 0.131072,
+      "slopeMaxMs": 0.9393493333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.45875200000000005,
+      "slopeMinMs": 0.2839893333333333,
+      "slopeMaxMs": 0.6990506666666668,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "preset burn",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.589824,
+      "slopeMs": 0.41506133333333334,
+      "slopeMinMs": 0.15291733333333327,
+      "slopeMaxMs": 0.851968,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "preset steady creep",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.41506133333333334,
+      "slopeMinMs": 0.10922666666666665,
+      "slopeMaxMs": 0.8082773333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "preset patchy smoulder",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.4369066666666666,
+      "slopeMinMs": 0.131072,
+      "slopeMaxMs": 0.8082773333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "preset fast cycle",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.589824,
+      "slopeMs": 0.5024426666666666,
+      "slopeMinMs": 0.131072,
+      "slopeMaxMs": 0.8956586666666667,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "dom-fuel",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.589824,
+      "slopeMs": 0.4369066666666666,
+      "slopeMinMs": 0.10922666666666665,
+      "slopeMaxMs": 0.786432,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "dom-fuel",
+      "config": "preset slow creep",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.4805973333333333,
+      "slopeMinMs": 0.32768,
+      "slopeMaxMs": 0.8082773333333334,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "dom-fuel",
+      "config": "preset fast spread",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.589824,
+      "slopeMs": 0.524288,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.8738133333333332,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "dom-fuel",
+      "config": "preset embers only",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.589824,
+      "slopeMs": 0.45875200000000005,
+      "slopeMinMs": 0.41506133333333334,
+      "slopeMaxMs": 0.7208960000000001,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.393216,
+      "slopeMs": 0.3713706666666667,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.6116693333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset hearth",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.458752,
+      "slopeMs": 0.393216,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.6116693333333333,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset classic doom",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.458752,
+      "slopeMs": 0.3713706666666667,
+      "slopeMinMs": 0.262144,
+      "slopeMaxMs": 0.7208960000000001,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset footer",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.458752,
+      "slopeMs": 0.3713706666666667,
+      "slopeMinMs": 0.32767999999999997,
+      "slopeMaxMs": 0.41506133333333334,
+      "passes": 9,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset draw with the pointer",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.458752,
+      "slopeMs": 0.393216,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.5679786666666667,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset burnt out",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.458752,
+      "slopeMs": 0.3713706666666667,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.524288,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset fed by scrolling",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.458752,
+      "slopeMs": 0.3495253333333333,
+      "slopeMinMs": 0.15291733333333335,
+      "slopeMaxMs": 0.41506133333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset gas blue",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.458752,
+      "slopeMs": 0.393216,
+      "slopeMinMs": 0.32767999999999997,
+      "slopeMaxMs": 0.6335146666666666,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "preset compute backend",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.458752,
+      "slopeMs": 0.30583466666666664,
+      "slopeMinMs": 0.10922666666666665,
+      "slopeMaxMs": 0.4805973333333333,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.41506133333333334,
+      "slopeMinMs": 0.10922666666666665,
+      "slopeMaxMs": 0.7208959999999999,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "preset living forest",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.41506133333333334,
+      "slopeMinMs": 0.08738133333333331,
+      "slopeMaxMs": 0.786432,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "preset quiet valley",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.45875200000000005,
+      "slopeMinMs": 0.06553599999999997,
+      "slopeMaxMs": 0.65536,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "preset windy day",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.589824,
+      "slopeMs": 0.41506133333333334,
+      "slopeMinMs": -0.15291733333333335,
+      "slopeMaxMs": 0.8301226666666667,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "preset all sizes",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.4150613333333333,
+      "slopeMinMs": 0.06553599999999997,
+      "slopeMaxMs": 0.6990506666666668,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "preset embers",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.458752,
+      "slopeMinMs": 0.15291733333333327,
+      "slopeMaxMs": 0.7427413333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=render resolution=48",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "backend": "render",
+        "resolution": 48
+      },
+      "spanMs": 0.524288,
+      "slopeMs": 0.39321599999999995,
+      "slopeMinMs": 0.3713706666666667,
+      "slopeMaxMs": 0.7208960000000001,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=render resolution=96",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "backend": "render",
+        "resolution": 96
+      },
+      "spanMs": 0.65536,
+      "slopeMs": 0.393216,
+      "slopeMinMs": 0.262144,
+      "slopeMaxMs": 1.048576,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=render resolution=192",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "backend": "render",
+        "resolution": 192
+      },
+      "spanMs": 0.458752,
+      "slopeMs": 0.32767999999999997,
+      "slopeMinMs": 0.2839893333333333,
+      "slopeMaxMs": 0.3495253333333333,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=render resolution=256",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "backend": "render",
+        "resolution": 256
+      },
+      "spanMs": 0.458752,
+      "slopeMs": 0.3713706666666667,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.6990506666666666,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=compute resolution=48",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "backend": "compute",
+        "resolution": 48
+      },
+      "spanMs": 0.393216,
+      "slopeMs": 0.32767999999999997,
+      "slopeMinMs": 0.28398933333333337,
+      "slopeMaxMs": 0.589824,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=compute resolution=96",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "backend": "compute",
+        "resolution": 96
+      },
+      "spanMs": 0.393216,
+      "slopeMs": 0.3713706666666667,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.41506133333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=compute resolution=192",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "backend": "compute",
+        "resolution": 192
+      },
+      "spanMs": 0.458752,
+      "slopeMs": 0.3495253333333333,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.6990506666666668,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "doom-fire",
+      "config": "backend=compute resolution=256",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "backend": "compute",
+        "resolution": 256
+      },
+      "spanMs": 0.393216,
+      "slopeMs": 0.3713706666666667,
+      "slopeMinMs": 0.32767999999999997,
+      "slopeMaxMs": 0.6116693333333333,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "resolution=64",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "resolution": 64
+      },
+      "spanMs": 0.458752,
+      "slopeMs": 0.3713706666666667,
+      "slopeMinMs": 0.30583466666666664,
+      "slopeMaxMs": 0.6990506666666666,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "resolution=128",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "resolution": 128
+      },
+      "spanMs": 0.589824,
+      "slopeMs": 0.4369066666666666,
+      "slopeMinMs": 0.28398933333333337,
+      "slopeMaxMs": 0.8956586666666667,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "resolution=256",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "resolution": 256
+      },
+      "spanMs": 0.524288,
+      "slopeMs": 0.524288,
+      "slopeMinMs": 0.19660799999999998,
+      "slopeMaxMs": 0.98304,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "burn-front",
+      "config": "resolution=512",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "resolution": 512
+      },
+      "spanMs": 0.524288,
+      "slopeMs": 0.524288,
+      "slopeMinMs": 0.06553599999999997,
+      "slopeMaxMs": 0.9393493333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "resolution=48",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "resolution": 48
+      },
+      "spanMs": 0.524288,
+      "slopeMs": 0.4369066666666666,
+      "slopeMinMs": 0.15291733333333327,
+      "slopeMaxMs": 0.8301226666666667,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "resolution=90",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "resolution": 90
+      },
+      "spanMs": 0.524288,
+      "slopeMs": 0.4369066666666666,
+      "slopeMinMs": 0.15291733333333327,
+      "slopeMaxMs": 0.7427413333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "resolution=180",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "resolution": 180
+      },
+      "spanMs": 0.524288,
+      "slopeMs": 0.39321599999999995,
+      "slopeMinMs": 0.04369066666666662,
+      "slopeMaxMs": 0.8082773333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "forest-fire",
+      "config": "resolution=360",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "resolution": 360
+      },
+      "spanMs": 0.589824,
+      "slopeMs": 0.41506133333333334,
+      "slopeMinMs": 0.08738133333333331,
+      "slopeMaxMs": 0.8956586666666667,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "grid=192",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "grid": 192
+      },
+      "spanMs": 0.524288,
+      "slopeMs": 0.41506133333333334,
+      "slopeMinMs": 0.10922666666666665,
+      "slopeMaxMs": 0.851968,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "grid=256",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "grid": 256
+      },
+      "spanMs": 0.589824,
+      "slopeMs": 0.41506133333333334,
+      "slopeMinMs": 0.13107199999999994,
+      "slopeMaxMs": 0.7208960000000001,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "grid=384",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "grid": 384
+      },
+      "spanMs": 0.524288,
+      "slopeMs": 0.4369066666666666,
+      "slopeMinMs": 0.021845333333333345,
+      "slopeMaxMs": 0.8082773333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "combustion-front",
+      "config": "grid=512",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "grid": 512
+      },
+      "spanMs": 0.65536,
+      "slopeMs": 0.524288,
+      "slopeMinMs": 0.28398933333333337,
+      "slopeMaxMs": 0.8301226666666667,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    }
+  ]
+}

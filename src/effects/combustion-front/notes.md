@@ -73,13 +73,13 @@ What it costs:
 
 ## Cost
 
-GPU time: not measured yet. What can be counted, at the defaults on a 1920 × 1080 canvas:
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, simulation and tail included): 1.0 ms per frame on Dawn, where the tail alone reads 0.7 ms and repeated runs differ by about half a millisecond, so the simulation cannot be told apart from the tail; and 1.31 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.29 to 1.39), which includes the browser's timing floor. Both are inside the Tier A budget on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. How the cost moves with grid size is in `docs/studies/epic-5.md` (story 5.9): within the sizes a page would use, it does not measurably move. What can be counted, at the defaults on a 1920 × 1080 canvas:
 
 - **Simulation:** a 683 × 384 grid (262 thousand cells, 4.2 MB for the two `rgba16float` state textures). 60 steps a second whatever the display rate (0 or 1 per frame at 120 Hz, 2 at 30 fps, at most 2), and one sub-step per step at the default `D`. Per cell per sub-step: 9 texel loads, one 3-component PCG hash, 2 `exp`, a smoothstep, the igniter loop (usually 0 or 1 iteration, at most 16), two quantisations; one 8-byte write. So about 2.4 million texel loads a frame, a little more than one full-canvas pass.
 - **Display:** one pass at canvas size, 2.07 million pixels: one bilinear fetch of the state, one of the shared noise tile, `blackbody_radiance` (about 30 ALU operations, 2 `exp`, 2 `log`) and `ramp_whiten`. Then the HDR tail.
 - **What scales it:** sub-steps grow with `D × (grid / 384)²`: the worst setting (`D` 60, `grid` 512, 910 × 512 cells) takes 8 sub-steps, 33.5 million loads a frame, 16 passes at 30 fps. The display pass scales with the canvas, the simulation does not. Laying fuel is one extra pass, only at start, on a resize and when a fuel slider moves.
 
-The work at the defaults is about two full-canvas passes plus the tail, which suggests it could fit Tier A; it is labelled B, the story's target, until a measurement says otherwise.
+The work at the defaults is about two full-canvas passes plus the tail, and measured it fits Tier A on this machine (see above), so it is marked A, not the B the story planned. The heaviest slider settings (grid 512 with fast diffusion, eight sub-steps a step) cost more and were not measured; at those, treat it as Tier Be.
 
 ## Pitfalls
 

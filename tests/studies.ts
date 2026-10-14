@@ -52,4 +52,12 @@ export const STUDY_SWEEPS: Readonly<Record<string, readonly StudyConfig[]>> = {
     // 4.9: sparks should not cost more as they get denser.
     ...sweep('sparks', 'layers', [1, 2, 3, 4]),
   ],
+  '5': [
+    // 5.9: grid resolution against frame time, and render pass against compute.
+    ...sweep('doom-fire', 'resolution', [48, 96, 192, 256], { backend: 'render' }),
+    ...sweep('doom-fire', 'resolution', [48, 96, 192, 256], { backend: 'compute' }),
+    ...sweep('burn-front', 'resolution', [64, 128, 256, 512]),
+    ...sweep('forest-fire', 'resolution', [48, 90, 180, 360]),
+    ...sweep('combustion-front', 'grid', [192, 256, 384, 512]),
+  ],
 };

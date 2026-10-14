@@ -4,7 +4,7 @@ export const meta: EffectMeta = {
   id: 'dom-fuel',
   title: 'DOM as fuel',
   epic: '5',
-  tier: 'B',
+  tier: 'A',
   tags: ['simulation', 'overlay', 'dom', 'interactive'],
   summary:
     'The page is the fuel: the rounded rectangles of marked elements are drawn into a fuel map, so fire climbs cards and headings, stops at the gaps between them, leaves a scorch that fades, and the fuel returns.',

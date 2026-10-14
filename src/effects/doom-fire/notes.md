@@ -54,7 +54,7 @@ The base row is the standing fuel. At `fuel` 0 the base goes dark at once and th
 
 ## Cost
 
-GPU time: not measured yet. Leave the scorecard's numbers to the measured runs. What can be counted:
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, simulation and tail included): 0.7 ms per frame on Dawn, where the tail alone reads 0.7 ms and repeated runs differ by about half a millisecond, so the simulation cannot be told apart from the tail; and 0.97 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 0.88 to 1.06), which includes the browser's timing floor. Both are inside the Tier A budget on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. How the cost moves with grid size is in `docs/studies/epic-5.md` (story 5.9): within the sizes a page would use, it does not measurably move. What can be counted:
 
 - Passes: one step pass per simulation step (0 or 1 a frame at 45 steps a second and 60 frames a second; at most 4 a frame after a stall), one display pass at canvas size, then the tail.
 - The step: 66 048 cells at the default 192 on a 16:9 canvas (16 128 at 96, 116 736 at 256), each one texel fetch, one PCG hash, 24 more for the gust field (none for the classic rule), a segment distance per igniter in use, and two float value noises for the cells of the bottom row only. About three million cell updates a second at the defaults, independent of the canvas size.

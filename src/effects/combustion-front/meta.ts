@@ -4,7 +4,7 @@ export const meta: EffectMeta = {
   id: 'combustion-front',
   title: 'Reaction–diffusion combustion',
   epic: '5',
-  tier: 'B',
+  tier: 'A',
   tags: ['simulation', 'overlay', 'interactive', 'front', 'blackbody'],
   summary:
     'Fire as a travelling front in two continuous fields, temperature and fuel. Heat diffuses into unburnt fuel, the fuel ignites and releases heat; the speed and thickness of the front follow from the physical constants. Tap or drag to light it.',

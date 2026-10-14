@@ -157,7 +157,7 @@ holds a still frame; an effect must look right as one.
   chunks together, so a name collision fails the suite.
 - Each chunk `#include`s what it depends on.
 - WGSL reserves many ordinary words as identifiers (`patch`, `crate`, `pass`, `filter`, `mod`,
-  `target`, …). An "unexpected token" on a plain variable name usually means it is one of them.
+  `target`, `layout`, `active`, `set`, `from`, …). An "unexpected token" on a plain variable name usually means it is one of them.
 - Prove behaviour with numbers: `tests/wgsl-eval.ts` runs WGSL on the GPU from a test
   (`gpuF32`, `scalars`). Tests may include any library chunk; they pass the whole library
   (`tests/library.ts`), which application code never does.
@@ -206,6 +206,19 @@ For anything with persistent state:
   as a share of the calm level, never into the simulation's clock.
 - A cell that flips every step flickers at the step rate. Keep the step rate and the speed of a
   bright front low enough for the flash analyser, or blur the state before it is shown.
+- Writing to an `rgba16float` target truncates toward zero on Apple GPUs instead of rounding, so
+  a quantity that changes by less than half a step per write leaks away (Epic 5 lost 0.05 of a
+  unit of fuel a second this way). Round stochastically in the shader to an exact half float
+  (`combust_quantise` in `src/gpu/sim/combustion-step.wgsl` does it with an exact ulp), and do not
+  count elapsed time in a half float: it stops resolving 1/60 s past about 32 s.
+- Several steps encoded in one frame each need their own uniform buffer: `writeBuffer` calls
+  before a submit all land before the first step runs, so they would share the last values.
+- Randomness is a hash of (cell, step, seed), never per-frame `Math.random`, so runs repeat and the
+  render and compute versions of a step agree. Tests of a probabilistic rule still check shapes and
+  totals, never single cells: one last-digit difference between drivers diverges the whole run.
+- A front has to be about three cells thick to stay round and move at its physical speed; thinner
+  ones pin to the grid. A rule that only reads axis neighbours grows diamonds: use all eight with
+  weights, or an arrival-time update (`src/gpu/sim/burn.ts`).
 
 - Keep the grid independent of the canvas size and step it with a fixed timestep, so it behaves
   the same at 60 Hz, 120 Hz and after the tab was in the background.

@@ -47,7 +47,7 @@ The head runs at up to 1.7 cells a step (the two-cell jump caps it near 2), the 
 
 ## Cost
 
-GPU time: not measured yet (no `npm run study` run, and the browser figures below are indicative).
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, simulation and tail included): 1.1 ms per frame on Dawn, where the tail alone reads 0.7 ms and repeated runs differ by about half a millisecond, so the simulation cannot be told apart from the tail; and 1.51 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.12 to 1.52), which includes the browser's timing floor. Both are inside the Tier A budget on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. How the cost moves with grid size is in `docs/studies/epic-5.md` (story 5.9): within the sizes a page would use, it does not measurably move.
 
 What can be counted, at the defaults on a 1920 × 1080 canvas (a 320 × 180 grid, 15 steps a second): per step, per cell, at most 9 state reads (25 when the wind is strong enough to spot), one noise fetch for the land, one for the smoke wobble and four bilinear smoke taps, over 57 600 cells, about once every four frames. Per frame, a grid-size pass of two reads per cell, then per pixel four bilinear reads of that small texture and two of the noise tile, no procedural noise, no loop, one `pow` and the fire ramp. The grid does not grow with the canvas, so the full-size pass is the only part that scales with resolution.
 

@@ -16,7 +16,7 @@ The page is the fuel. Every element marked `data-ft-obstacle` near the canvas is
 
 ## Cost
 
-GPU time: not measured yet. Chrome's HUD in the browser check (Apple M1 Max, 1920 x 1080 canvas in the bare layout, so on the stand-in cards, default settings, while other agents were using the GPU, indicative only) read 1.05 to 1.19 ms for one frame over two runs (medians 1.17 and 1.05 ms of three loads each), which is the HDR tail's own cost there.
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, simulation and tail included): 0.7 ms per frame on Dawn, where the tail alone reads 0.7 ms and repeated runs differ by about half a millisecond, so the simulation cannot be told apart from the tail; and 1.16 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 1.04 to 1.20), which includes the browser's timing floor. Both are inside the Tier A budget on this machine. The budget is set for an integrated GPU, and no integrated GPU or phone has been measured, so the tier is provisional. How the cost moves with grid size is in `docs/studies/epic-5.md` (story 5.9): within the sizes a page would use, it does not measurably move. Chrome's HUD in the browser check (Apple M1 Max, 1920 x 1080 canvas in the bare layout, so on the stand-in cards, default settings, while other agents were using the GPU, indicative only) read 1.05 to 1.19 ms for one frame over two runs (medians 1.17 and 1.05 ms of three loads each), which is the HDR tail's own cost there.
 
 What can be counted, at the defaults on a 1920 x 1080 canvas:
 
@@ -28,7 +28,7 @@ What can be counted, at the defaults on a 1920 x 1080 canvas:
 - On the CPU per frame: one `getBoundingClientRect` for the canvas and one per marked element, cached computed style (see `dom-rects.ts`).
 - Texture memory beyond the tail: state 2 x 0.93 MB, map 0.93 MB, flames 2 x 0.93 MB.
 
-There is no whole-map regrowth here, so the reduction passes `burn-front` needs never run. It is labelled Tier B for the story; by the reading above it may fit Tier A, which needs measuring on a quiet GPU and an integrated one.
+There is no whole-map regrowth here, so the reduction passes `burn-front` needs never run. It was planned as Tier B; measured, it fits Tier A on this machine (see Cost). That reading is on the stand-in cards; a page with many marked elements adds only to the map rasterisation, which runs when the layout changes, not every frameng on a quiet GPU and an integrated one.
 
 ## Pitfalls
 
