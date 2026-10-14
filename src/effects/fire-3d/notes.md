@@ -1,0 +1,67 @@
+## How it works
+
+A fire simulated in three dimensions and ray-marched: the technique behind film fire, at the smallest grid that still looks like one. Two halves, the simulation in `src/gpu/sim/fire3d.ts` and the picture in this directory.
+
+**The solver.** `src/gpu/sim/fluid3d.ts` is Water Temple's 3D stable-fluids solver, ported: a staggered (MAC) grid of 32 x 48 x 32 cells by default, velocity in one `rgba16float` 3D texture, semi-Lagrangian velocity advection with a midpoint back-trace, vorticity confinement, a pressure projection by one multigrid V-cycle (two damped-Jacobi sweeps before and after the coarse correction, four levels), and a scalar field on its own, finer grid (43 x 64 x 43 texels) advected with limited MacCormack. The port added four things, all off by default so the solver's own tests still pass unchanged: buoyancy that follows any mix of the scalar's channels, a divergence source, open boundaries (pressure held at 0 on the top and side faces, so air is drawn in at the sides and the plume leaves through the top instead of piling up under a lid; the floor stays a wall), and a hook that runs a pass on the scalar after every advection.
+
+**Combustion** (`fire3d.ts`, `src/gpu/sim/fire3d-react.wgsl`) uses that hook. The scalar's four channels are temperature T (in units of 1000 K above a 300 K room), fuel F, smoke S and the burn rate R. Every step, after the advection, each texel of the field grid:
+
+1. takes fuel from the source capsules (the inner halves of four logs, or the four ports of a ring burner), in lumps from a rising noise so flames tear off in tongues, and holds the bed at a glowing temperature;
+2. burns: above an ignition temperature (0.35, switched on smoothly over 0.2) fuel reacts at the burn rate, `burnt = F (1 - exp(-k g(T) dt))`; the fuel is consumed, T rises by `heat x burnt`, soot is made, and R records the rate. The exponential makes the step exact for any rate;
+3. loses heat by a loss that grows with height and by radiation (`dT/dt = -c T^4`, integrated exactly), and lets smoke and stray fuel thin out; a sponge under the top keeps anything from pooling there;
+4. rounds the result stochastically to a half float (Apple GPUs truncate half-float writes; see "Simulations" in the authoring guide) and clamps every channel to a fixed range, so the fields stay finite and bounded whatever the input.
+
+The solver then reads the field back: buoyancy is `T - 0.1 S` (hot gas lifts, soot weighs a little), tilted sideways by `wind`, and the projection makes the velocity diverge by `0.6 R` per second where fuel burns, so the gas swells as it burns (Nguyen, Fedkiw and Jensen's expansion, as a source term rather than a jump across a level set). Stray embers from the shared ignition layer (`createAmbientIgnition`) land on the source as heat splats, so a fire that has been blown out lights again; with `drag` set to `fuel` or `heat` the pointer (`createPointerIgnition`) throws fuel or heat into the box where its ray crosses the middle of it (by default a drag orbits the camera). `drive` (story 5.8) lets scrolling or sound add up to 60% to the fuel supply and the ember rate.
+
+**The picture.** Eight passes a frame:
+
+1. `fire`: the simulation's steps for the frame, on its own fixed 60 Hz clock (about one a frame).
+2. `probe` (`probe.wgsl`): one workgroup samples the temperature on a 16 x 24 x 16 lattice and turns it into one point light (strength from the total glow, position at its luminance-weighted centre), eased with a 0.35 s time constant. Everything else that is lit by the fire reads it, so the ground brightens when the fire flares and the light follows the flames, but never faster than the easing.
+3. `scene`: logs or burner, stones and ground, as albedo and depth (the shared forward renderer).
+4. `lighting` (`lighting.wgsl`): rebuilds normals from depth and lights the scene with that light, a night sky and a moon; surfaces inside the box glow with the temperature of the gas against them, read straight from the field, so the logs are embers exactly where the simulated fire is hot.
+5. to 7. `march depth`, `march`, `upsample`: `src/gpu/volume/`'s reduced-resolution march with its recommended settings (half resolution, 64 samples across the box's width, interleaved-gradient jitter, depth-aware upsample with the depth limit at the far side of the box). `march.wgsl` reads the four fields with one filtered 3D fetch per sample and builds the medium there: the hot gas as a blackbody (`blackbody_radiance`, 1 at 1800 K, times 22, whitened toward its core with `ramp_whiten`), emitted in thermal equilibrium so a thick flame never gets brighter than its temperature, with an opacity that follows the soot (a sooty wood flame is nearly solid, a clean gas flame faint); a faint blue emission in proportion to the burn rate where the gas is still cool, which is the blue base of the gas flame; and the smoke from `smoke.wgsl`, lit by the probe's light with the one-tap gradient self-shadow toward it and a dim sky. Flame cores reach 20 to 40, flame bodies 3 to 10, the lit smoke under 1.
+6. the HDR tail.
+
+## Cost
+
+GPU time: not measured yet (`npm run study` has not been run on it). Indicative only: Chrome's HUD in the `hud-1080p` view of `npm run browser-check` (1920 x 1080, Apple M1 Max, other work on the GPU at the time) read 3.6 to 4.3 ms a frame at the defaults over four loads (median of three readings each), and 6.2 ms with the heaviest settings tried (64-cell grid, 60 steps a second, 96 march samples). The budget is 12 ms.
+
+The work, counted at the defaults:
+
+| Part          | Size                                                   | Passes                                                                                                                                                          | Per frame                    |
+| ------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| Velocity grid | 32 x 48 x 32 = 49k cells (velocity texture 53k texels) | advection 1, confinement 4, forces 1, divergence 1, V-cycle 6 fine-grid dispatches plus 18 on coarser levels (12 of them on the 96-cell coarsest), projection 1 | one step (60 steps a second) |
+| Field grid    | 43 x 64 x 43 = 118k texels                             | MacCormack 2, combustion 1                                                                                                                                      | one step                     |
+| Probe         | 6144 samples                                           | 1 workgroup                                                                                                                                                     | 1                            |
+| March         | 960 x 540 = 518k rays                                  | at most 64 samples each (33M), one 3D fetch per sample, a second where there is smoke; empty samples skip all shading                                           | 1                            |
+| Scene         | 2.07M pixels                                           | forward pass, lighting (one 3D fetch for pixels inside the box), depth reduction, upsample (9 texels)                                                           | 1                            |
+
+That is about 42 compute dispatches and a million cell updates a step; a velocity cell costs about 21 filtered fetches to advect (three components, two back-trace taps each with three fetches, plus the sample), a field texel about 30 for both MacCormack passes. The scene and the tail cost what they cost in `volume-march`. Texture memory: the solver's textures take about 6 MB at the default grid (2 MB at 32 cells, 12 MB at 64; `fluid3dTextureBytes`); the 1080p targets are the same as `volume-march`'s.
+
+What scales it: the grid scales the simulation with its cube (64 cells tall is 40 x 64 x 40, 2.1 times the cells of 48), the step rate scales it linearly, and the march scales with march pixels times samples. The `budget` preset (32 cells, 40 samples, quarter-resolution march) is the cheap end.
+
+## Pitfalls
+
+- **A closed box cannot burn.** Expanding gas has nowhere to go and the projection's right-hand side stops being solvable; even without expansion, a plume in a closed box comes back down the walls and the smoke piles up under the lid. The solver's open boundaries fix both, and they need the Dirichlet condition placed on the face itself (a ghost value of minus the inside cell) on every multigrid level: with the ghost at its own cell's centre the coarse levels saw the boundary in a different place from the fine one and the V-cycle diverged within twenty steps. The tests check that an open top lets a plume leave and that a divergence source comes out at the rate asked for.
+- **With only the top open, the plume is starved.** Air could only come in through the top, so the hot gas barely rose (half a metre in two seconds). Opening the sides as well, as round a real fire, fixed it.
+- **Vorticity confinement is easy to overdo on a coarse grid.** At 6 per second the flame lay down and swirled round the box; at 0 it is a smooth spike. 2.5 keeps it upright and alive.
+- **The march must step about as finely as the field.** Spreading 64 samples over the box's diagonal (5 cm steps against a 3.75 cm field texel) showed the jitter as a cross-hatch all over the flame; 64 samples over the box's width (2.5 cm) removed it at no extra cost for the rays that matter.
+- **Averaging the gas's colour makes a bad light.** Most of the gas is cool and deep red, so a probe that averaged its radiance lit the ground like a darkroom lamp; the light takes its strength from the gas and its colour from a fixed firelight orange.
+- **A thin gas flame pinches to two cells.** Fuel from a small burner, pushed up hard, accelerates into a column the grid cannot resolve. The `gas flame` preset uses a wide burner, little jet and modest buoyancy so the flame stays several cells across.
+- **Truncating half-float writes still costs heat in the solver's own passes.** The combustion step rounds stochastically, but the advection passes it inherits from Water Temple do not; on Apple GPUs that acts as about 0.1% of extra decay per step, small next to the cooling.
+- **Flash.** A whole fire that flares at once is what the analyser looks for, and a simulated fire does puff. Two things keep it local: the flames cover a small part of the picture, and the light the fire casts on the scene comes from the eased probe, so the ground cannot brighten faster than its 0.35 s time constant. Measured over 8 s at 480 x 270 with `experiments/flash.test.ts`, every preset is `low`: at most two flashes in any cell, none over the area threshold, and whole-frame luminance moving by 0.2% (`smoulder`) to 3.6% (`gas flame`). A burst of fuel thrown in with `drag = fuel` flares the whole fire on purpose and was not measured.
+- Normals come from depth, so the logs and stones are lit per facet, and the stones show their tessellation where they meet the ground.
+
+## When to use it
+
+For a hero scene where the fire is the subject and the camera goes round it, on a discrete or Apple Silicon GPU: Tier C. It is the only fire on the site that is volumetric and simulated: it reacts to wind, to fuel thrown in, to a burner turned up, and it lights and smokes the scene it sits in. By the same indicative HUD reading it costs about half of `volume-march`'s procedural plume (7.9 ms), whose per-sample noise is dearer than one texture fetch; that plume cannot react to anything.
+
+For a flame seen from one side, the 2D fires are far cheaper and look as good: the shader-only flames of Epic 4 (`noise-flame` reads about 0.5 ms a frame on Dawn) or the cellular and reaction-diffusion fires of Epic 5. For a simulated flame seen from one side, the 2D grid solver of story 6.1 spends a budget on far more cells (a 256 x 256 grid has 65k cells; this one has 49k spread over a third dimension). Where WebGPU compute is missing there is no fallback but a video of it.
+
+## References
+
+- Duc Quang Nguyen, Ronald Fedkiw and Henrik Wann Jensen, [Physically Based Modeling and Animation of Fire](https://physbam.stanford.edu/~fedkiw/papers/stanford2002-02.pdf) (SIGGRAPH 2002): fuel, a reaction zone, hot products and expansion.
+- Keenan Crane, Ignacio Llamas and Sarah Tariq, [Real-Time Simulation and Rendering of 3D Fluids](https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-30-real-time-simulation-and-rendering-3d-fluids) (GPU Gems 3, chapter 30): smoke and fire on a GPU grid, temperature and buoyancy, ray-marched rendering.
+- Jos Stam, [Stable Fluids](https://www.josstam.com/publications) (SIGGRAPH 1999), and Ronald Fedkiw, Jos Stam and Henrik Wann Jensen, [Visual Simulation of Smoke](https://physbam.stanford.edu/~fedkiw/papers/stanford2001-01.pdf) (SIGGRAPH 2001): the solver and vorticity confinement.
+- Andrew Selle, Ronald Fedkiw, ByungMoon Kim, Yingjie Liu and Jarek Rossignac, [An Unconditionally Stable MacCormack Method](https://physbam.stanford.edu/~fedkiw/papers/stanford2006-09.pdf) (2008).
+- Water Temple's `fluid3d` solver and its notes, which this effect's solver is ported from.
