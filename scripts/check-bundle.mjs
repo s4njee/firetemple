@@ -22,6 +22,8 @@ const dist = option('--dist', 'dist');
 const jsonPath = option('--json', undefined);
 const budgetPath = option('--budget', 'bundle-budget.json');
 const updateBudget = args.includes('--update-budget');
+// Headroom absorbs small cross-environment differences (Vite/rolldown versions, Node gzip).
+const BUDGET_HEADROOM = 1536;
 
 const manifestPath = join(dist, '.vite', 'manifest.json');
 if (!existsSync(manifestPath)) {
@@ -135,8 +137,10 @@ if (updateBudget) {
       {
         $comment:
           'Eager and per-effect gzip ceilings from scripts/check-bundle.mjs. Regenerate with `node scripts/check-bundle.mjs --update-budget` after `vite build`.',
-        eager: currentEager,
-        effects: Object.fromEntries(effects.map((effect) => [effect.id, effect.gzip])),
+        eager: currentEager + BUDGET_HEADROOM,
+        effects: Object.fromEntries(
+          effects.map((effect) => [effect.id, effect.gzip + BUDGET_HEADROOM]),
+        ),
       },
       null,
       2,
