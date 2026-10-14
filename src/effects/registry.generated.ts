@@ -10,26 +10,31 @@ import { meta as meta6 } from './compositing/meta.ts';
 import { meta as meta7 } from './dom-fuel/meta.ts';
 import { meta as meta8 } from './doom-fire/meta.ts';
 import { meta as meta9 } from './ember-bed/meta.ts';
-import { meta as meta10 } from './fire-light/meta.ts';
-import { meta as meta11 } from './fire-ring/meta.ts';
-import { meta as meta12 } from './firelight-background/meta.ts';
-import { meta as meta13 } from './fireplace/meta.ts';
-import { meta as meta14 } from './flame-ramps/meta.ts';
-import { meta as meta15 } from './flame-shape/meta.ts';
-import { meta as meta16 } from './flame-strip/meta.ts';
-import { meta as meta17 } from './flicker/meta.ts';
-import { meta as meta18 } from './forest-fire/meta.ts';
-import { meta as meta19 } from './gas-jet/meta.ts';
-import { meta as meta20 } from './haze-overlay/meta.ts';
-import { meta as meta21 } from './heat-haze/meta.ts';
-import { meta as meta22 } from './hello/meta.ts';
-import { meta as meta23 } from './noise-flame/meta.ts';
-import { meta as meta24 } from './smoke-shading/meta.ts';
-import { meta as meta25 } from './soft-sprites/meta.ts';
-import { meta as meta26 } from './sparks/meta.ts';
-import { meta as meta27 } from './toon-fire/meta.ts';
-import { meta as meta28 } from './torch/meta.ts';
-import { meta as meta29 } from './volume-march/meta.ts';
+import { meta as meta10 } from './fire-3d/meta.ts';
+import { meta as meta11 } from './fire-fluid/meta.ts';
+import { meta as meta12 } from './fire-haze/meta.ts';
+import { meta as meta13 } from './fire-light/meta.ts';
+import { meta as meta14 } from './fire-obstacles/meta.ts';
+import { meta as meta15 } from './fire-ring/meta.ts';
+import { meta as meta16 } from './firelight-background/meta.ts';
+import { meta as meta17 } from './fireplace/meta.ts';
+import { meta as meta18 } from './flame-ramps/meta.ts';
+import { meta as meta19 } from './flame-shape/meta.ts';
+import { meta as meta20 } from './flame-strip/meta.ts';
+import { meta as meta21 } from './flicker/meta.ts';
+import { meta as meta22 } from './forest-fire/meta.ts';
+import { meta as meta23 } from './gas-jet/meta.ts';
+import { meta as meta24 } from './haze-overlay/meta.ts';
+import { meta as meta25 } from './heat-haze/meta.ts';
+import { meta as meta26 } from './hello/meta.ts';
+import { meta as meta27 } from './noise-flame/meta.ts';
+import { meta as meta28 } from './smoke-shading/meta.ts';
+import { meta as meta29 } from './soft-sprites/meta.ts';
+import { meta as meta30 } from './sparks/meta.ts';
+import { meta as meta31 } from './stable-fluids/meta.ts';
+import { meta as meta32 } from './toon-fire/meta.ts';
+import { meta as meta33 } from './torch/meta.ts';
+import { meta as meta34 } from './volume-march/meta.ts';
 import poster0 from './advected-noise/poster.webp?url';
 import poster1 from './blackbody/poster.webp?url';
 import poster2 from './bloom-tuning/poster.webp?url';
@@ -40,26 +45,31 @@ import poster6 from './compositing/poster.webp?url';
 import poster7 from './dom-fuel/poster.webp?url';
 import poster8 from './doom-fire/poster.webp?url';
 import poster9 from './ember-bed/poster.webp?url';
-import poster10 from './fire-light/poster.webp?url';
-import poster11 from './fire-ring/poster.webp?url';
-import poster12 from './firelight-background/poster.webp?url';
-import poster13 from './fireplace/poster.webp?url';
-import poster14 from './flame-ramps/poster.webp?url';
-import poster15 from './flame-shape/poster.webp?url';
-import poster16 from './flame-strip/poster.webp?url';
-import poster17 from './flicker/poster.webp?url';
-import poster18 from './forest-fire/poster.webp?url';
-import poster19 from './gas-jet/poster.webp?url';
-import poster20 from './haze-overlay/poster.webp?url';
-import poster21 from './heat-haze/poster.webp?url';
-import poster22 from './hello/poster.webp?url';
-import poster23 from './noise-flame/poster.webp?url';
-import poster24 from './smoke-shading/poster.webp?url';
-import poster25 from './soft-sprites/poster.webp?url';
-import poster26 from './sparks/poster.webp?url';
-import poster27 from './toon-fire/poster.webp?url';
-import poster28 from './torch/poster.webp?url';
-import poster29 from './volume-march/poster.webp?url';
+import poster10 from './fire-3d/poster.webp?url';
+import poster11 from './fire-fluid/poster.webp?url';
+import poster12 from './fire-haze/poster.webp?url';
+import poster13 from './fire-light/poster.webp?url';
+import poster14 from './fire-obstacles/poster.webp?url';
+import poster15 from './fire-ring/poster.webp?url';
+import poster16 from './firelight-background/poster.webp?url';
+import poster17 from './fireplace/poster.webp?url';
+import poster18 from './flame-ramps/poster.webp?url';
+import poster19 from './flame-shape/poster.webp?url';
+import poster20 from './flame-strip/poster.webp?url';
+import poster21 from './flicker/poster.webp?url';
+import poster22 from './forest-fire/poster.webp?url';
+import poster23 from './gas-jet/poster.webp?url';
+import poster24 from './haze-overlay/poster.webp?url';
+import poster25 from './heat-haze/poster.webp?url';
+import poster26 from './hello/poster.webp?url';
+import poster27 from './noise-flame/poster.webp?url';
+import poster28 from './smoke-shading/poster.webp?url';
+import poster29 from './soft-sprites/poster.webp?url';
+import poster30 from './sparks/poster.webp?url';
+import poster31 from './stable-fluids/poster.webp?url';
+import poster32 from './toon-fire/poster.webp?url';
+import poster33 from './torch/poster.webp?url';
+import poster34 from './volume-march/poster.webp?url';
 
 export const metas: readonly EffectMeta[] = [
   meta0,
@@ -92,6 +102,11 @@ export const metas: readonly EffectMeta[] = [
   meta27,
   meta28,
   meta29,
+  meta30,
+  meta31,
+  meta32,
+  meta33,
+  meta34,
 ];
 
 export const loaders: Readonly<Record<string, () => Promise<EffectModule>>> = {
@@ -105,7 +120,11 @@ export const loaders: Readonly<Record<string, () => Promise<EffectModule>>> = {
   'dom-fuel': () => import('./dom-fuel/index.ts').then((module) => module.effect),
   'doom-fire': () => import('./doom-fire/index.ts').then((module) => module.effect),
   'ember-bed': () => import('./ember-bed/index.ts').then((module) => module.effect),
+  'fire-3d': () => import('./fire-3d/index.ts').then((module) => module.effect),
+  'fire-fluid': () => import('./fire-fluid/index.ts').then((module) => module.effect),
+  'fire-haze': () => import('./fire-haze/index.ts').then((module) => module.effect),
   'fire-light': () => import('./fire-light/index.ts').then((module) => module.effect),
+  'fire-obstacles': () => import('./fire-obstacles/index.ts').then((module) => module.effect),
   'fire-ring': () => import('./fire-ring/index.ts').then((module) => module.effect),
   'firelight-background': () =>
     import('./firelight-background/index.ts').then((module) => module.effect),
@@ -123,6 +142,7 @@ export const loaders: Readonly<Record<string, () => Promise<EffectModule>>> = {
   'smoke-shading': () => import('./smoke-shading/index.ts').then((module) => module.effect),
   'soft-sprites': () => import('./soft-sprites/index.ts').then((module) => module.effect),
   sparks: () => import('./sparks/index.ts').then((module) => module.effect),
+  'stable-fluids': () => import('./stable-fluids/index.ts').then((module) => module.effect),
   'toon-fire': () => import('./toon-fire/index.ts').then((module) => module.effect),
   torch: () => import('./torch/index.ts').then((module) => module.effect),
   'volume-march': () => import('./volume-march/index.ts').then((module) => module.effect),
@@ -139,24 +159,29 @@ export const posters: Readonly<Record<string, string>> = {
   'dom-fuel': poster7,
   'doom-fire': poster8,
   'ember-bed': poster9,
-  'fire-light': poster10,
-  'fire-ring': poster11,
-  'firelight-background': poster12,
-  fireplace: poster13,
-  'flame-ramps': poster14,
-  'flame-shape': poster15,
-  'flame-strip': poster16,
-  flicker: poster17,
-  'forest-fire': poster18,
-  'gas-jet': poster19,
-  'haze-overlay': poster20,
-  'heat-haze': poster21,
-  hello: poster22,
-  'noise-flame': poster23,
-  'smoke-shading': poster24,
-  'soft-sprites': poster25,
-  sparks: poster26,
-  'toon-fire': poster27,
-  torch: poster28,
-  'volume-march': poster29,
+  'fire-3d': poster10,
+  'fire-fluid': poster11,
+  'fire-haze': poster12,
+  'fire-light': poster13,
+  'fire-obstacles': poster14,
+  'fire-ring': poster15,
+  'firelight-background': poster16,
+  fireplace: poster17,
+  'flame-ramps': poster18,
+  'flame-shape': poster19,
+  'flame-strip': poster20,
+  flicker: poster21,
+  'forest-fire': poster22,
+  'gas-jet': poster23,
+  'haze-overlay': poster24,
+  'heat-haze': poster25,
+  hello: poster26,
+  'noise-flame': poster27,
+  'smoke-shading': poster28,
+  'soft-sprites': poster29,
+  sparks: poster30,
+  'stable-fluids': poster31,
+  'toon-fire': poster32,
+  torch: poster33,
+  'volume-march': poster34,
 };
