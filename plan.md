@@ -12,10 +12,10 @@ A research site that implements, measures, and documents fire-looking WebGPU eff
 
 ## Non-goals
 
-- A general-purpose rendering engine or a published npm library (extraction may come later).
+- A general-purpose rendering engine. A published npm library is now planned; the cross-project plan is in the [holofx backlog](../holofx/backlog.md).
 - Physically exact combustion. Plausible and cheap beats correct and slow.
 - Full WebGL2 parity. WebGL2 ports are done only where the comparison is the research.
-- A shared package with Water Temple. Code is copied across and allowed to diverge; extraction is a later question.
+- A shared package with Water Temple in this plan's own milestones. The shared temple core is now planned as part of the holofx work; see story 3.5 in the [holofx backlog](../holofx/backlog.md).
 
 ## Decisions
 

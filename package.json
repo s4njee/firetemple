@@ -37,5 +37,12 @@
     "shiki": "^4.5.0",
     "tweakpane": "^4.0.5",
     "wgpu-matrix": "^3.4.2"
-  }
+  },
+  "description": "A research gallery of fire-looking WebGPU effects with live demos, readable source, notes and practicality scorecards.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/s4njee/firetemple.git"
+  },
+  "homepage": "https://github.com/s4njee/firetemple"
 }
