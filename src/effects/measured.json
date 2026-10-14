@@ -11,7 +11,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 3.85
+        "ms": 3.61
       }
     ],
     "bundleKb": 39.3
@@ -28,10 +28,10 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 6.14
+        "ms": 6.81
       }
     ],
-    "bundleKb": 27.2
+    "bundleKb": 27.3
   },
   "bloom-tuning": {
     "gpuMs": [
@@ -45,7 +45,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.27
+        "ms": 1.48
       }
     ],
     "bundleKb": 20
@@ -62,7 +62,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.5
+        "ms": 1.52
       }
     ],
     "bundleKb": 55.9
@@ -79,7 +79,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.66
+        "ms": 1
       }
     ],
     "bundleKb": 45.9
@@ -96,10 +96,10 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.31
+        "ms": 1.38
       }
     ],
-    "bundleKb": 49.2
+    "bundleKb": 49.3
   },
   "compositing": {
     "gpuMs": [
@@ -113,7 +113,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 3.57
+        "ms": 3.75
       }
     ],
     "bundleKb": 26.4
@@ -130,7 +130,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.16
+        "ms": 1.17
       }
     ],
     "bundleKb": 58
@@ -147,10 +147,10 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 0.97
+        "ms": 1.24
       }
     ],
-    "bundleKb": 46.6
+    "bundleKb": 46.7
   },
   "ember-bed": {
     "gpuMs": [
@@ -164,10 +164,61 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.32
+        "ms": 1.11
       }
     ],
     "bundleKb": 39.3
+  },
+  "fire-3d": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "method": "marginal",
+        "ms": 1.55
+      },
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "method": "browser-span",
+        "ms": 5.53
+      }
+    ],
+    "bundleKb": 96.3
+  },
+  "fire-fluid": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "method": "marginal",
+        "ms": 1.03
+      },
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "method": "browser-span",
+        "ms": 3.24
+      }
+    ],
+    "bundleKb": 91.8
+  },
+  "fire-haze": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "method": "marginal",
+        "ms": 0.85
+      },
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "method": "browser-span",
+        "ms": 3.01
+      }
+    ],
+    "bundleKb": 77.1
   },
   "fire-light": {
     "gpuMs": [
@@ -181,10 +232,27 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 4.64
+        "ms": 4.74
       }
     ],
     "bundleKb": 45.7
+  },
+  "fire-obstacles": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "method": "marginal",
+        "ms": 1.4
+      },
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "method": "browser-span",
+        "ms": 4.85
+      }
+    ],
+    "bundleKb": 66.4
   },
   "fire-ring": {
     "gpuMs": [
@@ -198,7 +266,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.03
+        "ms": 1.06
       }
     ],
     "bundleKb": 37.3
@@ -215,7 +283,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.17
+        "ms": 1.08
       }
     ],
     "bundleKb": 25.8
@@ -232,7 +300,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.52
+        "ms": 2.05
       }
     ],
     "bundleKb": 49.7
@@ -249,10 +317,10 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 3.08
+        "ms": 3.03
       }
     ],
-    "bundleKb": 41.3
+    "bundleKb": 41.5
   },
   "flame-shape": {
     "gpuMs": [
@@ -266,7 +334,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.69
+        "ms": 2.2
       }
     ],
     "bundleKb": 38.4
@@ -283,7 +351,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.49
+        "ms": 1.14
       }
     ],
     "bundleKb": 40.2
@@ -300,7 +368,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 2.27
+        "ms": 1.58
       }
     ],
     "bundleKb": 29.6
@@ -317,7 +385,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.51
+        "ms": 1.3
       }
     ],
     "bundleKb": 51.2
@@ -334,7 +402,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.01
+        "ms": 0.98
       }
     ],
     "bundleKb": 43.8
@@ -351,10 +419,10 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 0.4
+        "ms": 0.51
       }
     ],
-    "bundleKb": 38.5
+    "bundleKb": 38.8
   },
   "heat-haze": {
     "gpuMs": [
@@ -368,7 +436,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 3.46
+        "ms": 3.76
       }
     ],
     "bundleKb": 36.3
@@ -385,7 +453,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 6.19
+        "ms": 6.59
       }
     ],
     "bundleKb": 22.8
@@ -402,7 +470,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 0.9
+        "ms": 0.98
       }
     ],
     "bundleKb": 40.3
@@ -419,7 +487,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 6.64
+        "ms": 8.38
       }
     ],
     "bundleKb": 38.8
@@ -436,10 +504,10 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.71
+        "ms": 1.24
       }
     ],
-    "bundleKb": 42.7
+    "bundleKb": 42.8
   },
   "sparks": {
     "gpuMs": [
@@ -453,10 +521,27 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.46
+        "ms": 1.67
       }
     ],
     "bundleKb": 41.8
+  },
+  "stable-fluids": {
+    "gpuMs": [
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "method": "marginal",
+        "ms": 0.79
+      },
+      {
+        "device": "Apple M1 Max",
+        "deviceClass": "apple-silicon",
+        "method": "browser-span",
+        "ms": 3.19
+      }
+    ],
+    "bundleKb": 54.6
   },
   "toon-fire": {
     "gpuMs": [
@@ -470,7 +555,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 2.18
+        "ms": 1.28
       }
     ],
     "bundleKb": 37.3
@@ -487,7 +572,7 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 1.78
+        "ms": 1.11
       }
     ],
     "bundleKb": 44
@@ -504,9 +589,9 @@
         "device": "Apple M1 Max",
         "deviceClass": "apple-silicon",
         "method": "browser-span",
-        "ms": 7.26
+        "ms": 8.75
       }
     ],
-    "bundleKb": 58.5
+    "bundleKb": 59
   }
 }

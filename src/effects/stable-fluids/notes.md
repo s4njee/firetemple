@@ -18,7 +18,7 @@ The pointer stirs through `fluid-stir.ts`: a press-drag pushes the fluid with th
 
 ## Cost
 
-Chrome 155, Apple M1 Max, 1920 x 1080, defaults: **3.1 ms** of GPU time for one frame as the HUD reads it (three loads: 3.08, 3.10, 3.73 ms; indicative, it includes the browser's timing floor). That is inside the Tier B budget (6 ms) on this machine; no integrated GPU or phone has been measured, so the tier is provisional. Not measured on Dawn yet (`npm run study`).
+Measured on a quiet GPU (Apple M1 Max, 1920 × 1080, defaults): 0.8 ms per frame on Dawn and 3.19 ms for one frame in Chrome 155 (median of three loads; `docs/studies/epic-6.md`, `docs/studies/browser-check.md`), inside the Tier B budget on this machine; no integrated GPU or phone has been measured. An earlier reading: Chrome 155, Apple M1 Max, 1920 x 1080, defaults: **3.1 ms** of GPU time for one frame as the HUD reads it (three loads: 3.08, 3.10, 3.73 ms; indicative, it includes the browser's timing floor). That is inside the Tier B budget (6 ms) on this machine; no integrated GPU or phone has been measured, so the tier is provisional. Not measured on Dawn yet (`npm run study`).
 
 What can be counted at the defaults:
 

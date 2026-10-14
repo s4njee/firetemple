@@ -19,7 +19,7 @@ Fire as a fluid (stories 6.2 to 6.7): the stable-fluids solver of story 6.1 (`sr
 
 ## Cost
 
-GPU time: not measured yet (`npm run study`). Indicative HUD readings, Chrome, Apple M1 Max, 1920 x 1080, with other agents' work on the GPU (median of three loads): **2.9 to 3.1 ms** at the defaults (2.79, 2.90, 3.23 and 3.04, 3.10, 3.24 ms in two runs), 2.7 ms for `gas burner`, 3.3 ms with 192 velocity cells (dye 768). Inside the Tier B budget (6 ms) on this machine; the stable-fluids validation scene read 3.1 ms. No integrated GPU or phone has been measured, so the tier is provisional.
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, simulation and tail included): 1.0 ms per frame on Dawn, where the tail alone reads 0.7 ms; and 3.24 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 3.02 to 3.33), which includes the browser's timing floor. The gap between the two is larger for these effects than for the single-pass ones, because a fluid step is many small dispatches. Both are inside the Tier B budget of 6 ms on this machine; no integrated GPU or phone has been measured. How the cost moves with grid size and pressure solver is in `docs/studies/epic-6.md` (story 6.10). Earlier indicative HUD readings, Chrome, Apple M1 Max, 1920 x 1080, with other agents' work on the GPU (median of three loads): **2.9 to 3.1 ms** at the defaults (2.79, 2.90, 3.23 and 3.04, 3.10, 3.24 ms in two runs), 2.7 ms for `gas burner`, 3.3 ms with 192 velocity cells (dye 768). Inside the Tier B budget (6 ms) on this machine; the stable-fluids validation scene read 3.1 ms. No integrated GPU or phone has been measured, so the tier is provisional.
 
 What can be counted at the defaults (128 x 72 cells, 129 x 73 velocity faces, 512 x 288 dye):
 

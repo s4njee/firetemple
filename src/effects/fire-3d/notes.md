@@ -24,7 +24,7 @@ The solver then reads the field back: buoyancy is `T - 0.1 S` (hot gas lifts, so
 
 ## Cost
 
-GPU time: not measured yet (`npm run study` has not been run on it). Indicative only: Chrome's HUD in the `hud-1080p` view of `npm run browser-check` (1920 x 1080, Apple M1 Max, other work on the GPU at the time) read 3.6 to 4.3 ms a frame at the defaults over four loads (median of three readings each), and 6.2 ms with the heaviest settings tried (64-cell grid, 60 steps a second, 96 march samples). The budget is 12 ms.
+GPU time, measured on a quiet GPU (Apple M1 Max, 1920 × 1080, default settings, simulation and tail included): 1.6 ms per frame on Dawn, where the tail alone reads 0.7 ms; and 5.53 ms for one frame in Chrome 155 at 60 fps (median of 3 loads, 5.51 to 5.74), which includes the browser's timing floor. The gap between the two is larger for these effects than for the single-pass ones, because a fluid step is many small dispatches. Both are inside the Tier C budget of 12 ms on this machine; no integrated GPU or phone has been measured. That is under the Tier B number too, but it stays Tier C: it is a full 3D scene, and the B budget is set for an integrated GPU several times slower than this one, where a volume march and a 3D solve will not fit in 6 ms. How the cost moves with grid size and pressure solver is in `docs/studies/epic-6.md` (story 6.10). Earlier, indicative only: Chrome's HUD in the `hud-1080p` view of `npm run browser-check` (1920 x 1080, Apple M1 Max, other work on the GPU at the time) read 3.6 to 4.3 ms a frame at the defaults over four loads (median of three readings each), and 6.2 ms with the heaviest settings tried (64-cell grid, 60 steps a second, 96 march samples). The budget is 12 ms.
 
 The work, counted at the defaults:
 

@@ -12,35 +12,40 @@ The HUD time is not the number the cost studies report. It is one frame measured
 
 | Effect | Started | Animates | HUD at 1080p |
 | --- | ---: | --- | --- |
-| advected-noise | 8 of 8 | yes | 60 fps, 3.85 ms (3.80 to 3.86 over 3 loads) |
-| blackbody | 8 of 8 | no (a still picture) | 60 fps, 6.14 ms (6.07 to 6.41 over 3 loads) |
-| bloom-tuning | 8 of 8 | yes | 60 fps, 1.27 ms (1.27 to 1.41 over 3 loads) |
-| burn-front | 8 of 8 | yes | 60 fps, 1.50 ms (1.34 to 1.51 over 3 loads) |
-| candle | 8 of 8 | yes | 60 fps, 1.66 ms (1.57 to 1.85 over 3 loads) |
-| combustion-front | 8 of 8 | yes | 60 fps, 1.31 ms (1.29 to 1.39 over 3 loads) |
-| compositing | 8 of 8 | yes | 60 fps, 3.57 ms (3.57 to 3.61 over 3 loads) |
-| dom-fuel | 8 of 8 | yes | 60 fps, 1.16 ms (1.04 to 1.20 over 3 loads) |
-| doom-fire | 8 of 8 | yes | 60 fps, 0.97 ms (0.88 to 1.06 over 3 loads) |
-| ember-bed | 8 of 8 | yes | 60 fps, 1.32 ms (1.10 to 1.42 over 3 loads) |
-| fire-light | 8 of 8 | yes | 60 fps, 4.64 ms (4.39 to 4.83 over 3 loads) |
-| fire-ring | 8 of 8 | yes | 60 fps, 1.03 ms (1.01 to 1.03 over 3 loads) |
-| firelight-background | 8 of 8 | yes | 60 fps, 1.17 ms (1.10 to 1.37 over 3 loads) |
-| fireplace | 8 of 8 | yes | 60 fps, 1.52 ms (1.38 to 2.18 over 3 loads) |
-| flame-ramps | 8 of 8 | yes | 60 fps, 3.08 ms (2.66 to 3.12 over 3 loads) |
-| flame-shape | 8 of 8 | yes | 60 fps, 1.69 ms (1.69 to 1.96 over 3 loads) |
-| flame-strip | 8 of 8 | yes | 60 fps, 1.49 ms (1.41 to 1.52 over 3 loads) |
-| flicker | 8 of 8 | yes | 60 fps, 2.27 ms (2.25 to 2.38 over 3 loads) |
-| forest-fire | 8 of 8 | yes | 60 fps, 1.51 ms (1.12 to 1.52 over 3 loads) |
-| gas-jet | 8 of 8 | yes | 60 fps, 1.01 ms (0.97 to 1.03 over 3 loads) |
-| haze-overlay | 8 of 8 | yes | 60 fps, 0.40 ms (0.38 to 0.45 over 3 loads) |
-| heat-haze | 8 of 8 | yes | 60 fps, 3.46 ms (3.36 to 4.20 over 3 loads) |
-| hello | 8 of 8 | yes | 60 fps, 6.19 ms (5.88 to 6.30 over 3 loads) |
-| noise-flame | 8 of 8 | yes | 60 fps, 0.90 ms (0.88 to 1.07 over 3 loads) |
-| smoke-shading | 8 of 8 | yes | 60 fps, 6.64 ms (6.09 to 7.97 over 3 loads) |
-| soft-sprites | 8 of 8 | yes | 60 fps, 1.71 ms (1.70 to 1.84 over 3 loads) |
-| sparks | 8 of 8 | yes | 60 fps, 1.46 ms (1.46 to 1.59 over 3 loads) |
-| toon-fire | 8 of 8 | yes | 60 fps, 2.18 ms (1.49 to 2.19 over 3 loads) |
-| torch | 8 of 8 | yes | 60 fps, 1.78 ms (1.34 to 1.97 over 3 loads) |
-| volume-march | 8 of 8 | yes | 60 fps, 7.26 ms (7.10 to 7.49 over 3 loads) |
+| advected-noise | 8 of 8 | yes | 60 fps, 3.61 ms (3.53 to 3.62 over 3 loads) |
+| blackbody | 8 of 8 | no (a still picture) | 60 fps, 6.81 ms (6.59 to 7.10 over 3 loads) |
+| bloom-tuning | 8 of 8 | yes | 60 fps, 1.48 ms (1.48 to 1.49 over 3 loads) |
+| burn-front | 8 of 8 | yes | 60 fps, 1.52 ms (1.49 to 1.53 over 3 loads) |
+| candle | 8 of 8 | yes | 60 fps, 1.00 ms (0.99 to 1.05 over 3 loads) |
+| combustion-front | 8 of 8 | yes | 60 fps, 1.38 ms (1.21 to 1.53 over 3 loads) |
+| compositing | 8 of 8 | yes | 60 fps, 3.75 ms (3.32 to 4.15 over 3 loads) |
+| dom-fuel | 8 of 8 | yes | 60 fps, 1.17 ms (1.09 to 1.18 over 3 loads) |
+| doom-fire | 8 of 8 | yes | 60 fps, 1.24 ms (1.23 to 1.40 over 3 loads) |
+| ember-bed | 8 of 8 | yes | 60 fps, 1.11 ms (0.92 to 1.17 over 3 loads) |
+| fire-3d | 8 of 8 | yes | 60 fps, 5.53 ms (5.51 to 5.74 over 3 loads) |
+| fire-fluid | 8 of 8 | yes | 60 fps, 3.24 ms (3.02 to 3.33 over 3 loads) |
+| fire-haze | 8 of 8 | yes | 60 fps, 3.01 ms (2.19 to 4.91 over 3 loads) |
+| fire-light | 8 of 8 | yes | 60 fps, 4.74 ms (1.87 to 5.66 over 3 loads) |
+| fire-obstacles | 8 of 8 | yes | 60 fps, 4.85 ms (4.81 to 4.99 over 3 loads) |
+| fire-ring | 8 of 8 | yes | 60 fps, 1.06 ms (1.05 to 1.07 over 3 loads) |
+| firelight-background | 8 of 8 | yes | 60 fps, 1.08 ms (1.04 to 1.15 over 3 loads) |
+| fireplace | 8 of 8 | yes | 60 fps, 2.05 ms (1.94 to 2.15 over 3 loads) |
+| flame-ramps | 8 of 8 | yes | 60 fps, 3.03 ms (2.88 to 3.12 over 3 loads) |
+| flame-shape | 8 of 8 | yes | 60 fps, 2.20 ms (1.93 to 2.34 over 3 loads) |
+| flame-strip | 8 of 8 | yes | 60 fps, 1.14 ms (1.11 to 1.16 over 3 loads) |
+| flicker | 8 of 8 | yes | 60 fps, 1.58 ms (1.57 to 1.82 over 3 loads) |
+| forest-fire | 8 of 8 | yes | 60 fps, 1.30 ms (1.15 to 1.31 over 3 loads) |
+| gas-jet | 8 of 8 | yes | 60 fps, 0.98 ms (0.97 to 1.03 over 3 loads) |
+| haze-overlay | 8 of 8 | yes | 60 fps, 0.51 ms (0.50 to 0.55 over 3 loads) |
+| heat-haze | 8 of 8 | yes | 60 fps, 3.76 ms (3.60 to 3.94 over 3 loads) |
+| hello | 8 of 8 | yes | 60 fps, 6.59 ms (6.21 to 6.94 over 3 loads) |
+| noise-flame | 8 of 8 | yes | 60 fps, 0.98 ms (0.94 to 0.98 over 3 loads) |
+| smoke-shading | 8 of 8 | yes | 60 fps, 8.38 ms (7.95 to 8.42 over 3 loads) |
+| soft-sprites | 8 of 8 | yes | 60 fps, 1.24 ms (1.14 to 1.28 over 3 loads) |
+| sparks | 8 of 8 | yes | 60 fps, 1.67 ms (1.62 to 1.98 over 3 loads) |
+| stable-fluids | 8 of 8 | yes | 60 fps, 3.19 ms (3.15 to 3.25 over 3 loads) |
+| toon-fire | 8 of 8 | yes | 60 fps, 1.28 ms (1.24 to 1.29 over 3 loads) |
+| torch | 8 of 8 | yes | 60 fps, 1.11 ms (1.10 to 1.21 over 3 loads) |
+| volume-march | 8 of 8 | yes | 60 fps, 8.75 ms (8.55 to 8.76 over 3 loads) |
 
 No view logged a console error.

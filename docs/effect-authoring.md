@@ -140,6 +140,7 @@ holds a still frame; an effect must look right as one.
 | Pointer position and drags | `src/gpu/pointer.ts` |
 | Scroll position, audio level | `src/gpu/scroll.ts`, `src/gpu/audio.ts` |
 | Where DOM elements are, in canvas uv | `src/gpu/dom-rects.ts` |
+| 2D and 3D grid fluids; fire as a fluid | `src/gpu/sim/fluid.ts`, `fluid3d.ts`, `fire-fluid.ts` (+ `obstacles.ts`, `obstacle-shapes.ts`) |
 | Pointer and ambient ignition, scroll and audio drive (simulations) | `src/gpu/sim/ignition.ts` + `ignite.wgsl`, `src/gpu/sim/excitation.ts` |
 | Camera, meshes, a forward pass | `src/gpu/scene/` |
 | Noise, FBM, Voronoi, curl, SDF, colour, maths | `src/wgsl/*.wgsl`; each file's header lists its functions |
@@ -157,7 +158,7 @@ holds a still frame; an effect must look right as one.
   chunks together, so a name collision fails the suite.
 - Each chunk `#include`s what it depends on.
 - WGSL reserves many ordinary words as identifiers (`patch`, `crate`, `pass`, `filter`, `mod`,
-  `target`, `layout`, `active`, `set`, `from`, …). An "unexpected token" on a plain variable name usually means it is one of them.
+  `target`, `layout`, `active`, `set`, `from`, `diagnostic`, …). An "unexpected token" on a plain variable name usually means it is one of them.
 - Prove behaviour with numbers: `tests/wgsl-eval.ts` runs WGSL on the GPU from a test
   (`gpuF32`, `scalars`). Tests may include any library chunk; they pass the whole library
   (`tests/library.ts`), which application code never does.
@@ -216,6 +217,18 @@ For anything with persistent state:
 - Randomness is a hash of (cell, step, seed), never per-frame `Math.random`, so runs repeat and the
   render and compute versions of a step agree. Tests of a probabilistic rule still check shapes and
   totals, never single cells: one last-digit difference between drivers diverges the whole run.
+- Fluids: build on `src/gpu/sim/fluid.ts` (2D) or `fluid3d.ts` (3D), and for fire on
+  `createFireFluid` in `src/gpu/sim/fire-fluid.ts`, which owns the solver's hooks and keeps
+  temperature, fuel, soot and burn rate in the dye. Step through the fire module, never
+  `fluid.update` directly. Burning gas expands, and a closed box cannot hold a net expansion: use
+  `boundary: 'open'` with `closedEdges: ['bottom']` for a floor.
+- Check every new force against open edges for several seconds, not three frames: the port found a
+  multigrid that diverged and a vorticity sheet that ran away only after seconds. Keep vorticity
+  confinement under about 14 x `velocityDissipation`. An open (Dirichlet) edge must put its ghost
+  value at the face, not at the ghost cell's centre, or the V-cycle diverges.
+- The solver applies queued splats to the next step only, so a warm-up that needs splats on every
+  step needs one submit per step. `createObstacleShapes(...).attach()` takes the solver's only
+  `hooks.forces` slot: chain it if a combustion layer needs that hook too.
 - A front has to be about three cells thick to stay round and move at its physical speed; thinner
   ones pin to the grid. A rule that only reads axis neighbours grows diamonds: use all eight with
   weights, or an arrival-time update (`src/gpu/sim/burn.ts`).

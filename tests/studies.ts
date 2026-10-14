@@ -60,4 +60,13 @@ export const STUDY_SWEEPS: Readonly<Record<string, readonly StudyConfig[]>> = {
     ...sweep('forest-fire', 'resolution', [48, 90, 180, 360]),
     ...sweep('combustion-front', 'grid', [192, 256, 384, 512]),
   ],
+  '6': [
+    // 6.10: velocity grid against frame time, and what the pressure solve costs.
+    ...sweep('stable-fluids', 'resolution', ['64', '96', '128', '192', '256']),
+    ...sweep('stable-fluids', 'pressureSolver', ['jacobi', 'sor', 'multigrid'], {
+      resolution: '192',
+    }),
+    ...sweep('fire-fluid', 'resolution', ['96', '128', '160', '192']),
+    ...sweep('fire-3d', 'grid', ['32', '48', '64']),
+  ],
 };
