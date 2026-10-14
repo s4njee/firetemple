@@ -147,6 +147,7 @@ holds a still frame; an effect must look right as one.
 | Noise from a texture fetch (use this in Tier A) | `getNoiseTexture(device)` in `src/gpu/emission/noise-texture.ts` + `#include "noisetex.wgsl"` |
 | Flame colour, shape, motion, flicker | `ramp.wgsl`, `blackbody.wgsl`, `flame.wgsl`, `advect.wgsl`, `flicker.wgsl` (+ `src/gpu/emission/`) |
 | Heat haze, sprites, smoke, firelight, volumes | `haze.wgsl`, `sprite.wgsl` + `src/gpu/sprites.ts`, `smoke.wgsl`, `firelight.wgsl`, `volume.wgsl` + `src/gpu/volume/` |
+| GPU particles: pool, emitters, forces, colliders, GPU spawning, sprites | `src/gpu/particles/` + `particles.wgsl` (see "Particles" below) |
 
 ## Shared WGSL chunks (`src/wgsl/`)
 
@@ -242,6 +243,81 @@ For anything with persistent state:
   rebuild their bind groups.
 - A render-pass solver can be ported to WebGL2 as a fallback; a compute solver cannot. Default to
   render passes unless compute is clearly needed, and set `scorecard.compute` accordingly.
+
+## Particles
+
+Particle effects build on the GPU particle framework in `src/gpu/particles/` (story 7.1; read the
+header of `system.ts` first, and `src/effects/particle-system/` for every feature switched on one at
+a time, `src/effects/embers/` for a shipped effect on it):
+
+```ts
+import {
+  createParticleRenderer, createParticleSystem, overlayCamera, planeThrough,
+} from '../../gpu/particles/index.ts';
+
+const system = createParticleSystem({ device, capacity: 16384, dimension: 2, profiler, label: 'sparks' });
+const tip = system.addEmitter({ shape: 'point', rate: 600, spread: 0.6, speed: [0.4, 0.9],
+                                life: [0.4, 1], temperature: [2200, 2700], size: [0.002, 0.004] });
+system.forces.gravity = [0, -1.5, 0];                   // forces, heat, colliders: live objects
+system.colliders.push(planeThrough([0, 0.05, 0], [0, 1, 0]));
+const renderer = createParticleRenderer(system, { camera: cameraBuffer, format: tail.scene.format });
+// resize: setCameraUniform(camera, overlayCamera(width, height), width, height)
+// frame:
+tip.moveTo(point);                                      // swept: no gaps however fast it moves
+system.advance(encoder, time.delta);                    // fixed steps, one compute pass
+renderer.encode(encoder, time.delta);                   // sprite instances, written on the GPU
+renderer.draw(encoder, { target: tail.scene.view, clear: { r: 0, g: 0, b: 0, a: 0 } });
+```
+
+- **Spaces.** A 2D overlay system uses `overlayCamera` (world units are canvas heights, origin at the
+  bottom-left, y up; pointer and igniter uv go through `overlayPoint`). A 3D one passes the forward
+  renderer's `view.camera.buffer` and a `depth` view to `draw` for soft particles.
+- **Emitters** (`emitter.ts`): point, segment, box, sphere shell, disc/ring; `rate` per second with a
+  fractional carry, `burst(n)`, `moveTo` for a moving emitter, at most eight per system. A rate-0
+  emitter is a *template* for GPU-spawned children.
+- **Forces and heat** (`forces.ts`): gravity, linear and quadratic drag towards `wind`, buoyancy per
+  1000 K above ambient, curl turbulence (`'2d'`, `'3d'`), up to four attractors or vortices, an
+  external velocity texture (`system.setField(fluid.fieldsView)` with `overlayFieldMapping(aspect)`
+  for the Epic 6 fluid; modes `drag`, `accel`, `advect`), Newtonian or linear cooling and a death
+  temperature.
+- **Colliders** (`colliders.ts`): plane, sphere, box (solid or container) and an SDF from
+  `hook_sdf`, tested on the segment a particle moved along, so nothing tunnels. Per collider:
+  restitution, friction, `kill`, `cool`, `spawnCount` children from a template.
+- **Hooks**: `createParticleSystem({ hooks: { code, chunks } })` splices WGSL into the kernels.
+  Define any of `hook_force`, `hook_update`, `hook_collide`, `hook_die`, `hook_emit`, `hook_sdf`,
+  `hook_sprite` (signatures in `kernels.wgsl`); the rest get empty defaults. Read the four
+  `system.params.user` vec4s as `ps_step.user[i]` (and `renderer.style.user` as `ps_draw.user[i]`
+  in `hook_sprite`). `userData: true` adds a free vec4 per particle (`p.user`).
+- **GPU spawning**: from `hook_update`, `hook_collide` or `hook_die`, `ps_spawn(position, velocity,
+  count, template, user)` appends a request with an atomic; the same step's emit pass gives its
+  children priority over CPU emission. No CPU round trip. `hook_emit` sees `source.spawned` and the
+  request's `user`.
+- **Colour**: the renderer's default is `blackbody_radiance(T, style.tRef, style.gamma) * tint *
+  intensity`, with per-particle twinkle capped at 4 Hz, a fade in and out, and a size-over-life
+  curve. `sprites.settings` is the shared sprite renderer's (shape, stretch, pixel floor).
+- **Start full**: `system.warmup(seconds)` simulates in its own submits; call it on the first frame
+  after `resize`, so a reduced-motion still looks right.
+- **Statistics**: `system.stats` (live count and running totals, a few frames late, for a HUD
+  label); `await system.readStats()` and `await system.read()` are exact, for tests.
+
+Pitfalls found building it:
+
+- A buffer copied into an encoder that is not yet submitted must not be mapped: the submit then
+  fails validation and the whole command buffer is dropped, silently unless you push an error
+  scope. Read back with a small submit of your own.
+- One dispatch cannot use a buffer both as writable storage and as indirect arguments: keep the
+  arguments in their own buffer, written by a kernel dispatched directly.
+- In a kernel that includes library chunks, never name a module-scope variable after a WGSL
+  built-in function (`step`, `select`, `min`...): it shadows it for every chunk. `template` is a
+  reserved word.
+- Each step encoded before one submit needs its own uniform slot (the framework keeps a ring of 32):
+  at most 32 steps per submit.
+- A collider that spawns on contact will spawn again when the children land: filter by `kind` in
+  `hook_collide`, or launch children away from the surface.
+- Dawn quantises GPU timestamps (65 µs here); a benchmark unit of one particle step reads as no time
+  at all. Measure several steps a unit (`PARTICLE_BENCH=1 npx vitest run tests/particles.test.ts -t cost`).
+- Sub-pixel sprites need the sprite renderer's pixel floor (`minPixels`), and an orthographic camera
+  needs the eye at a view distance of 1 for that floor to be right (`orthographicCamera` does it).
 
 ## Reading the HUD honestly
 

@@ -34,6 +34,11 @@ import { createUniformBuffer, defineUniformStruct } from './uniforms.ts';
  * must be the same size as the target, since it is read with `textureLoad` at the pixel position.
  *
  * Additive blending is order independent, so nothing is sorted. The target's alpha is left as it is.
+ *
+ * GPU-fed sprites. With `buffer` the instances come from a buffer a compute pass writes (it needs
+ * VERTEX and STORAGE usage), and `draw({ indirect })` takes the instance count from an indirect
+ * argument buffer the same compute work wrote, so a particle system never reads its live count back
+ * (src/gpu/particles/renderer.ts does both).
  */
 
 /** Floats per sprite in the instance data. */
@@ -197,7 +202,7 @@ export interface SpriteRendererOptions {
 }
 
 export interface SpriteDrawOptions {
-  /** View of the HDR target; it is loaded, not cleared. */
+  /** View of the HDR target; it is loaded, not cleared, unless `clear` is given. */
   target: GPUTextureView;
   /** The scene's depth as a sampleable view, the same size as `target`. Omit to ignore depth. */
   depth?: GPUTextureView;
@@ -205,6 +210,14 @@ export interface SpriteDrawOptions {
   count?: number;
   /** Restrict drawing to a pixel rectangle (x, y, width, height), e.g. for a split comparison. */
   scissor?: readonly [number, number, number, number];
+  /**
+   * Draw `drawIndirect` from four u32 at `offset` in `buffer` (vertex count 6, instance count,
+   * first vertex 0, first instance 0), which a compute pass wrote: the instance count never visits
+   * the CPU. `count` is then ignored. The buffer needs INDIRECT usage.
+   */
+  indirect?: { buffer: GPUBuffer; offset?: number };
+  /** Clear the target to this colour first instead of loading it. Default: load. */
+  clear?: GPUColor;
   label?: string;
   timestampWrites?: GPURenderPassTimestampWrites;
 }
@@ -383,9 +396,26 @@ export function createSpriteRenderer(
 
       const pass = encoder.beginRenderPass({
         label: drawOptions.label ?? label,
-        colorAttachments: [{ view: drawOptions.target, loadOp: 'load', storeOp: 'store' }],
+        colorAttachments: [
+          {
+            view: drawOptions.target,
+            loadOp: drawOptions.clear ? 'clear' : 'load',
+            clearValue: drawOptions.clear,
+            storeOp: 'store',
+          },
+        ],
         timestampWrites: drawOptions.timestampWrites,
       });
+      const indirect = drawOptions.indirect;
+      if (indirect) {
+        if (drawOptions.scissor) pass.setScissorRect(...drawOptions.scissor);
+        pass.setPipeline(pipeline);
+        pass.setBindGroup(0, groupFor(drawOptions.depth ?? noDepthView));
+        pass.setVertexBuffer(0, buffer, 0, capacity * SPRITE_STRIDE);
+        pass.drawIndirect(indirect.buffer, indirect.offset ?? 0);
+        pass.end();
+        return;
+      }
       const instances = Math.min(drawOptions.count ?? count, capacity);
       if (instances > 0) {
         if (drawOptions.scissor) pass.setScissorRect(...drawOptions.scissor);
