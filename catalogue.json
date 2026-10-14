@@ -1,5 +1,5 @@
 {
-  "project": "ft-wt",
+  "project": "firetemple",
   "effects": [
     {
       "id": "hello",
@@ -1082,6 +1082,304 @@
           "Checking the solver every Epic 6 effect builds on: schemes, solvers and confinement side by side",
           "Smoke that a visitor can stir, over a dark or a light page",
           "The starting point for combustion: temperature, fuel and smoke in the dye, buoyancy and expansion built in"
+        ]
+      }
+    },
+    {
+      "id": "embers",
+      "title": "Embers",
+      "summary": "Flying embers as real particles: they rise off a hidden fire line, drift in curl-noise air, cool along the blackbody curve from yellow-orange to deep red and out, and twinkle each at its own pace. Press and drag to wave a torch through them.",
+      "epic": "7",
+      "tier": "A",
+      "tags": [
+        "overlay",
+        "embers",
+        "particles",
+        "compute",
+        "interactive",
+        "simulation"
+      ],
+      "status": "demo",
+      "poster": "src/effects/embers/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "no",
+        "features": {
+          "required": []
+        },
+        "fallback": "The stateless `sparks` effect (a fragment shader, no compute) in its campfire preset, or nothing: embers are decoration and the page loses no meaning without them.",
+        "useCases": [
+          "Embers drifting up over a dark hero, a footer or the whole page, behind or in front of the content",
+          "Over a fire drawn by another effect: the particles carry the heat above the flames",
+          "A torch that follows a press and drag, leaving a trail of embers that drift off on the air",
+          "Scroll or music driven: the drive adds embers as a share of the calm rate, never speed",
+          "Dark pages only: on a light page an ember is a few pale orange pixels"
+        ]
+      }
+    },
+    {
+      "id": "fire-jet",
+      "title": "Directed jet",
+      "summary": "A flamethrower or dragon breath: a nozzle drives fuel, heat and momentum into the 2D fire fluid, and burning droplets, flame sprites and embers ride its velocity field, spreading, curling into eddies and rising as the jet slows, under the smoke the fluid makes. The nozzle aims at the pointer.",
+      "epic": "7",
+      "tier": "B",
+      "tags": [
+        "overlay",
+        "particles",
+        "fluid",
+        "compute",
+        "interactive",
+        "simulation",
+        "smoke"
+      ],
+      "status": "demo",
+      "poster": "src/effects/fire-jet/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The `gas-jet` shader (a directional flame with no simulation) for the burning cone, or a looping video; a still poster under reduced motion.",
+        "useCases": [
+          "A showpiece hero: a flamethrower that follows the pointer, or a dragon breathing across a section",
+          "A jet splashing against a page element (the wall preset): flame rolling along a surface",
+          "Any particles that should be carried by a simulated flow rather than by noise"
+        ]
+      }
+    },
+    {
+      "id": "fireworks",
+      "title": "Fireworks",
+      "summary": "Aerial shells as multi-stage emitters, entirely on the GPU: a shell rises with a spark tail and breaks at its apogee into a peony, chrysanthemum, willow, ring, palm, crossette, crackle or glitter burst, in the colours of real emitter salts. Click or tap to send one up to the pointer.",
+      "epic": "7",
+      "tier": "B",
+      "tags": [
+        "overlay",
+        "particles",
+        "compute",
+        "interactive",
+        "simulation"
+      ],
+      "status": "demo",
+      "poster": "src/effects/fireworks/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "no",
+        "features": {
+          "required": []
+        },
+        "fallback": "A still poster of a burst, or nothing: fireworks are celebration, not content. There is no fragment-only version; a few shells as CPU sprites (`soft-sprites`) would be the cheapest stand-in.",
+        "useCases": [
+          "A celebration over a dark hero, a launch page or a \"thank you\" screen, with shells going up on their own",
+          "A click or tap that answers with a shell bursting where the pointer is",
+          "Scroll or music driven: the drive adds shells to the schedule, never speed",
+          "Over a page as an overlay: on a dark page the bursts are light; on a light page they are confetti"
+        ]
+      }
+    },
+    {
+      "id": "particle-blending",
+      "title": "Sorting and blending",
+      "summary": "Fire and smoke puffs drawn four ways: all additive, alpha in buffer order, alpha after a GPU depth sort, and weighted blended order-independent transparency, side by side.",
+      "epic": "7",
+      "tier": "C",
+      "tags": [
+        "study",
+        "particles",
+        "compute",
+        "smoke",
+        "sorting",
+        "oit",
+        "overlay"
+      ],
+      "status": "demo",
+      "poster": "src/effects/particle-blending/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A still frame as a transparent PNG; smoke and a small fire read as a still. A study scene, not something to ship.",
+        "useCases": [
+          "Choosing how to blend smoke particles: the sort and OIT modules plug into any particle buffer",
+          "Seeing where each method fails: glowing smoke, wrong occlusion, popping, OIT colour bias",
+          "A fire with a smoke column over a dark or a light page: the smoke has real coverage"
+        ]
+      }
+    },
+    {
+      "id": "particle-flame",
+      "title": "Particle flame",
+      "summary": "The original particle-system fire: large soft sprites born hot at a base, lifted by their own heat, pulled into a taper, licked about by curl noise, cooling and shrinking until they overlap into a flame body, with embers thrown off the tips. Press to light a fire where you press.",
+      "epic": "7",
+      "tier": "B",
+      "tags": [
+        "flame",
+        "overlay",
+        "particles",
+        "compute",
+        "interactive",
+        "simulation"
+      ],
+      "status": "demo",
+      "poster": "src/effects/particle-flame/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The `noise-flame` wall (one fragment pass, no compute) or the `candle` and `torch` shader flames; a still poster under reduced motion.",
+        "useCases": [
+          "A campfire, torch or candle that responds to wind and to the pointer, over a dark hero or a card",
+          "A fire lit where the visitor presses and dying down when they let go",
+          "Several small flames in one canvas: the cost follows the sprites drawn, not the canvas area",
+          "The building block for a scene that also wants embers and sparks from the same particle pool"
+        ]
+      }
+    },
+    {
+      "id": "particle-system",
+      "title": "GPU particle system",
+      "summary": "The Epic 7 particle framework laid bare: a pool of up to a million particles born, moved, collided and recycled entirely on the GPU, with every emitter shape, force and collider switchable and the live count in the HUD.",
+      "epic": "7",
+      "tier": "B",
+      "tags": [
+        "particles",
+        "compute",
+        "simulation",
+        "validation",
+        "overlay",
+        "3d"
+      ],
+      "status": "demo",
+      "poster": "src/effects/particle-system/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "None needed: it is a test scene for the framework, not page decoration. The effects built on the framework name their own fallbacks.",
+        "useCases": [
+          "Checking what the framework does before building on it: shapes, rates, bursts, forces, colliders, GPU spawning, the external velocity field",
+          "The scene the particle scale study (7.10) sweeps: `count` sets the pool from 1 024 to 1 048 576 and the emission keeps it about `fill` full",
+          "A reference for the 2D overlay space (canvas heights) and the 3D scene space side by side"
+        ]
+      }
+    },
+    {
+      "id": "particle-trails",
+      "title": "Particle trails",
+      "summary": "Two ways to give a particle a trail, side by side on the same particles: ribbons built from each particle’s own history of positions, and an HDR buffer that fades a little every frame. Comets, a sparkler and embers in a vortex; press to throw sparks.",
+      "epic": "7",
+      "tier": "B",
+      "tags": [
+        "overlay",
+        "particles",
+        "compute",
+        "interactive",
+        "study"
+      ],
+      "status": "demo",
+      "poster": "src/effects/particle-trails/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "no",
+        "features": {
+          "required": []
+        },
+        "fallback": "Velocity-stretched sprites (the sprite renderer’s `stretch` and `trail`) give a short comet tail with no history at all; without WebGPU, the stateless `sparks` effect.",
+        "useCases": [
+          "Comets, meteors and thrown sparks whose path should stay visible behind them",
+          "A sparkler or a pointer trail: short bright streaks that follow the motion",
+          "Embers caught in a vortex, where the trail shows the flow",
+          "Choosing between ribbons and an accumulation buffer for a particle effect of your own"
+        ]
+      }
+    },
+    {
+      "id": "spark-shower",
+      "title": "Spark shower",
+      "summary": "A grinder, welding or forge shower of sparks as GPU particles: white-hot streaks arc under gravity and drag, cool along the blackbody curve, bounce off the floor, an anvil and the page’s own cards, and split on impact into smaller, cooler sparks. Move the pointer to aim the grinder; press to bite harder.",
+      "epic": "7",
+      "tier": "B",
+      "tags": [
+        "overlay",
+        "sparks",
+        "particles",
+        "compute",
+        "interactive",
+        "simulation",
+        "collisions"
+      ],
+      "status": "demo",
+      "poster": "src/effects/spark-shower/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "no",
+        "features": {
+          "required": []
+        },
+        "fallback": "The stateless `sparks` effect (a fragment shader, no compute) in its grinder preset kept small, or nothing: a spark shower is decoration and the page loses no meaning without it.",
+        "useCases": [
+          "A grinder or welding spray from a point on a dark page: a hero, a product shot, a cursor",
+          "Sparks that land on the page’s own cards and buttons, skid off their edges and split",
+          "A forge with an anvil and hammer strikes, as a section header or a loading moment",
+          "Scroll or music driven: the drive adds sparks as a share of the calm rate, never speed",
+          "Dark pages only: on a light page a spark is a thin pale streak"
+        ]
+      }
+    },
+    {
+      "id": "sparkler",
+      "title": "Sparkler",
+      "summary": "A hand-held sparkler as GPU particles: a white-hot core throws thousands of tiny sparks a second that live a fraction of a second and fork mid-flight into two or three, the branching look. The pointer is the hand; left alone, the tip traces a slow figure of eight and leaves an afterimage.",
+      "epic": "7",
+      "tier": "B",
+      "tags": [
+        "overlay",
+        "sparks",
+        "particles",
+        "compute",
+        "interactive",
+        "simulation"
+      ],
+      "status": "demo",
+      "poster": "src/effects/sparkler/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "no",
+        "features": {
+          "required": []
+        },
+        "fallback": "A small looping video or a still image of a sparkler, or nothing: it is decoration and the page loses no meaning without it.",
+        "useCases": [
+          "A celebration moment on a dark page: a launch, a birthday, a new year",
+          "A cursor that writes in light: the sparkler follows the pointer and leaves an afterimage",
+          "A dark hero or card that is never still: left alone, the tip traces a slow figure of eight",
+          "Scroll or music driven: the drive adds sparks as a share of the calm rate, never speed",
+          "Dark pages only: on a light page the sparks are thin pale lines"
         ]
       }
     }
