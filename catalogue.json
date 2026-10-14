@@ -1,0 +1,1089 @@
+{
+  "project": "ft-wt",
+  "effects": [
+    {
+      "id": "hello",
+      "title": "Hello, fire",
+      "summary": "Rising warped noise through the HDR tail. Exists to exercise the foundation end to end.",
+      "epic": "1",
+      "tier": "C",
+      "tags": [
+        "foundation"
+      ],
+      "status": "demo",
+      "poster": "src/effects/hello/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A static image in the same palette, or a dark CSS gradient.",
+        "useCases": [
+          "Smoke test for the shader pipeline, HDR tail, shell and shared WGSL library",
+          "A warm abstract backdrop; it glows, but nothing about it has the shape of a flame yet"
+        ]
+      }
+    },
+    {
+      "id": "advected-noise",
+      "title": "Advected noise",
+      "summary": "Ways to make noise look carried by rising gas instead of sliding past as one texture, side by side on the same heat field: scroll, domain warp, flow noise, curl displacement, a two-phase flow blend, and the combination that measures best.",
+      "epic": "3",
+      "tier": "B",
+      "tags": [
+        "building-block",
+        "noise",
+        "motion"
+      ],
+      "status": "demo",
+      "poster": "src/effects/advected-noise/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A looping video or animated WebP of the chosen variant; a still frame loses the whole point.",
+        "useCases": [
+          "Choosing how a procedural flame, smoke or ember bed is animated: every variant is one call in advect.wgsl",
+          "Seeing what a moving-noise trick costs in noise evaluations before spending it per pixel",
+          "A warm abstract fire wall (the backdrop preset) where no flame shape is needed"
+        ]
+      }
+    },
+    {
+      "id": "blackbody",
+      "title": "Blackbody colour",
+      "summary": "Temperature to colour three ways (Planck integral, polynomial fit, lookup texture) with their error, and a brightness mapping tamed enough to use.",
+      "epic": "3",
+      "tier": "C",
+      "tags": [
+        "building-block",
+        "colour"
+      ],
+      "status": "demo",
+      "poster": "src/effects/blackbody/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "none",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A static image of the chart; the colours themselves are available to CSS from the TypeScript twin.",
+        "useCases": [
+          "Colouring a simulated temperature field: blackbody_radiance(t, t_ref, gamma) per pixel",
+          "Tinting lights, embers and sparks by temperature without a texture binding (blackbody_tint)",
+          "Choosing between the fit and the lookup texture: this scene shows the error of each"
+        ]
+      }
+    },
+    {
+      "id": "bloom-tuning",
+      "title": "Bloom tuned for fire",
+      "summary": "A chart of hot shapes at known radiance, to find how little bloom still reads as heat: threshold, knee, radius, levels, and half against full resolution.",
+      "epic": "3",
+      "tier": "A",
+      "tags": [
+        "building-block",
+        "post",
+        "bloom"
+      ],
+      "status": "demo",
+      "poster": "src/effects/bloom-tuning/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "none",
+        "lightPage": "no",
+        "features": {
+          "required": []
+        },
+        "fallback": "A still image of the chart; it is a tuning tool, not decoration.",
+        "useCases": [
+          "Choosing bloom settings for an effect before spending GPU time on them",
+          "Checking that paper white does not glow and that thin, hot detail does",
+          "The scene the bloom cost study sweeps `levels` and resolution over"
+        ]
+      }
+    },
+    {
+      "id": "compositing",
+      "title": "Compositing over the page",
+      "summary": "One flame, smoke and logs written to a see-through canvas five ways: what an overlay effect has to put in alpha to read on a dark page and a light one.",
+      "epic": "3",
+      "tier": "B",
+      "tags": [
+        "building-block",
+        "overlay",
+        "compositing"
+      ],
+      "status": "demo",
+      "poster": "src/effects/compositing/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A transparent PNG or WebP of the flame with the same alpha, or nothing: it is decoration.",
+        "useCases": [
+          "Reference for every overlay effect: copy the alpha mode and underlay that suit the page",
+          "Checking a theme: switch presets over the dark and the light page to see what survives",
+          "A small campfire or hearth decoration that sits on the page instead of in a box"
+        ]
+      }
+    },
+    {
+      "id": "fire-light",
+      "title": "Fire as a light source",
+      "summary": "Wandering flames light a stone page and the cards on it: windowed inverse-square falloff, normal-mapped relief and analytic soft shadows from rounded rectangles.",
+      "epic": "3",
+      "tier": "B",
+      "tags": [
+        "building-block",
+        "lighting",
+        "shadows",
+        "sdf",
+        "normal-map",
+        "2d"
+      ],
+      "status": "demo",
+      "poster": "src/effects/fire-light/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A static dark image with a warm radial-gradient glow and CSS drop shadows on the cards, offset away from the glow.",
+        "useCases": [
+          "Fire, embers or a cursor torch that lights the DOM cards around it and throws their shadows across the page",
+          "Top-down 2D scenes: torches and camp fires lighting a normal-mapped floor",
+          "The lighting half of any flame effect: the falloff, shadow and tint functions are a shared chunk"
+        ]
+      }
+    },
+    {
+      "id": "flame-ramps",
+      "title": "Flame colour ramps",
+      "summary": "One flame through eight colour ramps: blackbody, an authored fire gradient, a banded toon ramp, a blue gas flame and four chemical tints, each as a formula and as a baked texture.",
+      "epic": "3",
+      "tier": "B",
+      "tags": [
+        "building-block",
+        "colour"
+      ],
+      "status": "demo",
+      "poster": "src/effects/flame-ramps/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A static image; the same ramps are available to CSS gradients from the TypeScript twins.",
+        "useCases": [
+          "Picking the heat-to-colour mapping for any procedural or simulated flame",
+          "Themed fire: copper green, sodium yellow, potassium lilac, lithium crimson, blue gas",
+          "Art-directed or banded gradients baked from colour stops into one small texture"
+        ]
+      }
+    },
+    {
+      "id": "flame-shape",
+      "title": "Flame shaping",
+      "summary": "One flame at three stages: a teardrop or taper distance field, the heat left after turbulence and erosion, and that heat through the fire ramp.",
+      "epic": "3",
+      "tier": "B",
+      "tags": [
+        "building-block",
+        "flame",
+        "sdf"
+      ],
+      "status": "demo",
+      "poster": "src/effects/flame-shape/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A static image or a short looping video of the flame; the diagram panels can be a PNG.",
+        "useCases": [
+          "Reference for the shared flame.wgsl chunk: every 2D flame effect starts from these functions",
+          "Tuning a silhouette (width, turbulence, erosion, falloff) before building a candle, torch or jet",
+          "A single stylised flame for a hero or a card, using the full-frame \"flame\" view"
+        ]
+      }
+    },
+    {
+      "id": "flicker",
+      "title": "Flicker signals",
+      "summary": "The shared flicker signal driving three candles, with a scrolling trace of each against the 10% band that defines a flash. Capped by default; the uncapped path is an explicit switch.",
+      "epic": "3",
+      "tier": "A",
+      "tags": [
+        "building-block",
+        "flicker",
+        "accessibility"
+      ],
+      "status": "ready",
+      "poster": "src/effects/flicker/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The same signal from src/gpu/emission/flicker.ts driving a CSS opacity or filter on a still image; it is plain TypeScript and needs no GPU.",
+        "useCases": [
+          "Intensity and position flicker for any flame, torch, ember bed or firelight on the site, safe by default",
+          "One signal shared by a WebGPU flame and the CSS glow around it, so the two stay in step",
+          "Checking a flicker setting against the flash threshold before it ships: the trace shows what the cap does to it"
+        ]
+      }
+    },
+    {
+      "id": "heat-haze",
+      "title": "Heat haze",
+      "summary": "Rising hot air bends what is behind it: a noise-driven refraction of a backdrop texture, masked by heat, with a faint colour fringe and softening where it is hottest.",
+      "epic": "3",
+      "tier": "B",
+      "tags": [
+        "building-block",
+        "refraction",
+        "distortion"
+      ],
+      "status": "demo",
+      "poster": "src/effects/heat-haze/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The backdrop itself, undistorted, with a still glow at its base. The haze is decoration: nothing is lost without it.",
+        "useCases": [
+          "The air above any flame, ember bed, exhaust or hot surface in a scene the canvas draws itself",
+          "Shimmer over a hero image or a video frame uploaded as a texture",
+          "Not over live page content: a canvas cannot read the pixels of the DOM behind it"
+        ]
+      }
+    },
+    {
+      "id": "smoke-shading",
+      "title": "Smoke shading",
+      "summary": "A ray-marched smoke plume lit from below by its fire and from above by a dim sky, comparing three ways to self-shadow it.",
+      "epic": "3",
+      "tier": "C",
+      "tags": [
+        "building-block",
+        "smoke",
+        "volumetric",
+        "overlay"
+      ],
+      "status": "demo",
+      "poster": "src/effects/smoke-shading/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A still frame of the plume as a transparent PNG; smoke moves slowly enough that a still reads as smoke.",
+        "useCases": [
+          "Reference for shading smoke in the volumetric fire effects: soot colour, self-shadowing, underlight",
+          "A smoke column over a hero or a card, on a dark or a light page (it has real coverage)",
+          "Choosing a self-shadowing method by eye: switch `shadowing` between none, gradient and march"
+        ]
+      }
+    },
+    {
+      "id": "soft-sprites",
+      "title": "Soft additive sprites",
+      "summary": "Embers, sparks and glow puffs as instanced additive quads: procedural shapes, velocity stretch, and the soft-particle depth fade that hides where a sprite cuts through geometry.",
+      "epic": "3",
+      "tier": "A",
+      "tags": [
+        "building-block",
+        "sprites",
+        "particles",
+        "depth"
+      ],
+      "status": "ready",
+      "poster": "src/effects/soft-sprites/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A still frame of the scene; sprites alone can also be a CSS radial-gradient per ember on a dark backdrop.",
+        "useCases": [
+          "Embers and sparks rising off any fire, drawn over a 3D scene or over a 2D flame",
+          "Glow halos and firelight in haze that must not show a seam where they meet walls and floors",
+          "The draw stage of a GPU particle system: the chunk and the renderer take any instance buffer",
+          "As drawn here it is an opaque dark scene; additive sprites on their own add nothing to a white page and need a dark region behind them"
+        ]
+      }
+    },
+    {
+      "id": "volume-march",
+      "title": "Volume ray-march kernel",
+      "summary": "An emissive flame and absorbing smoke integrated in one ray march, at reduced resolution, upsampled under the depth buffer so edges against geometry stay sharp.",
+      "epic": "3",
+      "tier": "C",
+      "tags": [
+        "building-block",
+        "volumetric",
+        "3d",
+        "smoke"
+      ],
+      "status": "demo",
+      "poster": "src/effects/volume-march/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "no",
+        "features": {
+          "required": []
+        },
+        "fallback": "A looped video or flipbook of the same shot; the march has no cheaper live equivalent.",
+        "useCases": [
+          "The integration kernel under every volumetric fire and smoke effect on the site",
+          "A 3D fire that geometry can stand in front of, inside and behind",
+          "Choosing step count, march resolution, jitter and upsample filter for a volumetric effect"
+        ]
+      }
+    },
+    {
+      "id": "candle",
+      "title": "Candle flame",
+      "summary": "One candle on the page: a teardrop flame with a blue foot, a dark wick and a soft halo over a wax body. It sways on its own and leans away from the pointer.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "flame",
+        "overlay",
+        "pointer",
+        "2d",
+        "shader-only"
+      ],
+      "status": "ready",
+      "poster": "src/effects/candle/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The poster as a transparent image, or an inline SVG candle with a CSS animation on the flame path; with reduced motion the still frame is the whole effect.",
+        "useCases": [
+          "A memorial, vigil or \"lit\" state: one calm flame beside a name, a date or a heading",
+          "A cursor toy on a landing page: the flame bends as the pointer passes and springs back",
+          "A row of tea lights as a quiet footer or loading state, one small canvas each"
+        ]
+      }
+    },
+    {
+      "id": "ember-bed",
+      "title": "Ember bed",
+      "summary": "A bed of glowing coals: dark crusts, cracks that breathe, and heat drifting slowly across it. The coal layout is baked once, so a frame is three texture fetches.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "background",
+        "embers",
+        "voronoi",
+        "blackbody",
+        "calm"
+      ],
+      "status": "ready",
+      "poster": "src/effects/ember-bed/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "none",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The poster: a still of the bed reads the same, since nothing in it moves fast. A CSS radial gradient from dark red to black is the cheapest stand-in.",
+        "useCases": [
+          "A calm, warm background for a hero, a footer or a card, safe to leave running",
+          "The base of a fire: put a flame effect above it, or sparks over it",
+          "A loading or idle state that should feel warm without drawing the eye",
+          "It is an opaque dark picture, so it works on a light page as an image does, in its own box"
+        ]
+      }
+    },
+    {
+      "id": "fire-ring",
+      "title": "Fire ring",
+      "summary": "A flame bent round a circle: tongues lick outward or inward from a ring, seamless all the way round, with a progress value that lights only part of it. Transparent in the middle.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "flame",
+        "polar",
+        "overlay",
+        "loader",
+        "ui"
+      ],
+      "status": "ready",
+      "poster": "src/effects/fire-ring/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A still image of the ring, or a CSS conic-gradient ring with a blur; for the loader, the CSS ring with its own rotation.",
+        "useCases": [
+          "A portal or a summoning circle with page content showing through the middle",
+          "A burning frame round an avatar or a badge",
+          "A loader or a progress ring: `progress` lights the arc from twelve o’clock clockwise"
+        ]
+      }
+    },
+    {
+      "id": "firelight-background",
+      "title": "Firelight background",
+      "summary": "The warm, slowly shifting light of a fire that is just out of frame. No flames: an opaque, calm backdrop for a dark page, steady enough to sit behind text.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "background",
+        "glow",
+        "ambient",
+        "firelight"
+      ],
+      "status": "demo",
+      "poster": "src/effects/firelight-background/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "none",
+        "lightPage": "no",
+        "features": {
+          "required": []
+        },
+        "fallback": "A CSS radial gradient in the same colours, which is most of the picture; or a still of the canvas.",
+        "useCases": [
+          "An ambient backdrop behind an article or a hero on a dark page, under a veil and text",
+          "A warm fill behind a fire effect that is drawn on top of it",
+          "A login or landing screen that should feel lit by a hearth without showing one"
+        ]
+      }
+    },
+    {
+      "id": "fireplace",
+      "title": "Fireplace",
+      "summary": "A whole hearth in one fragment pass: three layers of flame behind charred logs with glowing undersides, firelight on the wall and floor, and embers rising, with no simulation state.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "scene",
+        "hero",
+        "flame",
+        "logs",
+        "embers",
+        "stateless"
+      ],
+      "status": "ready",
+      "poster": "src/effects/fireplace/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The poster, or a short looping video of the same scene; a still fireplace still reads as one.",
+        "useCases": [
+          "A hero or a card that should feel like sitting by a fire",
+          "A cosy background for a landing page, a menu or a holiday banner",
+          "A \"low evening fire\" or \"dying embers\" idle state: the presets go down to a glow",
+          "It is an opaque scene with its own dark room, so a light page shows it as a picture in a box"
+        ]
+      }
+    },
+    {
+      "id": "flame-strip",
+      "title": "Flame strip",
+      "summary": "A band of flame tongues along the bottom edge of a wide, short canvas. It repeats exactly once per canvas width, so it tiles at any width, and is see-through above the flames.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "flame",
+        "overlay",
+        "divider",
+        "footer",
+        "tileable"
+      ],
+      "status": "ready",
+      "poster": "src/effects/flame-strip/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A horizontally repeating animated WebP or a short looping video of one period, anchored to the bottom edge; a still of it under reduced motion.",
+        "useCases": [
+          "A section break: a short full-width band of flame between two blocks of content",
+          "The top edge of a footer, or the bottom edge of a hero, with the page showing above it",
+          "A low ember line under a heading or along the bottom of a card"
+        ]
+      }
+    },
+    {
+      "id": "gas-jet",
+      "title": "Gas jet",
+      "summary": "A blue directional flame: a tight cone with a pale inner cone, alone, in a row or as a stove burner seen from above, and with shock diamonds along it for an exhaust.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "flame",
+        "overlay",
+        "gas",
+        "jet",
+        "2d",
+        "shader-only"
+      ],
+      "status": "ready",
+      "poster": "src/effects/gas-jet/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The poster as a transparent image, or a CSS gradient cone (blue to transparent) with a blurred pale core; the jet barely moves, so a still loses little.",
+        "useCases": [
+          "A burner or pilot light as a state: on, heating, cooking, boosting",
+          "Rocket, thruster and afterburner exhausts behind a logo, a ship or a launch button",
+          "A blowtorch or welding flame as a cursor trail tip or a progress indicator head"
+        ]
+      }
+    },
+    {
+      "id": "haze-overlay",
+      "title": "Heat-haze overlay",
+      "summary": "Hot air on its own: an image or a video shimmering in a band, a plume or all over, with no flame in sight. Drop a photo or a video file on it to try your own.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "refraction",
+        "distortion",
+        "image",
+        "video",
+        "haze"
+      ],
+      "status": "ready",
+      "poster": "src/effects/haze-overlay/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "none",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The image or the video itself, undistorted. The shimmer is decoration: nothing is lost without it.",
+        "useCases": [
+          "A hero photograph of a road, a desert, a runway or a grill that should feel hot",
+          "The air above an exhaust, a chimney or an engine in a product shot or a video loop",
+          "Not over live page content: a canvas can only distort an image, a video or what it draws itself"
+        ]
+      }
+    },
+    {
+      "id": "noise-flame",
+      "title": "Scrolling-noise flame",
+      "summary": "The classic: noise scrolled upward, shaped by a height gradient, through a fire ramp. A wall of flame along the bottom edge, with five noise sources to compare.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "flame",
+        "overlay",
+        "noise",
+        "hero"
+      ],
+      "status": "ready",
+      "poster": "src/effects/noise-flame/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A looping video or animated WebP of the flame wall with the same alpha; a still poster under reduced motion.",
+        "useCases": [
+          "A wall of fire along the bottom of a hero or a full-bleed section, over the page",
+          "A background for a dark landing page, with the flames kept below the headline",
+          "Starting point for any 2D flame: the gradient-minus-noise recipe in its smallest form"
+        ]
+      }
+    },
+    {
+      "id": "sparks",
+      "title": "Stateless sparks",
+      "summary": "Sparks that rise, wobble, cool and die with no buffers and no particle state: each pixel finds its spark from two hashes, in a few depth layers.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "overlay",
+        "sparks",
+        "embers",
+        "stateless",
+        "hash-grid"
+      ],
+      "status": "demo",
+      "poster": "src/effects/sparks/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "flashPresets": [
+          "welding spray",
+          "grinder"
+        ],
+        "lightPage": "no",
+        "features": {
+          "required": []
+        },
+        "fallback": "Nothing, or a still transparent image of a few sparks: it is decoration and the page loses no meaning without it.",
+        "useCases": [
+          "Embers drifting up behind a dark hero or over a fire drawn by another effect",
+          "A welding or grinding spray from a point: a button, a logo, a cursor",
+          "Dark pages only. Over a light page a spark is a few pale orange pixels and does not read",
+          "Any place a particle system would be overkill: it costs the same with ten sparks or a thousand",
+          "The welding spray and grinder presets are over the flash threshold when they fill a large view: keep them small"
+        ]
+      }
+    },
+    {
+      "id": "toon-fire",
+      "title": "Toon fire",
+      "summary": "Cartoon fire: three or four flat bands of colour with hard edges and an ink outline, redrawn ten times a second like a hand-animated cel. Opaque paint, so it sits on a light page.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "flame",
+        "stylised",
+        "overlay",
+        "ui",
+        "sdf"
+      ],
+      "status": "ready",
+      "poster": "src/effects/toon-fire/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "An SVG or a short sprite-sheet loop of the same flame: flat shapes are exactly what those formats are good at.",
+        "useCases": [
+          "A campfire, torch or hazard marker in a game UI or an illustrated page",
+          "A flame icon or a streak badge that needs to read at 48 pixels and on a white background",
+          "Coloured \"magic\" fire (the spirit and toxic palettes) where realism would look out of place"
+        ]
+      }
+    },
+    {
+      "id": "torch",
+      "title": "Torch and brazier",
+      "summary": "Up to 48 small flames in one canvas, each on a torch or in a brazier and each with its own seed, in a loop that closes exactly. Built to find out what many small flames cost.",
+      "epic": "4",
+      "tier": "A",
+      "tags": [
+        "flame",
+        "overlay",
+        "icons",
+        "loop",
+        "2d",
+        "shader-only"
+      ],
+      "status": "ready",
+      "poster": "src/effects/torch/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A sprite sheet or animated WebP baked from one loop of the effect (it repeats exactly), or the poster as a still.",
+        "useCases": [
+          "List markers, bullets and status icons: many small flames drawn by one canvas laid over the list",
+          "A row of wall torches or braziers along a header, a sidebar or a section edge",
+          "A seamless loop to bake into a sprite sheet for places WebGPU does not reach"
+        ]
+      }
+    },
+    {
+      "id": "burn-front",
+      "title": "Burn front on a fuel map",
+      "summary": "Burning paper: a sheet over the page that a tap or a stray ember lights. A thin glowing front crosses it, char follows and crumbles, the page shows through the hole, and the sheet grows back.",
+      "epic": "5",
+      "tier": "A",
+      "tags": [
+        "simulation",
+        "overlay",
+        "paper",
+        "interactive",
+        "transition"
+      ],
+      "status": "ready",
+      "poster": "src/effects/burn-front/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A looping video with alpha of one burn, or a still of the half-burnt sheet; under reduced motion any frame is a complete picture.",
+        "useCases": [
+          "A cover that burns away to reveal what is under it: a hero image, a spoiler, the next section",
+          "A page or route transition, lit from where the visitor clicked",
+          "A card or panel that burns when dismissed and leaves the page showing through"
+        ]
+      }
+    },
+    {
+      "id": "combustion-front",
+      "title": "Reaction–diffusion combustion",
+      "summary": "Fire as a travelling front in two continuous fields, temperature and fuel. Heat diffuses into unburnt fuel, the fuel ignites and releases heat; the speed and thickness of the front follow from the physical constants. Tap or drag to light it.",
+      "epic": "5",
+      "tier": "A",
+      "tags": [
+        "simulation",
+        "overlay",
+        "interactive",
+        "front",
+        "blackbody"
+      ],
+      "status": "ready",
+      "poster": "src/effects/combustion-front/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A looping video of the fronts crossing with the same alpha, or the still poster; under reduced motion one frame is a complete picture of fronts and char.",
+        "useCases": [
+          "A page or hero that burns: fronts creep over the content, leave char and the ground grows back",
+          "Touch-to-ignite surfaces where the fire has to spread at a believable, tunable speed",
+          "The reference model to compare a rule-based burn front against: speed, width and extinction come from constants"
+        ]
+      }
+    },
+    {
+      "id": "dom-fuel",
+      "title": "DOM as fuel",
+      "summary": "The page is the fuel: the rounded rectangles of marked elements are drawn into a fuel map, so fire climbs cards and headings, stops at the gaps between them, leaves a scorch that fades, and the fuel returns.",
+      "epic": "5",
+      "tier": "A",
+      "tags": [
+        "simulation",
+        "overlay",
+        "dom",
+        "interactive"
+      ],
+      "status": "ready",
+      "poster": "src/effects/dom-fuel/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "Nothing: it is decoration on top of real content, which is still there without it. A CSS box-shadow glow on hover is the nearest static stand-in.",
+        "useCases": [
+          "A page that catches fire where it is clicked: a 404, a launch page, a game menu",
+          "Cards or headings that burn on a destructive action (delete, dismiss) and come back",
+          "Ambient embers smouldering on a dark landing page without hiding its content"
+        ]
+      }
+    },
+    {
+      "id": "doom-fire",
+      "title": "Doom fire",
+      "summary": "The PSX Doom heat automaton on a small grid of its own: a bottom row held hot, heat climbing one cell a step. Draw fire with a pointer, let it die and relight it, drive it from scroll or sound.",
+      "epic": "5",
+      "tier": "A",
+      "tags": [
+        "flame",
+        "overlay",
+        "simulation",
+        "cellular",
+        "interactive",
+        "retro"
+      ],
+      "status": "ready",
+      "poster": "src/effects/doom-fire/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "A looping video or animated WebP of the wall of fire with the same alpha (the pointer drawing is lost); a still poster under reduced motion. The render-pass solver is plain enough to port to WebGL2.",
+        "useCases": [
+          "A wall of fire along the bottom of a hero, a footer or a 404 page that visitors can draw into",
+          "Retro and pixel-art pages: the original palette and blocky cells are one preset away",
+          "A fire that answers the page: taller while the visitor scrolls, or in time with music"
+        ]
+      }
+    },
+    {
+      "id": "forest-fire",
+      "title": "Forest-fire automaton",
+      "summary": "A landscape that burns, regrows and burns again: the Drossel–Schwabl forest-fire automaton on a small grid, with wind, lightning and smoke. Tap or drag to start a fire.",
+      "epic": "5",
+      "tier": "A",
+      "tags": [
+        "simulation",
+        "cellular",
+        "background",
+        "interactive",
+        "wind",
+        "top-down"
+      ],
+      "status": "ready",
+      "poster": "src/effects/forest-fire/poster.webp",
+      "scorecard": {
+        "compute": false,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The poster: a still of the map with a fire on it. The rule is a few lines and runs on a 2D canvas at this grid size, so a CPU port is a realistic second step; a looped video cannot be touched.",
+        "useCases": [
+          "A slow, living background for a hero or a section that rewards being left alone for a minute",
+          "An interactive piece: visitors start fires with a tap or a drag and watch where the wind takes them",
+          "Explaining self-organised criticality, fire regimes or wind-driven spread with something that runs",
+          "It is an opaque map, so it works on a light page as an image does, in its own box"
+        ]
+      }
+    },
+    {
+      "id": "fire-3d",
+      "title": "3D combustion",
+      "summary": "Fuel, heat and smoke carried by a 3D stable-fluids solver, burning above an ignition temperature, and ray-marched as blackbody flame and fire-lit smoke over a small scene.",
+      "epic": "6",
+      "tier": "C",
+      "tags": [
+        "simulation",
+        "compute",
+        "fluid",
+        "volumetric",
+        "3d",
+        "scene",
+        "smoke",
+        "interactive"
+      ],
+      "status": "demo",
+      "poster": "src/effects/fire-3d/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "no",
+        "features": {
+          "required": []
+        },
+        "fallback": "A looped video or flipbook of the same shot (story 8.6), or the 2D grid fire of Epic 6 for a flat view.",
+        "useCases": [
+          "A hero scene with a fire the camera can go round: campfire, brazier, gas burner",
+          "Fire that reacts to the scene: wind, a burst of fuel, a burner turned up",
+          "The upper bound of what a browser can simulate in 3D within a frame budget"
+        ]
+      }
+    },
+    {
+      "id": "fire-fluid",
+      "title": "Fluid fire",
+      "summary": "Fire as a fluid: fuel, temperature and soot carried by an incompressible flow, burning above an ignition temperature, lifting by buoyancy and expanding where it burns. Burners, a torch you draw with (press and drag), wood, gas and chemical colours, and the three ways to keep a coarse grid lively side by side.",
+      "epic": "6",
+      "tier": "B",
+      "tags": [
+        "simulation",
+        "fire",
+        "smoke",
+        "interactive",
+        "overlay",
+        "compute",
+        "fluid"
+      ],
+      "status": "demo",
+      "poster": "src/effects/fire-fluid/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "There is no render-pass version of the solver, so no WebGL2 path: an Epic 4 shader fire (noise-flame, fireplace, gas-jet) or a looping video. Under reduced motion the first frame is already a burning fire.",
+        "useCases": [
+          "A hero or backdrop fire that reacts to a visitor: drag to spray burning fuel, flames that bend round each other",
+          "Burners as page furniture: a strip along the footer, a ring round an avatar, a gas jet",
+          "The combustion layer later effects reuse (obstacles, heat haze over the page) and the reference for the cheaper fires"
+        ]
+      }
+    },
+    {
+      "id": "fire-haze",
+      "title": "Fire as page distortion",
+      "summary": "A hidden heat source below the frame sends a plume of hot gas up through a fluid simulation, and the gas bends the picture behind it: the shimmer rises, curls and fades with the gas instead of scrolling on its own. The pointer is a torch. Drop a photo or a video file on it to try your own.",
+      "epic": "6",
+      "tier": "B",
+      "tags": [
+        "simulation",
+        "fluid",
+        "compute",
+        "refraction",
+        "distortion",
+        "haze",
+        "image",
+        "video",
+        "interactive"
+      ],
+      "status": "demo",
+      "poster": "src/effects/fire-haze/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "none",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "The picture itself, undistorted, or the noise-driven heat-haze overlay (no compute) for a shimmer that does not follow a flow.",
+        "useCases": [
+          "A hero image above a grill, a radiator or an exhaust whose shimmer should rise and swirl like real hot air",
+          "A pointer that warms the page it passes over: text and images waver behind it and settle",
+          "Not over live page content: a canvas can only bend an image, a video or what it draws itself"
+        ]
+      }
+    },
+    {
+      "id": "fire-obstacles",
+      "title": "Fire round obstacles",
+      "summary": "Hot gas from a burner under the page rises through a fluid simulation and meets the page as solid walls: the marked cards, headings and buttons. The plume splits round them, curls over their top edges and leaves smoke pooled under overhangs. Press to add heat.",
+      "epic": "6",
+      "tier": "B",
+      "tags": [
+        "simulation",
+        "fluid",
+        "compute",
+        "overlay",
+        "dom",
+        "interactive",
+        "smoke"
+      ],
+      "status": "demo",
+      "poster": "src/effects/fire-obstacles/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "Nothing: it is decoration round real content, which is still there without it. The still poster, or a CSS glow under the cards, is the nearest stand-in.",
+        "useCases": [
+          "A landing page or a 404 whose cards and headings sit in a rising fire and shape it",
+          "Showing that a simulation knows where the page is: flow that parts round elements and pools under them",
+          "Judging the solver against solids: the SDF test shapes (card row, circle, slanted plate) without a page"
+        ]
+      }
+    },
+    {
+      "id": "stable-fluids",
+      "title": "Stable fluids",
+      "summary": "The validation scene of the grid-fluid solver ported from Water Temple: smoke and ember glow rising from a smouldering bed, carried by an incompressible velocity field on a staggered grid. Drag to stir it; the controls switch the advection scheme, the pressure solver, vorticity confinement and the grid size.",
+      "epic": "6",
+      "tier": "B",
+      "tags": [
+        "simulation",
+        "smoke",
+        "interactive",
+        "overlay",
+        "compute",
+        "fluid"
+      ],
+      "status": "demo",
+      "poster": "src/effects/stable-fluids/poster.webp",
+      "scorecard": {
+        "compute": true,
+        "mobile": "untested",
+        "flash": "low",
+        "lightPage": "yes",
+        "features": {
+          "required": []
+        },
+        "fallback": "There is no render-pass version of the solver, so no WebGL2 path: the still poster, or a looping video of the plume. Under reduced motion the first frame is already a plume.",
+        "useCases": [
+          "Checking the solver every Epic 6 effect builds on: schemes, solvers and confinement side by side",
+          "Smoke that a visitor can stir, over a dark or a light page",
+          "The starting point for combustion: temperature, fuel and smoke in the dye, buoyancy and expansion built in"
+        ]
+      }
+    }
+  ]
+}
