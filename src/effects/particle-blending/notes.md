@@ -54,8 +54,9 @@ it by all the smoke at its pixel, front and back. 0.5 had the lowest mean error 
 
 ## Cost
 
-GPU time: not measured yet (no `npm run study` run). Indicative readings, M1 Max, 1920 x 1080,
-another agent sharing the GPU throughout.
+GPU time, measured with another browser sharing the GPU (Apple M1 Max, 1920 × 1080, defaults, tail included): 6.51 ms per frame on Dawn and 3.52 ms for one frame in Chrome 155 (median of 3 loads, 3.44 to 3.75; `docs/studies/epic-7.md`, `docs/studies/browser-check.md`). Tier C on this machine: the Dawn reading is over B's 6 ms. The same bench read 1.8 ms on a quieter GPU while the effect was built, so the label follows contention as much as the effect; no integrated GPU or phone has been measured. Bundle: 74.8 kB.
+
+Earlier indicative readings, another agent sharing the GPU throughout:
 
 Dawn under Node, slope method (`PSORT_FRAME=1 npx vitest run tests/particle-sort.test.ts`), the
 cost of one more frame including the tail:
@@ -98,9 +99,8 @@ allocated only while an OIT view is on screen (10 bytes without the emission tar
 buffered, padded to a power of two for bitonic): 1 MB for 65 536 slots, plus a 4 KB histogram and
 16 KB of uniform slots. The puffs are 48 bytes a slot (3 MB at 65 536) plus a 256 KB identity order.
 
-Tier B: the default (`sorted`) read between 3.2 and 5.7 ms (medians of separate runs) in Chrome on
-this machine, inside B's 6 ms; B is an integrated-GPU budget, so the label is provisional. Bundle
-size: not measured yet.
+While it was built, the default (`sorted`) read between 3.2 and 5.7 ms (medians of separate runs) in Chrome on
+this machine.
 
 ## Pitfalls
 
@@ -170,7 +170,7 @@ render passes only, so unlike the sort it can be ported to WebGL2 with float ren
 Unsorted alpha is a defensible fallback for thin smoke of one colour, which it gets within a couple
 of levels, but not for smoke over lights or fire. Additive is right for fire and wrong for smoke.
 
-This is a study scene (Tier B, provisional), not something to ship; the sort and OIT modules plug
+This is a study scene (Tier C, provisional), not something to ship; the sort and OIT modules plug
 into any particle buffer of vec4 positions.
 
 ## References

@@ -59,7 +59,7 @@ What each is for: the noise flame for a wall or a band of fire, cheaply and shar
 
 ## Cost
 
-GPU time: not measured yet with the benchmark harness (`npm run study`); the scorecard has no `gpuMs`.
+GPU time, measured with another browser sharing the GPU (Apple M1 Max, 1920 × 1080, defaults, tail included): 2.88 ms per frame on Dawn and 2.09 ms for one frame in Chrome 155 (median of 3 loads, 1.66 to 3.07; `docs/studies/epic-7.md`, `docs/studies/browser-check.md`). Tier B on this machine by both readings; no integrated GPU or phone has been measured. Bundle: 94.3 kB.
 
 Indicative readings, Apple M1 Max, 1920 × 1080, headless Chrome, the HUD's GPU span of one frame including the HDR tail, median of three rounds of three loads, with another agent using the same GPU: 2.44 ms at the default 2 500 particles (table above); two later checks of the default, after the last changes, read 2.72 ms (2.64 to 2.84) and 2.10 ms (1.98 to 2.80), with `noise-flame` at 1.47 ms alongside the second. Tier A (2 ms) holds up to about 1 000 particles on this machine, Tier B (6 ms) up to about 15 000. The pool is the next power of two above three times `count` (8 192 at the default): 64 bytes of state with the per-particle user data, 12 of list entries and 48 of sprite instance per slot, about 1 MB.
 

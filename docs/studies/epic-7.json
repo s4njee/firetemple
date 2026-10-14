@@ -1,0 +1,2574 @@
+{
+  "epic": "7",
+  "measuredAt": "2026-10-14T13:48:57.788Z",
+  "device": "Apple M1 Max",
+  "deviceClass": "apple-silicon",
+  "adapter": {
+    "vendor": "apple",
+    "architecture": "metal-3",
+    "device": "apple-m1-max",
+    "description": "Metal driver on macOS Version 26.6.2 (Build 25G83)"
+  },
+  "runtime": "Dawn (node webgpu bindings)",
+  "method": {
+    "metric": "GPU timestamps: frame span (first pass start to last pass end) and marginal cost per extra frame",
+    "warmupFrames": 12,
+    "rounds": 11,
+    "repeats": 4
+  },
+  "note": "Only this adapter was measured. spanMs includes the timing floor (see the \"(floor)\" rows); slopeMs is the cost of one more frame of the same work and is the number to compare by. A slope at or below zero means the work is below what this method can resolve.",
+  "rows": [
+    {
+      "effect": "(floor)",
+      "config": "one constant-colour pass",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.065536,
+      "slopeMs": 0.2184533333333333,
+      "slopeMinMs": -0.5679786666666667,
+      "slopeMaxMs": 0.65536,
+      "passes": 1,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "(tail)",
+      "config": "constant scene + bloom + output",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.376256,
+      "slopeMs": 0.3713706666666667,
+      "slopeMinMs": -0.9611946666666666,
+      "slopeMaxMs": 1.114112,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 0.720896,
+      "slopeMs": 0.7645866666666666,
+      "slopeMinMs": -1.6820906666666666,
+      "slopeMaxMs": 1.9879253333333333,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "preset campfire",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 2.097152,
+      "slopeMs": 0.4150613333333333,
+      "slopeMinMs": -0.41506133333333334,
+      "slopeMaxMs": 2.337450666666667,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "preset bonfire gust",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 2.818048,
+      "slopeMs": 0.8956586666666667,
+      "slopeMinMs": -0.2184533333333333,
+      "slopeMaxMs": 2.118997333333333,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "preset quiet hearth",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 2.883584,
+      "slopeMs": 0.10922666666666665,
+      "slopeMinMs": -0.8082773333333333,
+      "slopeMaxMs": 2.6214399999999998,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "preset torch trail",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 2.555904,
+      "slopeMs": 1.0048853333333332,
+      "slopeMinMs": -0.9393493333333335,
+      "slopeMaxMs": 3.2549546666666664,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "preset ember storm",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 5.308416,
+      "slopeMs": 0.7427413333333334,
+      "slopeMinMs": -0.2621439999999999,
+      "slopeMaxMs": 3.014656,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 10.747904,
+      "slopeMs": 5.548714666666666,
+      "slopeMinMs": -21.757952,
+      "slopeMaxMs": 9.786709333333333,
+      "passes": 22,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset flamethrower",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 8.388608,
+      "slopeMs": 7.8861653333333335,
+      "slopeMinMs": 3.910314666666667,
+      "slopeMaxMs": 13.784405333333334,
+      "passes": 22,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset dragon breath",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 9.437184,
+      "slopeMs": 4.674901333333334,
+      "slopeMinMs": 2.6651306666666668,
+      "slopeMaxMs": 8.060927999999999,
+      "passes": 22,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset wall splash",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 14.614528,
+      "slopeMs": 7.4711039999999995,
+      "slopeMinMs": 4.085077333333332,
+      "slopeMaxMs": 14.396074666666665,
+      "passes": 22,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset two-way coupling",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 9.961472,
+      "slopeMs": 6.378837333333332,
+      "slopeMinMs": 3.4734080000000005,
+      "slopeMaxMs": 7.580330666666668,
+      "passes": 22,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset particles only",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 7.143424,
+      "slopeMs": 5.614250666666666,
+      "slopeMinMs": 2.3374506666666663,
+      "slopeMaxMs": 7.492949333333333,
+      "passes": 22,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset fluid only",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 5.373952,
+      "slopeMs": 2.5340586666666667,
+      "slopeMinMs": 0.961194666666667,
+      "slopeMaxMs": 5.352106666666667,
+      "passes": 21,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.93216,
+      "slopeMs": 0.3058346666666667,
+      "slopeMinMs": -1.092266666666667,
+      "slopeMaxMs": 3.145728,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset evening show",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.325376,
+      "slopeMs": -0.4805973333333333,
+      "slopeMinMs": -10.704213333333335,
+      "slopeMaxMs": 1.3981013333333332,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset peonies and chrysanthemums",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.342336,
+      "slopeMs": 0.6772053333333332,
+      "slopeMinMs": -0.3713706666666667,
+      "slopeMaxMs": 3.058346666666667,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset willow gold",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 2.228224,
+      "slopeMs": 0.9830399999999999,
+      "slopeMinMs": -0.589824,
+      "slopeMaxMs": 3.582634666666667,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset crossettes",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.211264,
+      "slopeMs": 0.3495253333333333,
+      "slopeMinMs": -0.8082773333333334,
+      "slopeMaxMs": 1.376256,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset crackle and glitter",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.407872,
+      "slopeMs": 0.6990506666666666,
+      "slopeMinMs": -0.589824,
+      "slopeMaxMs": 2.097152,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset rings and palms",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 2.162688,
+      "slopeMs": 0.28398933333333337,
+      "slopeMinMs": -0.5461333333333332,
+      "slopeMaxMs": 1.987925333333333,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset finale",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.014656,
+      "slopeMs": 0.6116693333333334,
+      "slopeMinMs": -0.7645866666666666,
+      "slopeMaxMs": 1.179648,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 7.798784,
+      "slopeMs": 6.509909333333333,
+      "slopeMinMs": 5.417642666666667,
+      "slopeMaxMs": 8.323072,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "preset sorted | oit",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 13.43488,
+      "slopeMs": 14.636373333333333,
+      "slopeMinMs": 10.114389333333333,
+      "slopeMaxMs": 17.891328,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "preset additive | sorted",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 10.551296,
+      "slopeMs": 9.590101333333331,
+      "slopeMinMs": 7.733247999999999,
+      "slopeMaxMs": 15.400960000000003,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "preset unsorted | sorted",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 10.289152,
+      "slopeMs": 10.878976,
+      "slopeMinMs": 6.619136000000001,
+      "slopeMaxMs": 16.36215466666667,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "preset heavy smoke",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 25.821184,
+      "slopeMs": 18.612224,
+      "slopeMinMs": 12.932437333333334,
+      "slopeMaxMs": 20.709376000000002,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "preset dense",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 26.738688,
+      "slopeMs": 25.624576,
+      "slopeMinMs": 22.325930666666665,
+      "slopeMaxMs": 30.80192,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 5.636096,
+      "slopeMs": 2.8835840000000004,
+      "slopeMinMs": 0.1529173333333335,
+      "slopeMaxMs": 8.017237333333334,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset campfire",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.25984,
+      "slopeMs": 3.910314666666667,
+      "slopeMinMs": 1.0704213333333332,
+      "slopeMaxMs": 5.920085333333333,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset torch",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 5.963776,
+      "slopeMs": 2.686976,
+      "slopeMinMs": 1.5947093333333335,
+      "slopeMaxMs": 5.221034666666665,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset candle",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.653056,
+      "slopeMs": 1.8131626666666667,
+      "slopeMinMs": -0.2184533333333333,
+      "slopeMaxMs": 5.395797333333333,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset line of fire",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 6.5536,
+      "slopeMs": 5.046272,
+      "slopeMinMs": 3.0365013333333337,
+      "slopeMaxMs": 9.000277333333335,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset windy brazier",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 6.029312,
+      "slopeMs": 3.60448,
+      "slopeMinMs": 0.851968,
+      "slopeMaxMs": 6.684672,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset black body",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 6.750208,
+      "slopeMs": 3.648170666666666,
+      "slopeMinMs": -0.41506133333333334,
+      "slopeMaxMs": 5.898239999999999,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 5.57056,
+      "slopeMs": 1.0048853333333332,
+      "slopeMinMs": -0.3058346666666667,
+      "slopeMaxMs": 4.478293333333334,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset fountain",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.390912,
+      "slopeMs": 1.6165546666666668,
+      "slopeMinMs": -0.3058346666666667,
+      "slopeMaxMs": 4.128768,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset collisions",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.93216,
+      "slopeMs": 0.7427413333333331,
+      "slopeMinMs": -0.5024426666666666,
+      "slopeMaxMs": 4.653056,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset split on impact",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.866624,
+      "slopeMs": 1.245184,
+      "slopeMinMs": -0.28398933333333315,
+      "slopeMaxMs": 2.4029866666666666,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset bursts and children",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.407872,
+      "slopeMs": 0.9830399999999999,
+      "slopeMinMs": -0.26214400000000015,
+      "slopeMaxMs": 2.140842666666667,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset swept emitter",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 5.046272,
+      "slopeMs": 2.6432853333333335,
+      "slopeMinMs": 0.39321600000000007,
+      "slopeMaxMs": 4.871509333333333,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset vortex field",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.670016,
+      "slopeMs": 2.359296,
+      "slopeMinMs": -0.2839893333333334,
+      "slopeMaxMs": 6.531754666666667,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset attractor",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.014656,
+      "slopeMs": 1.463637333333333,
+      "slopeMinMs": -0.3495253333333334,
+      "slopeMaxMs": 4.041386666666667,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset 3d scene",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.128768,
+      "slopeMs": 0.6990506666666665,
+      "slopeMinMs": -0.48059733333333315,
+      "slopeMaxMs": 2.162688,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset million",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 25.100288,
+      "slopeMs": 15.510186666666668,
+      "slopeMinMs": 7.252650666666665,
+      "slopeMaxMs": 21.408426666666667,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 6.094848,
+      "slopeMs": 1.4854826666666667,
+      "slopeMinMs": 0.2184533333333333,
+      "slopeMaxMs": 5.221034666666667,
+      "passes": 17,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset vortex embers",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.670016,
+      "slopeMs": 0.7864319999999999,
+      "slopeMinMs": -0.34952533333333324,
+      "slopeMaxMs": 3.0801920000000003,
+      "passes": 17,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset comets",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.653056,
+      "slopeMs": 0.6335146666666666,
+      "slopeMinMs": 0.06553599999999982,
+      "slopeMaxMs": 3.3860266666666665,
+      "passes": 17,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset sparkler",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 1.572864,
+      "slopeMs": 0.9830399999999999,
+      "slopeMinMs": -0.9830400000000002,
+      "slopeMaxMs": 2.5340586666666667,
+      "passes": 17,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset camera motion",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.538944,
+      "slopeMs": 0.7208960000000001,
+      "slopeMinMs": 0.06553600000000011,
+      "slopeMaxMs": 3.7355519999999998,
+      "passes": 17,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset ribbons only",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.538944,
+      "slopeMs": 0.4587519999999999,
+      "slopeMinMs": -0.8956586666666668,
+      "slopeMaxMs": 1.9879253333333333,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset accumulation only",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.407872,
+      "slopeMs": 1.0704213333333332,
+      "slopeMinMs": -0.6116693333333334,
+      "slopeMaxMs": 2.839893333333334,
+      "passes": 16,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset 100k vortex",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 10.944512,
+      "slopeMs": 8.213845333333333,
+      "slopeMinMs": 5.352106666666667,
+      "slopeMaxMs": 13.238272,
+      "passes": 17,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "spark-shower",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.325376,
+      "slopeMs": 1.31072,
+      "slopeMinMs": -0.2621439999999999,
+      "slopeMaxMs": 3.211264,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "spark-shower",
+      "config": "preset grinder",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.325376,
+      "slopeMs": 1.5510186666666668,
+      "slopeMinMs": -0.2839893333333334,
+      "slopeMaxMs": 3.2549546666666664,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "spark-shower",
+      "config": "preset welding",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.128768,
+      "slopeMs": 1.8786986666666667,
+      "slopeMinMs": 0.5242880000000003,
+      "slopeMaxMs": 3.4734080000000005,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "spark-shower",
+      "config": "preset forge hammer",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 5.24288,
+      "slopeMs": 2.031616,
+      "slopeMinMs": -0.45875200000000005,
+      "slopeMaxMs": 2.8180479999999997,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "spark-shower",
+      "config": "preset sparks on cards",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 5.373952,
+      "slopeMs": 1.4417919999999997,
+      "slopeMinMs": -0.3058346666666667,
+      "slopeMaxMs": 3.014656,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "sparkler",
+      "config": "default",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 5.111808,
+      "slopeMs": 1.703936,
+      "slopeMinMs": 0.2184533333333333,
+      "slopeMaxMs": 3.4952533333333338,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "sparkler",
+      "config": "preset hand-held",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.063232,
+      "slopeMs": 2.774357333333333,
+      "slopeMinMs": -1.7476266666666669,
+      "slopeMaxMs": 4.980735999999999,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "sparkler",
+      "config": "preset light painting",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.456448,
+      "slopeMs": 2.643285333333333,
+      "slopeMinMs": 0.3932159999999998,
+      "slopeMaxMs": 4.063232,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "sparkler",
+      "config": "preset golden shower",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 4.390912,
+      "slopeMs": 2.2937600000000002,
+      "slopeMinMs": -2.337450666666667,
+      "slopeMaxMs": 5.373952,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "sparkler",
+      "config": "preset branching stars",
+      "width": 1920,
+      "height": 1080,
+      "spanMs": 3.407872,
+      "slopeMs": 2.6651306666666668,
+      "slopeMinMs": -0.262144,
+      "slopeMaxMs": 4.150613333333333,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "fill=0.95 count=16384",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "fill": 0.95,
+        "count": 16384
+      },
+      "spanMs": 5.24288,
+      "slopeMs": 2.4248320000000003,
+      "slopeMinMs": -0.4369066666666666,
+      "slopeMaxMs": 4.019541333333334,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "fill=0.95 count=65536",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "fill": 0.95,
+        "count": 65536
+      },
+      "spanMs": 5.963776,
+      "slopeMs": 3.7355519999999998,
+      "slopeMinMs": -1.31072,
+      "slopeMaxMs": 5.9856213333333335,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "fill=0.95 count=262144",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "fill": 0.95,
+        "count": 262144
+      },
+      "spanMs": 12.845056,
+      "slopeMs": 7.733248000000001,
+      "slopeMinMs": 5.89824,
+      "slopeMaxMs": 11.818325333333334,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "fill=0.95 count=1048576",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "fill": 0.95,
+        "count": 1048576
+      },
+      "spanMs": 29.032448,
+      "slopeMs": 21.058901333333335,
+      "slopeMinMs": 14.658218666666668,
+      "slopeMaxMs": 28.551850666666667,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "space=3d fill=0.95 count=65536",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "space": "3d",
+        "fill": 0.95,
+        "count": 65536
+      },
+      "spanMs": 3.211264,
+      "slopeMs": 1.7694720000000002,
+      "slopeMinMs": -0.021845333333333272,
+      "slopeMaxMs": 3.1457279999999996,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "space=3d fill=0.95 count=262144",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "space": "3d",
+        "fill": 0.95,
+        "count": 262144
+      },
+      "spanMs": 10.027008,
+      "slopeMs": 6.772053333333332,
+      "slopeMinMs": 3.2986453333333343,
+      "slopeMaxMs": 9.393493333333334,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "space=3d fill=0.95 count=1048576",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "space": "3d",
+        "fill": 0.95,
+        "count": 1048576
+      },
+      "spanMs": 27.000832,
+      "slopeMs": 21.976405333333332,
+      "slopeMinMs": 8.060928000000002,
+      "slopeMaxMs": 30.627157333333333,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "count=2500",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 2500
+      },
+      "spanMs": 5.57056,
+      "slopeMs": 1.507328,
+      "slopeMinMs": -0.524288,
+      "slopeMaxMs": 3.0801920000000003,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "count=10000",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 10000
+      },
+      "spanMs": 4.063232,
+      "slopeMs": 1.5947093333333333,
+      "slopeMinMs": -0.7864319999999999,
+      "slopeMaxMs": 4.347221333333334,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "count=40000",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 40000
+      },
+      "spanMs": 3.538944,
+      "slopeMs": 0.9611946666666666,
+      "slopeMinMs": -0.4805973333333333,
+      "slopeMaxMs": 2.94912,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "count=200000",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 200000
+      },
+      "spanMs": 7.471104,
+      "slopeMs": 4.653056,
+      "slopeMinMs": 2.4685226666666673,
+      "slopeMaxMs": 7.624021333333334,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "count=500",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 500
+      },
+      "spanMs": 2.162688,
+      "slopeMs": 1.3981013333333336,
+      "slopeMinMs": -0.262144,
+      "slopeMaxMs": 2.3811413333333333,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "count=2500",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 2500
+      },
+      "spanMs": 3.473408,
+      "slopeMs": 2.8835840000000004,
+      "slopeMinMs": 0.08738133333333309,
+      "slopeMaxMs": 3.5389440000000003,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "count=10000",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 10000
+      },
+      "spanMs": 10.616832,
+      "slopeMs": 7.318186666666666,
+      "slopeMinMs": 4.805973333333333,
+      "slopeMaxMs": 10.485759999999999,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=ribbons count=1000",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "method": "ribbons",
+        "count": 1000
+      },
+      "spanMs": 2.490368,
+      "slopeMs": 0.65536,
+      "slopeMinMs": 0,
+      "slopeMaxMs": 2.1626879999999997,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=ribbons count=10000",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "method": "ribbons",
+        "count": 10000
+      },
+      "spanMs": 3.93216,
+      "slopeMs": 1.3325653333333334,
+      "slopeMinMs": -0.3276799999999998,
+      "slopeMaxMs": 2.468522666666667,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=ribbons count=100000",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "method": "ribbons",
+        "count": 100000
+      },
+      "spanMs": 13.500416,
+      "slopeMs": 11.490645333333333,
+      "slopeMinMs": 6.553599999999999,
+      "slopeMaxMs": 15.750485333333332,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=accumulation count=1000",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "method": "accumulation",
+        "count": 1000
+      },
+      "spanMs": 2.29376,
+      "slopeMs": 0.7427413333333334,
+      "slopeMinMs": -1.048576,
+      "slopeMaxMs": 4.412757333333333,
+      "passes": 16,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=accumulation count=10000",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "method": "accumulation",
+        "count": 10000
+      },
+      "spanMs": 1.31072,
+      "slopeMs": 0.6335146666666667,
+      "slopeMinMs": 0.41506133333333334,
+      "slopeMaxMs": 1.3325653333333334,
+      "passes": 16,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=accumulation count=100000",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "method": "accumulation",
+        "count": 100000
+      },
+      "spanMs": 2.228224,
+      "slopeMs": 1.8568533333333335,
+      "slopeMinMs": 1.4854826666666667,
+      "slopeMaxMs": 2.4685226666666664,
+      "passes": 16,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=2048 mode=additive",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 2048,
+        "mode": "additive"
+      },
+      "spanMs": 6.029312,
+      "slopeMs": 7.099733333333333,
+      "slopeMinMs": 5.046271999999999,
+      "slopeMaxMs": 9.895935999999999,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=2048 mode=unsorted",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 2048,
+        "mode": "unsorted"
+      },
+      "spanMs": 7.143424,
+      "slopeMs": 8.060927999999999,
+      "slopeMinMs": 4.937045333333333,
+      "slopeMaxMs": 9.699328,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=2048 mode=sorted",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 2048,
+        "mode": "sorted"
+      },
+      "spanMs": 9.17504,
+      "slopeMs": 9.262421333333332,
+      "slopeMinMs": 7.077887999999999,
+      "slopeMaxMs": 12.102314666666665,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=2048 mode=oit",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 2048,
+        "mode": "oit"
+      },
+      "spanMs": 13.1072,
+      "slopeMs": 12.124160000000002,
+      "slopeMinMs": 10.005162666666665,
+      "slopeMaxMs": 14.964053333333332,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 mode=additive",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 32768,
+        "mode": "additive"
+      },
+      "spanMs": 56.492032,
+      "slopeMs": 57.19108266666667,
+      "slopeMinMs": 44.214954666666664,
+      "slopeMaxMs": 61.84413866666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 mode=unsorted",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 32768,
+        "mode": "unsorted"
+      },
+      "spanMs": 58.589184,
+      "slopeMs": 54.37303466666666,
+      "slopeMinMs": 49.19569066666667,
+      "slopeMaxMs": 67.82976,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 mode=sorted",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 32768,
+        "mode": "sorted"
+      },
+      "spanMs": 54.788096,
+      "slopeMs": 60.24942933333333,
+      "slopeMinMs": 48.955391999999996,
+      "slopeMaxMs": 71.696384,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 mode=oit",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 32768,
+        "mode": "oit"
+      },
+      "spanMs": 84.54144,
+      "slopeMs": 76.48051199999999,
+      "slopeMinMs": 66.93410133333333,
+      "slopeMaxMs": 94.961664,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 sort=radix",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 32768,
+        "sort": "radix"
+      },
+      "spanMs": 56.950784,
+      "slopeMs": 59.63775999999999,
+      "slopeMinMs": 53.21523200000001,
+      "slopeMaxMs": 69.94875733333335,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 sort=radix16",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 32768,
+        "sort": "radix16"
+      },
+      "spanMs": 64.88064,
+      "slopeMs": 61.97521066666667,
+      "slopeMinMs": 51.75159466666667,
+      "slopeMaxMs": 68.091904,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 sort=bitonic",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 32768,
+        "sort": "bitonic"
+      },
+      "spanMs": 57.212928,
+      "slopeMs": 56.535722666666665,
+      "slopeMinMs": 47.819434666666666,
+      "slopeMaxMs": 68.90018133333334,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 sort=temporal",
+      "width": 1920,
+      "height": 1080,
+      "params": {
+        "count": 32768,
+        "sort": "temporal"
+      },
+      "spanMs": 64.421888,
+      "slopeMs": 57.802752,
+      "slopeMinMs": 45.350911999999994,
+      "slopeMaxMs": 64.33450666666666,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "(floor)",
+      "config": "one constant-colour pass",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.32768,
+      "slopeMs": 0.08738133333333335,
+      "slopeMinMs": -0.6990506666666666,
+      "slopeMaxMs": 1.0048853333333334,
+      "passes": 1,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "(tail)",
+      "config": "constant scene + bloom + output",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.589824,
+      "slopeMs": 0.32768,
+      "slopeMinMs": -0.2184533333333333,
+      "slopeMaxMs": 0.7645866666666666,
+      "passes": 9,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.524288,
+      "slopeMs": 0.3495253333333334,
+      "slopeMinMs": -0.6116693333333334,
+      "slopeMaxMs": 1.572864,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "preset campfire",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.65536,
+      "slopeMs": 0.4369066666666666,
+      "slopeMinMs": -0.524288,
+      "slopeMaxMs": 2.031616,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "preset bonfire gust",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.6384,
+      "slopeMs": 0.3495253333333334,
+      "slopeMinMs": -0.2839893333333334,
+      "slopeMaxMs": 1.5510186666666668,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "preset quiet hearth",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.114112,
+      "slopeMs": 0.32767999999999997,
+      "slopeMinMs": -0.8738133333333334,
+      "slopeMaxMs": 2.2719146666666665,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "preset torch trail",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.6384,
+      "slopeMs": 0.24029866666666666,
+      "slopeMinMs": -0.8301226666666667,
+      "slopeMaxMs": 0.8082773333333334,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "preset ember storm",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.031616,
+      "slopeMs": 0.06553599999999997,
+      "slopeMinMs": -0.4369066666666666,
+      "slopeMaxMs": 1.048576,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 4.25984,
+      "slopeMs": 2.337450666666667,
+      "slopeMinMs": -37.70504533333334,
+      "slopeMaxMs": 4.106922666666667,
+      "passes": 20,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset flamethrower",
+      "width": 960,
+      "height": 540,
+      "spanMs": 4.653056,
+      "slopeMs": 2.774357333333333,
+      "slopeMinMs": 1.6602453333333331,
+      "slopeMaxMs": 4.434602666666667,
+      "passes": 20,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset dragon breath",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.62144,
+      "slopeMs": 2.446677333333333,
+      "slopeMinMs": 1.6383999999999999,
+      "slopeMaxMs": 4.412757333333333,
+      "passes": 20,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset wall splash",
+      "width": 960,
+      "height": 540,
+      "spanMs": 13.172736,
+      "slopeMs": 9.939626666666667,
+      "slopeMinMs": 6.531754666666667,
+      "slopeMaxMs": 12.167850666666666,
+      "passes": 20,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset two-way coupling",
+      "width": 960,
+      "height": 540,
+      "spanMs": 10.15808,
+      "slopeMs": 5.876394666666667,
+      "slopeMinMs": 2.861738666666667,
+      "slopeMaxMs": 9.240575999999999,
+      "passes": 20,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset particles only",
+      "width": 960,
+      "height": 540,
+      "spanMs": 9.043968,
+      "slopeMs": 6.444373333333334,
+      "slopeMinMs": 3.9103146666666664,
+      "slopeMaxMs": 8.84736,
+      "passes": 20,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fire-jet",
+      "config": "preset fluid only",
+      "width": 960,
+      "height": 540,
+      "spanMs": 5.308416,
+      "slopeMs": 5.810858666666667,
+      "slopeMinMs": 2.118997333333333,
+      "slopeMaxMs": 10.616832,
+      "passes": 19,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.424832,
+      "slopeMs": 0.262144,
+      "slopeMinMs": -0.3713706666666667,
+      "slopeMaxMs": 1.7476266666666669,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset evening show",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.769472,
+      "slopeMs": 0.3495253333333333,
+      "slopeMinMs": -0.6990506666666666,
+      "slopeMaxMs": 1.2670293333333333,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset peonies and chrysanthemums",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.114112,
+      "slopeMs": 0.45875200000000005,
+      "slopeMinMs": -0.24029866666666666,
+      "slopeMaxMs": 1.703936,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset willow gold",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.96608,
+      "slopeMs": 0.13107199999999994,
+      "slopeMinMs": -0.524288,
+      "slopeMaxMs": 1.6602453333333334,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset crossettes",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.589824,
+      "slopeMs": 0.589824,
+      "slopeMinMs": -0.08738133333333338,
+      "slopeMaxMs": 1.900544,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset crackle and glitter",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.458752,
+      "slopeMs": 0.5242879999999999,
+      "slopeMinMs": 0.15291733333333332,
+      "slopeMaxMs": 1.6165546666666668,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset rings and palms",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.589824,
+      "slopeMs": 0.6772053333333332,
+      "slopeMinMs": -0.7427413333333334,
+      "slopeMaxMs": 1.3981013333333332,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "fireworks",
+      "config": "preset finale",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.441792,
+      "slopeMs": 0.10922666666666665,
+      "slopeMinMs": -0.7645866666666666,
+      "slopeMaxMs": 1.3981013333333336,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 4.063232,
+      "slopeMs": 2.5559039999999995,
+      "slopeMinMs": 1.6602453333333334,
+      "slopeMaxMs": 3.7573973333333335,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "preset sorted | oit",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.883584,
+      "slopeMs": 4.237994666666666,
+      "slopeMinMs": 1.4417920000000002,
+      "slopeMaxMs": 6.269610666666666,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "preset additive | sorted",
+      "width": 960,
+      "height": 540,
+      "spanMs": 3.538944,
+      "slopeMs": 3.014656,
+      "slopeMinMs": 1.813162666666667,
+      "slopeMaxMs": 4.500138666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "preset unsorted | sorted",
+      "width": 960,
+      "height": 540,
+      "spanMs": 3.801088,
+      "slopeMs": 2.9709653333333335,
+      "slopeMinMs": 1.6165546666666664,
+      "slopeMaxMs": 3.5607893333333336,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "preset heavy smoke",
+      "width": 960,
+      "height": 540,
+      "spanMs": 5.767168,
+      "slopeMs": 3.975850666666666,
+      "slopeMinMs": 2.730666666666666,
+      "slopeMaxMs": 7.034197333333334,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "preset dense",
+      "width": 960,
+      "height": 540,
+      "spanMs": 15.204352,
+      "slopeMs": 14.221312,
+      "slopeMinMs": 11.010048,
+      "slopeMaxMs": 19.638954666666663,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.031616,
+      "slopeMs": 0.8082773333333334,
+      "slopeMinMs": 0.30583466666666653,
+      "slopeMaxMs": 1.4854826666666667,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset campfire",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.835008,
+      "slopeMs": 0.5679786666666667,
+      "slopeMinMs": -0.17476266666666662,
+      "slopeMaxMs": 1.8568533333333335,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset torch",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.786432,
+      "slopeMs": 0.4805973333333333,
+      "slopeMinMs": 0.19660800000000003,
+      "slopeMaxMs": 2.0753066666666666,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset candle",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.359296,
+      "slopeMs": 0.3495253333333333,
+      "slopeMinMs": -1.3544106666666667,
+      "slopeMaxMs": 2.5122133333333334,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset line of fire",
+      "width": 960,
+      "height": 540,
+      "spanMs": 3.342336,
+      "slopeMs": 2.009770666666667,
+      "slopeMinMs": -0.1529173333333335,
+      "slopeMaxMs": 3.254954666666667,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset windy brazier",
+      "width": 960,
+      "height": 540,
+      "spanMs": 3.538944,
+      "slopeMs": 0.7427413333333334,
+      "slopeMinMs": -0.3276799999999998,
+      "slopeMaxMs": 2.2937600000000002,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "preset black body",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.96608,
+      "slopeMs": 1.9223893333333333,
+      "slopeMinMs": -0.5898240000000001,
+      "slopeMaxMs": 3.1020373333333335,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.031616,
+      "slopeMs": 0.8738133333333332,
+      "slopeMinMs": -0.5461333333333332,
+      "slopeMaxMs": 1.4417920000000002,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset fountain",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.686976,
+      "slopeMs": 1.1359573333333333,
+      "slopeMinMs": -0.8956586666666668,
+      "slopeMaxMs": 1.987925333333333,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset collisions",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.245184,
+      "slopeMs": 0.6772053333333333,
+      "slopeMinMs": -0.851968,
+      "slopeMaxMs": 1.6820906666666666,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset split on impact",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.245184,
+      "slopeMs": 0.7864319999999999,
+      "slopeMinMs": -0.5461333333333332,
+      "slopeMaxMs": 1.9442346666666666,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset bursts and children",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.048576,
+      "slopeMs": 1.419946666666667,
+      "slopeMinMs": -0.9393493333333333,
+      "slopeMaxMs": 2.686976,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset swept emitter",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.162688,
+      "slopeMs": 1.594709333333333,
+      "slopeMinMs": 1.1359573333333335,
+      "slopeMaxMs": 2.337450666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset vortex field",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.555904,
+      "slopeMs": 2.337450666666667,
+      "slopeMinMs": 0.17476266666666676,
+      "slopeMaxMs": 3.3204906666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset attractor",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.900544,
+      "slopeMs": 0.7427413333333334,
+      "slopeMinMs": 0.08738133333333338,
+      "slopeMaxMs": 2.097152,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset 3d scene",
+      "width": 960,
+      "height": 540,
+      "spanMs": 3.211264,
+      "slopeMs": 1.6384,
+      "slopeMinMs": 0.28398933333333315,
+      "slopeMaxMs": 3.5389440000000003,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "preset million",
+      "width": 960,
+      "height": 540,
+      "spanMs": 26.804224,
+      "slopeMs": 14.767445333333333,
+      "slopeMinMs": 12.888746666666664,
+      "slopeMaxMs": 19.50788266666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 5.177344,
+      "slopeMs": 1.2888746666666668,
+      "slopeMinMs": -0.7864319999999999,
+      "slopeMaxMs": 4.25984,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset vortex embers",
+      "width": 960,
+      "height": 540,
+      "spanMs": 5.24288,
+      "slopeMs": 1.507328,
+      "slopeMinMs": 0.3276799999999997,
+      "slopeMaxMs": 4.281685333333333,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset comets",
+      "width": 960,
+      "height": 540,
+      "spanMs": 4.521984,
+      "slopeMs": 2.686976,
+      "slopeMinMs": -0.6772053333333333,
+      "slopeMaxMs": 3.997696,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset sparkler",
+      "width": 960,
+      "height": 540,
+      "spanMs": 5.046272,
+      "slopeMs": 2.118997333333333,
+      "slopeMinMs": -0.8956586666666667,
+      "slopeMaxMs": 4.041386666666667,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset camera motion",
+      "width": 960,
+      "height": 540,
+      "spanMs": 5.111808,
+      "slopeMs": 1.987925333333333,
+      "slopeMinMs": -0.4369066666666666,
+      "slopeMaxMs": 4.434602666666667,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset ribbons only",
+      "width": 960,
+      "height": 540,
+      "spanMs": 5.505024,
+      "slopeMs": 0.19660800000000003,
+      "slopeMinMs": -1.2670293333333331,
+      "slopeMaxMs": 3.5607893333333336,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset accumulation only",
+      "width": 960,
+      "height": 540,
+      "spanMs": 3.866624,
+      "slopeMs": 1.791317333333333,
+      "slopeMinMs": -1.594709333333333,
+      "slopeMaxMs": 4.784128,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "preset 100k vortex",
+      "width": 960,
+      "height": 540,
+      "spanMs": 9.568256,
+      "slopeMs": 7.318186666666666,
+      "slopeMinMs": 4.434602666666667,
+      "slopeMaxMs": 10.966357333333335,
+      "passes": 15,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "spark-shower",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.752512,
+      "slopeMs": 0.2184533333333333,
+      "slopeMinMs": -0.6116693333333334,
+      "slopeMaxMs": 1.572864,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "spark-shower",
+      "config": "preset grinder",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.179648,
+      "slopeMs": 0.524288,
+      "slopeMinMs": -0.7645866666666666,
+      "slopeMaxMs": 1.3762559999999997,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "spark-shower",
+      "config": "preset welding",
+      "width": 960,
+      "height": 540,
+      "spanMs": 2.752512,
+      "slopeMs": 0.08738133333333338,
+      "slopeMinMs": -1.0704213333333334,
+      "slopeMaxMs": 0.8082773333333333,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "spark-shower",
+      "config": "preset forge hammer",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.720896,
+      "slopeMs": 0.7864319999999999,
+      "slopeMinMs": -0.8301226666666667,
+      "slopeMaxMs": 1.6383999999999999,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "spark-shower",
+      "config": "preset sparks on cards",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.441792,
+      "slopeMs": 0.45875200000000005,
+      "slopeMinMs": -0.65536,
+      "slopeMaxMs": 1.2451839999999998,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "sparkler",
+      "config": "default",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.96608,
+      "slopeMs": 0.04369066666666662,
+      "slopeMinMs": -0.8519680000000002,
+      "slopeMaxMs": 0.5024426666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "sparkler",
+      "config": "preset hand-held",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.65536,
+      "slopeMs": 0.5024426666666666,
+      "slopeMinMs": -0.786432,
+      "slopeMaxMs": 1.7039360000000003,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "sparkler",
+      "config": "preset light painting",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.786432,
+      "slopeMs": 0.524288,
+      "slopeMinMs": -0.7645866666666666,
+      "slopeMaxMs": 0.6553599999999999,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "sparkler",
+      "config": "preset golden shower",
+      "width": 960,
+      "height": 540,
+      "spanMs": 1.048576,
+      "slopeMs": 0.4369066666666667,
+      "slopeMinMs": -0.7427413333333334,
+      "slopeMaxMs": 2.468522666666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "sparkler",
+      "config": "preset branching stars",
+      "width": 960,
+      "height": 540,
+      "spanMs": 0.98304,
+      "slopeMs": 0.45875200000000005,
+      "slopeMinMs": -0.17476266666666662,
+      "slopeMaxMs": 1.2888746666666668,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "fill=0.95 count=16384",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "fill": 0.95,
+        "count": 16384
+      },
+      "spanMs": 0.524288,
+      "slopeMs": 0.7645866666666666,
+      "slopeMinMs": 0.32768,
+      "slopeMaxMs": 1.3981013333333332,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "fill=0.95 count=65536",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "fill": 0.95,
+        "count": 65536
+      },
+      "spanMs": 1.6384,
+      "slopeMs": 1.1141119999999998,
+      "slopeMinMs": 0.32767999999999997,
+      "slopeMaxMs": 1.9879253333333333,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "fill=0.95 count=262144",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "fill": 0.95,
+        "count": 262144
+      },
+      "spanMs": 4.128768,
+      "slopeMs": 3.233109333333333,
+      "slopeMinMs": 2.162688,
+      "slopeMaxMs": 4.128768,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "fill=0.95 count=1048576",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "fill": 0.95,
+        "count": 1048576
+      },
+      "spanMs": 21.561344,
+      "slopeMs": 13.43488,
+      "slopeMinMs": 8.891050666666667,
+      "slopeMaxMs": 17.935018666666668,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "space=3d fill=0.95 count=65536",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "space": "3d",
+        "fill": 0.95,
+        "count": 65536
+      },
+      "spanMs": 3.473408,
+      "slopeMs": 1.2670293333333333,
+      "slopeMinMs": -0.2621439999999999,
+      "slopeMaxMs": 2.6651306666666668,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "space=3d fill=0.95 count=262144",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "space": "3d",
+        "fill": 0.95,
+        "count": 262144
+      },
+      "spanMs": 8.585216,
+      "slopeMs": 6.073002666666667,
+      "slopeMinMs": 2.970965333333334,
+      "slopeMaxMs": 10.507605333333332,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-system",
+      "config": "space=3d fill=0.95 count=1048576",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "space": "3d",
+        "fill": 0.95,
+        "count": 1048576
+      },
+      "spanMs": 28.573696,
+      "slopeMs": 18.72145066666667,
+      "slopeMinMs": 13.806250666666669,
+      "slopeMaxMs": 21.53949866666667,
+      "passes": 12,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "count=2500",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 2500
+      },
+      "spanMs": 2.94912,
+      "slopeMs": 0.17476266666666662,
+      "slopeMinMs": -1.245184,
+      "slopeMaxMs": 0.8082773333333333,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "count=10000",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 10000
+      },
+      "spanMs": 1.31072,
+      "slopeMs": 0.7208960000000001,
+      "slopeMinMs": -0.32767999999999997,
+      "slopeMaxMs": 1.376256,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "count=40000",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 40000
+      },
+      "spanMs": 3.080192,
+      "slopeMs": 0.9830399999999999,
+      "slopeMinMs": -0.26214400000000015,
+      "slopeMaxMs": 3.2549546666666664,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "embers",
+      "config": "count=200000",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 200000
+      },
+      "spanMs": 5.963776,
+      "slopeMs": 4.500138666666667,
+      "slopeMinMs": 2.0097706666666664,
+      "slopeMaxMs": 5.264725333333334,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "count=500",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 500
+      },
+      "spanMs": 1.703936,
+      "slopeMs": 0.9611946666666666,
+      "slopeMinMs": -0.5898239999999998,
+      "slopeMaxMs": 3.4515626666666663,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "count=2500",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 2500
+      },
+      "spanMs": 3.211264,
+      "slopeMs": 1.7694719999999997,
+      "slopeMinMs": 0,
+      "slopeMaxMs": 3.691861333333333,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-flame",
+      "config": "count=10000",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 10000
+      },
+      "spanMs": 3.866624,
+      "slopeMs": 5.505024,
+      "slopeMinMs": 1.900544,
+      "slopeMaxMs": 7.427413333333334,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=ribbons count=1000",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "method": "ribbons",
+        "count": 1000
+      },
+      "spanMs": 3.145728,
+      "slopeMs": 0.3058346666666667,
+      "slopeMinMs": -0.8519680000000003,
+      "slopeMaxMs": 1.2670293333333333,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=ribbons count=10000",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "method": "ribbons",
+        "count": 10000
+      },
+      "spanMs": 2.94912,
+      "slopeMs": 1.7476266666666669,
+      "slopeMinMs": 0.6335146666666667,
+      "slopeMaxMs": 3.9540053333333334,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=ribbons count=100000",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "method": "ribbons",
+        "count": 100000
+      },
+      "spanMs": 16.05632,
+      "slopeMs": 9.786709333333334,
+      "slopeMinMs": 7.187114666666666,
+      "slopeMaxMs": 15.947093333333333,
+      "passes": 13,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=accumulation count=1000",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "method": "accumulation",
+        "count": 1000
+      },
+      "spanMs": 4.128768,
+      "slopeMs": 2.5340586666666667,
+      "slopeMinMs": -0.34952533333333324,
+      "slopeMaxMs": 4.194304,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=accumulation count=10000",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "method": "accumulation",
+        "count": 10000
+      },
+      "spanMs": 5.963776,
+      "slopeMs": -0.13107199999999994,
+      "slopeMinMs": -0.7427413333333334,
+      "slopeMaxMs": 3.7792426666666668,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-trails",
+      "config": "method=accumulation count=100000",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "method": "accumulation",
+        "count": 100000
+      },
+      "spanMs": 5.701632,
+      "slopeMs": 4.631210666666667,
+      "slopeMinMs": 2.184533333333333,
+      "slopeMaxMs": 7.187114666666666,
+      "passes": 14,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=2048 mode=additive",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 2048,
+        "mode": "additive"
+      },
+      "spanMs": 6.619136,
+      "slopeMs": 6.7283626666666665,
+      "slopeMinMs": 4.25984,
+      "slopeMaxMs": 8.803669333333334,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=2048 mode=unsorted",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 2048,
+        "mode": "unsorted"
+      },
+      "spanMs": 11.599872,
+      "slopeMs": 5.526869333333333,
+      "slopeMinMs": 0.8082773333333328,
+      "slopeMaxMs": 6.946816000000001,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=2048 mode=sorted",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 2048,
+        "mode": "sorted"
+      },
+      "spanMs": 5.439488,
+      "slopeMs": 4.194304,
+      "slopeMinMs": 1.9442346666666666,
+      "slopeMaxMs": 5.3302613333333335,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=2048 mode=oit",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 2048,
+        "mode": "oit"
+      },
+      "spanMs": 6.488064,
+      "slopeMs": 4.784128,
+      "slopeMinMs": 1.9442346666666666,
+      "slopeMaxMs": 7.449258666666666,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 mode=additive",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 32768,
+        "mode": "additive"
+      },
+      "spanMs": 24.117248,
+      "slopeMs": 24.357546666666668,
+      "slopeMinMs": 21.233664,
+      "slopeMaxMs": 26.78237866666667,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 mode=unsorted",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 32768,
+        "mode": "unsorted"
+      },
+      "spanMs": 23.003136,
+      "slopeMs": 21.2992,
+      "slopeMinMs": 20.621994666666666,
+      "slopeMaxMs": 27.110058666666664,
+      "passes": 10,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 mode=sorted",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 32768,
+        "mode": "sorted"
+      },
+      "spanMs": 23.658496,
+      "slopeMs": 22.085632000000004,
+      "slopeMinMs": 18.131626666666666,
+      "slopeMaxMs": 29.229056,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 mode=oit",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 32768,
+        "mode": "oit"
+      },
+      "spanMs": 27.066368,
+      "slopeMs": 27.35035733333333,
+      "slopeMinMs": 21.037055999999996,
+      "slopeMaxMs": 43.472213333333336,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 sort=radix",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 32768,
+        "sort": "radix"
+      },
+      "spanMs": 25.755648,
+      "slopeMs": 25.799338666666667,
+      "slopeMinMs": 21.95456,
+      "slopeMaxMs": 28.22417066666667,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 sort=radix16",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 32768,
+        "sort": "radix16"
+      },
+      "spanMs": 26.083328,
+      "slopeMs": 27.219285333333335,
+      "slopeMinMs": 21.80164266666667,
+      "slopeMaxMs": 31.894186666666666,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 sort=bitonic",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 32768,
+        "sort": "bitonic"
+      },
+      "spanMs": 23.134208,
+      "slopeMs": 25.602730666666663,
+      "slopeMinMs": 20.97152,
+      "slopeMaxMs": 28.704768,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    },
+    {
+      "effect": "particle-blending",
+      "config": "count=32768 sort=temporal",
+      "width": 960,
+      "height": 540,
+      "params": {
+        "count": 32768,
+        "sort": "temporal"
+      },
+      "spanMs": 22.020096,
+      "slopeMs": 23.26528,
+      "slopeMinMs": 20.600149333333334,
+      "slopeMaxMs": 27.634346666666662,
+      "passes": 11,
+      "metric": "gpu-timestamp"
+    }
+  ]
+}

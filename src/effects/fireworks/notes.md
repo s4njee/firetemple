@@ -23,7 +23,7 @@ Measured over 10 s each (`FLASH_EFFECTS=fireworks FLASH_PRESET=... experiments/f
 
 ## Cost
 
-GPU time: not measured yet with the benchmark harness (`npm run study`); the scorecard has no `gpuMs`.
+GPU time, measured with another browser sharing the GPU (Apple M1 Max, 1920 × 1080, defaults, tail included): 0.31 ms per frame on Dawn and 2.93 ms for one frame in Chrome 155 (median of 3 loads, 2.35 to 3.76; `docs/studies/epic-7.md`, `docs/studies/browser-check.md`). Tier B on this machine by both readings; no integrated GPU or phone has been measured. Bundle: 93.8 kB.
 
 Indicative readings, Apple M1 Max, 1920 x 1080, headless Chrome, HUD "GPU" span of one frame including the HDR tail, median of three loads (two other agents were using the same GPU):
 

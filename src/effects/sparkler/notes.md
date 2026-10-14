@@ -16,7 +16,7 @@ A hand-held sparkler as real particles on the Epic 7 framework (`src/gpu/particl
 
 ## Cost
 
-GPU time: not measured yet with the benchmark harness (`npm run study`); the scorecard has no `gpuMs`.
+GPU time, measured with another browser sharing the GPU (Apple M1 Max, 1920 × 1080, defaults, tail included): 1.70 ms per frame on Dawn and 1.73 ms for one frame in Chrome 155 (median of 3 loads, 1.70 to 2.09; `docs/studies/epic-7.md`, `docs/studies/browser-check.md`). Tier B on this machine by both readings; no integrated GPU or phone has been measured. Bundle: 90.9 kB.
 
 Counts: about 600 sparks alive at the default (1 800 a second plus 5 300 forked children a second); pool 4 096 (the peak drive rate × mean life × fork factor × 2.5, a power of two); 480 afterimage sprites at most.
 

@@ -16,7 +16,7 @@ A grinder, welding or forge shower as real particles on the Epic 7 framework (`s
 
 ## Cost
 
-GPU time: not measured yet with the benchmark harness (`npm run study`); the scorecard has no `gpuMs`.
+GPU time, measured with another browser sharing the GPU (Apple M1 Max, 1920 × 1080, defaults, tail included): 1.31 ms per frame on Dawn and 1.99 ms for one frame in Chrome 155 (median of 3 loads, 1.82 to 1.99; `docs/studies/epic-7.md`, `docs/studies/browser-check.md`). Tier B on this machine by both readings; no integrated GPU or phone has been measured. Bundle: 96.2 kB.
 
 Counts: 1 400 sparks a second at the default, about 6 000 alive with splitting (2 800 without); pool 65 536 (sized for the highest rate the controls, a press and the drive can ask for at once; 7 MB of state, list and sprite instances), cost follows the live count, not the pool. The hot spot is one CPU-written sprite; the backdrop (`scene.wgsl`) is one fullscreen pass that only runs when there is something to draw in it (stand-in cards, the anvil): over a page the sparks clear the target themselves.
 

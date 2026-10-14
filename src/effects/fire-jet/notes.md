@@ -32,7 +32,7 @@ To see whether it is worth building, the effect has a cheap stand-in, `two-way c
 
 ## Cost
 
-GPU time: not measured yet with the benchmark harness (`npm run study`); the scorecard has no `gpuMs`.
+GPU time, measured with another browser sharing the GPU (Apple M1 Max, 1920 × 1080, defaults, tail included): 5.55 ms per frame on Dawn and 3.61 ms for one frame in Chrome 155 (median of 3 loads, 3.39 to 3.72; `docs/studies/epic-7.md`, `docs/studies/browser-check.md`). Tier B on this machine by both readings; no integrated GPU or phone has been measured. Bundle: 145.5 kB.
 
 Indicative readings, Apple M1 Max, 1920 × 1080, headless Chrome, the HUD's GPU span of one frame including the HDR tail, median of three loads, with another agent using the same GPU throughout. Two sessions, which differ by more than the settings do:
 

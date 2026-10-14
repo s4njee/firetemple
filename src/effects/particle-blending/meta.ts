@@ -4,7 +4,7 @@ export const meta: EffectMeta = {
   id: 'particle-blending',
   title: 'Sorting and blending',
   epic: '7',
-  tier: 'B',
+  tier: 'C',
   tags: ['study', 'particles', 'compute', 'smoke', 'sorting', 'oit', 'overlay'],
   summary:
     'Fire and smoke puffs drawn four ways: all additive, alpha in buffer order, alpha after a GPU depth sort, and weighted blended order-independent transparency, side by side.',

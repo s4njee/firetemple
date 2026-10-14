@@ -22,7 +22,7 @@ Two ways to give a particle a trail, drawn side by side on the SAME particles (`
 
 ## Cost
 
-GPU time: not measured yet with the benchmark harness (`npm run study`); the scorecard has no `gpuMs`.
+GPU time, measured with another browser sharing the GPU (Apple M1 Max, 1920 × 1080, defaults, tail included): 1.49 ms per frame on Dawn and 1.59 ms for one frame in Chrome 155 (median of 3 loads, 1.45 to 2.42; `docs/studies/epic-7.md`, `docs/studies/browser-check.md`). Tier B on this machine by both readings; no integrated GPU or phone has been measured. Bundle: 94.1 kB.
 
 Indicative readings, Apple M1 Max, 1920 x 1080, headless Chrome, HUD "GPU" span of one frame including the HDR tail, median of three loads (two other agents were using the same GPU, so the spread is wide), vortex scene, 24 ribbon points:
 

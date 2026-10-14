@@ -23,7 +23,7 @@ Buoyancy is set so a fresh ember's terminal speed is `rise`. It is proportional 
 
 ## Cost
 
-GPU time: not measured yet with the benchmark harness (`npm run study`); the scorecard has no `gpuMs`.
+GPU time, measured with another browser sharing the GPU (Apple M1 Max, 1920 × 1080, defaults, tail included): 0.76 ms per frame on Dawn and 1.25 ms for one frame in Chrome 155 (median of 3 loads, 1.22 to 3.31; `docs/studies/epic-7.md`, `docs/studies/browser-check.md`). Tier A on this machine by both readings; no integrated GPU or phone has been measured. Bundle: 88.1 kB.
 
 Indicative readings, Apple M1 Max, 1920 × 1080, headless Chrome, HUD "GPU" span of one frame including the HDR tail, median of five loads (range in brackets). Another agent was using the same GPU; the first sweep, under heavier contention, read up to twice these numbers, so treat them as indicative:
 
