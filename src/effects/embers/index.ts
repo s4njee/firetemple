@@ -345,6 +345,11 @@ export const effect = defineEffect({
         tail.encode(encoder, target, time, params, profiler);
       },
 
+      stats() {
+        // The live count, read back from the GPU a few frames late, for the HUD.
+        return { 'live embers': sim?.system.stats.alive ?? 0, pool: sim?.capacity ?? 0 };
+      },
+
       destroy() {
         sim?.renderer.destroy();
         sim?.system.destroy();

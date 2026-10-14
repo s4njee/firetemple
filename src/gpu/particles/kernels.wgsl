@@ -5,14 +5,26 @@
 //   update  (indirect, one thread per live particle)  forces, colliders, cooling, ageing, hooks; the
 //           survivors are appended to the other alive list, the dead are pushed on the dead stack,
 //           and GPU events append spawn requests to the queue (`ps_spawn`)
-//   plan    (one thread)  sizes this step's emission: the queue's children first, then the CPU
-//           emitters' counts, clamped to the free slots; writes the emit dispatch's arguments
+//   plan    (one workgroup of 256)  sizes this step's emission: an exclusive prefix sum of the
+//           requests' child counts (each thread sums a contiguous run of requests, then a
+//           workgroup scan of the 256 run totals) gives each request its first child; the
+//           children come first, then the CPU emitters' counts, clamped to the free slots; writes
+//           the emit dispatch's arguments
 //   emit    (indirect, one thread per new particle)  pops a slot off the dead stack, samples the
 //           particle from its emitter record or spawn request, appends it to the alive list
 //   finish  (one thread)  writes the next step's update arguments, the draw arguments and the
 //           statistics, and clears the list that was read and the queue
 // and `draw` (indirect, one thread per live particle, once a frame, src/gpu/particles/renderer.ts)
 // writes one sprite instance per live particle, compacted, for an indirect instanced draw.
+//
+// DETERMINISM. Which slot a particle gets and where it lands in the alive list depend on the order
+// threads reach the atomics, and so does the order of the spawn queue. Nothing a particle IS may
+// depend on either: a CPU-emitted particle's random numbers and seed are a hash of (emitter, index
+// among that emitter's particles this step, step, system seed); a request's seed is a hash of its
+// parent's seed, the step and how many requests that parent made before it in the step; a child's
+// are a hash of (request seed, index in the request). So the same run gives the same particles,
+// as a multiset, every time (tests/particles.test.ts checks it), unless the pool or the queue
+// overflows: then which births are dropped depends on the order.
 //
 // Runtime chunks, made by system.ts:
 //   particle-step.wgsl   struct ParticleStep (the per-step uniform block, one ring slot per step)
@@ -21,14 +33,17 @@
 //   particle-hooks.wgsl  the effect's hooks; system.ts supplies a default for each one it lacks:
 //     fn hook_force(p: Particle, time: f32) -> vec3f                  extra acceleration
 //     fn hook_update(p: ptr<function, Particle>, time: f32, dt: f32)  after the sub-steps of a step
-//     fn hook_collide(p: ptr<function, Particle>, hit: ParticleHit)   at every contact
+//     fn hook_collide(p: ptr<function, Particle>, hit: ParticleHit)   at every contact (the
+//                                                                      colliders after one that
+//                                                                      killed it are skipped)
 //     fn hook_die(p: Particle)                                         once, as it dies
 //     fn hook_emit(p: ptr<function, Particle>, source: ParticleSource) once, as it is born
 //     fn hook_sdf(q: vec3f) -> f32                                     the 'sdf' collider's surface
 //     fn hook_sprite(p: Particle, s: ptr<function, ParticleSprite>, time: f32)   colour, size, ...
-// Hooks may call `ps_spawn` (from update, collide and die; not from emit), `ps_random`, read
-// `ps_step.user[0..3]` (update-stage hooks) and `ps_draw.user[0..3]` (hook_sprite), and include library
-// chunks they pass in the hook's `chunks`. Names starting with `ps_` and `hook_` are the framework's.
+// Hooks may call `ps_spawn` (from update, collide and die; not from emit), `ps_random`, `ps_field`
+// (the external field at a point, already mapped to particle velocity), read `ps_step.user[0..3]`
+// (update-stage hooks) and `ps_draw.user[0..3]` (hook_sprite), and include library chunks they
+// pass in the hook's `chunks`. Names starting with `ps_` and `hook_` are the framework's.
 
 #include "particles.wgsl"
 #include "curl.wgsl"
@@ -75,10 +90,19 @@ struct ParticleSource {
   emitter: u32,
   // True for a child of a GPU spawn request.
   spawned: bool,
-  // The request's `user` value (zero for CPU emission).
+  // The request's `user` value; for CPU emission the burst's (`burst(n, user)`), zero for the
+  // emitter's rate particles.
   user: vec4f,
   // Index of this particle among those its emitter or request made this step.
   index: u32,
+  // How many its emitter or request made this step.
+  count: u32,
+  // A child: the request's position (where its parent asked for it), unmoved. CPU emission: the
+  // emitter's centre at the moment of birth (along its sweep), before the shape's offset.
+  position: vec3f,
+  // A child: the request's velocity (usually its parent's), before the template's `inherit`
+  // scales it. CPU emission: the emitter's own (sweep) velocity.
+  velocity: vec3f,
 }
 
 struct ParticleSprite {
@@ -104,6 +128,11 @@ struct ParticleSpawn {
   kind: u32,
   // Written by `plan`: index of the request's first child among the step's emissions.
   first: u32,
+  // From the parent (see DETERMINISM above): what the children's random numbers are drawn from.
+  seed: u32,
+  _pad0: u32,
+  _pad1: u32,
+  _pad2: u32,
 }
 
 struct ParticleLists {
@@ -133,13 +162,19 @@ const PS_ARGS_EMIT: u32 = 3u;
 const PS_ARGS_DRAW: u32 = 6u;
 const PS_ARGS_INDIRECT: u32 = 9u;
 
-const PS_EMITTER_VEC4: u32 = 9u;
+const PS_EMITTER_VEC4: u32 = 10u;
 const PS_COLLIDER_VEC4: u32 = 4u;
 const PS_POINT_VEC4: u32 = 3u;
 const PS_FLAG_INSIDE: u32 = 1u;
 const PS_FLAG_KILL: u32 = 2u;
 const PS_FLAG_SPAWN: u32 = 4u;
 const PS_GROUP: u32 = 64u;
+// Threads of the plan kernel's one workgroup.
+const PS_PLAN_GROUP: u32 = 256u;
+// Child counts saturate here in the plan's sums: exact below it, never overflowing a u32.
+const PS_PLAN_SATURATE: u32 = 0x40000000u;
+// Separates a child's random numbers from a CPU-emitted particle's.
+const PS_CHILD_SALT: u32 = 0x6a09e667u;
 
 @group(0) @binding(0) var<uniform> ps_step: ParticleStep;
 @group(0) @binding(1) var<storage, read_write> ps_position: array<vec4f>;
@@ -186,6 +221,16 @@ fn ps_random(index: u32, salt: u32) -> vec4f {
   return particle_random(index, salt ^ (ps_step.step_index * 0x9e3779b9u) ^ ps_step.seed);
 }
 
+// The particle the update thread is working on, for the seeds of the requests its hooks make: its
+// seed, and how many requests it has made so far this step (set by `update`).
+var<private> ps_spawn_parent: u32;
+var<private> ps_spawn_made: u32;
+
+/** The hash a birth's random numbers come from: (a, b) names the birth (see DETERMINISM). */
+fn ps_birth_hash(a: u32, b: u32, salt: u32) -> vec4u {
+  return pcg_4d(vec4u(a, b, salt ^ ps_step.seed, ps_step.step_index));
+}
+
 /**
  * Appends a spawn request: `count` children of emitter (template) `emitter` at `position`, with the
  * template's velocity plus `velocity` times its `inherit`, and `user` handed to hook_emit. Returns
@@ -210,12 +255,29 @@ fn ps_spawn_with(
   if (count == 0u) {
     return true;
   }
+  // The seed depends on the parent and the order of its own requests, never on the queue position.
+  let seed = ps_birth_hash(ps_spawn_parent, ps_spawn_made, 0x3c6ef372u).x;
+  ps_spawn_made += 1u;
   let q = atomicAdd(&lists.counters[PS_QUEUE], 1u);
   if (q >= ps_step.queue_capacity) {
     atomicAdd(&lists.counters[PS_DROPPED_SPAWNS], 1u);
     return false;
   }
-  queue[q] = ParticleSpawn(position, count, velocity, emitter, user, temperature, size_scale, kind, 0u);
+  queue[q] = ParticleSpawn(
+    position,
+    count,
+    velocity,
+    emitter,
+    user,
+    temperature,
+    size_scale,
+    kind,
+    0u,
+    seed,
+    0u,
+    0u,
+    0u,
+  );
   return true;
 }
 
@@ -343,6 +405,8 @@ fn update(@builtin(global_invocation_id) id: vec3u) {
   let cap = ps_step.capacity;
   let slot = lists.data[cap * (1u + input) + i];
   var p = ps_load(slot);
+  ps_spawn_parent = p.seed;
+  ps_spawn_made = 0u;
 
   let substeps = max(ps_step.substeps, 1u);
   let h = ps_step.dt / f32(substeps);
@@ -436,6 +500,11 @@ fn update(@builtin(global_invocation_id) id: vec3u) {
       hook_collide(&p, event);
       v = p.velocity;
       p1 = p.position;
+      // Dead (the collider's `kill` or the hook): the colliders after this one must not see it, or
+      // a corner where two meet would split or spawn it twice.
+      if (!p.alive) {
+        break;
+      }
     }
 
     if (flat_space) {
@@ -471,15 +540,57 @@ fn update(@builtin(global_invocation_id) id: vec3u) {
 
 // --- Plan ----------------------------------------------------------------------------------------
 
-@compute @workgroup_size(1)
-fn plan() {
-  let used = min(atomicLoad(&lists.counters[PS_QUEUE]), ps_step.queue_capacity);
-  var children = 0u;
-  for (var q = 0u; q < used; q++) {
-    queue[q].first = children;
-    // A single request cannot ask for more than the pool holds.
-    children += min(queue[q].count, ps_step.capacity);
+// The run totals of the plan's threads, scanned in place (Hillis-Steele, as scan.wgsl does).
+var<workgroup> ps_plan_sums: array<u32, 256>;
+var<workgroup> ps_plan_used: u32;
+
+/** Child counts add up to at most PS_PLAN_SATURATE (associative, so any grouping agrees). */
+fn ps_plan_add(a: u32, b: u32) -> u32 {
+  return min(a + b, PS_PLAN_SATURATE);
+}
+
+@compute @workgroup_size(256)
+fn plan(@builtin(local_invocation_id) lid: vec3u) {
+  let i = lid.x;
+  if (i == 0u) {
+    ps_plan_used = min(atomicLoad(&lists.counters[PS_QUEUE]), ps_step.queue_capacity);
   }
+  let used = workgroupUniformLoad(&ps_plan_used);
+  // Thread i owns the contiguous run of requests [i * per, (i + 1) * per).
+  let per = (used + PS_PLAN_GROUP - 1u) / PS_PLAN_GROUP;
+  let begin = i * per;
+  var run = 0u;
+  for (var k = 0u; k < per; k++) {
+    let q = begin + k;
+    if (q < used) {
+      // A single request cannot ask for more than the pool holds.
+      run = ps_plan_add(run, min(queue[q].count, ps_step.capacity));
+    }
+  }
+  ps_plan_sums[i] = run;
+  workgroupBarrier();
+  for (var offset = 1u; offset < PS_PLAN_GROUP; offset = offset << 1u) {
+    var t = ps_plan_sums[i];
+    if (i >= offset) {
+      t = ps_plan_add(t, ps_plan_sums[i - offset]);
+    }
+    workgroupBarrier();
+    ps_plan_sums[i] = t;
+    workgroupBarrier();
+  }
+  // Exclusive prefix of this thread's run (saturation keeps it monotonic, so emit's search works).
+  var first = select(0u, ps_plan_sums[max(i, 1u) - 1u], i > 0u);
+  for (var k = 0u; k < per; k++) {
+    let q = begin + k;
+    if (q < used) {
+      queue[q].first = first;
+      first = ps_plan_add(first, min(queue[q].count, ps_step.capacity));
+    }
+  }
+  if (i != 0u) {
+    return;
+  }
+  let children = ps_plan_sums[PS_PLAN_GROUP - 1u];
   let wanted = children + ps_step.cpu_emit_total;
   let free_slots = atomicLoad(&lists.counters[PS_DEAD]);
   let total = min(wanted, free_slots);
@@ -514,7 +625,11 @@ fn emit(@builtin(global_invocation_id) id: vec3u) {
   var temperature_override = 0.0;
   var size_scale = 1.0;
   var kind_override = 0xffffffffu;
-  let r3 = ps_random(t, 0x2545f491u);
+  // What names this birth, whatever slot it gets (see DETERMINISM): (emitter, index) for CPU
+  // emission, (request seed, index) for a child, whose salts differ by PS_CHILD_SALT.
+  var key_a = 0u;
+  var key_b = 0u;
+  var domain = 0u;
 
   if (t < queue_total) {
     // The request whose children cover t: the last one whose `first` is <= t.
@@ -540,6 +655,10 @@ fn emit(@builtin(global_invocation_id) id: vec3u) {
     source.spawned = true;
     source.user = q.user;
     source.index = t - q.first;
+    source.count = min(q.count, ps_step.capacity);
+    key_a = q.seed;
+    key_b = source.index;
+    domain = PS_CHILD_SALT;
   } else {
     let k = t - queue_total;
     var count = 1u;
@@ -557,16 +676,23 @@ fn emit(@builtin(global_invocation_id) id: vec3u) {
     base_from = ps_emitter(e, 0u).xyz;
     base_to = ps_emitter(e, 1u).xyz;
     base_velocity = ps_emitter(e, 8u).xyz;
-    // Rate particles are spread over the step (stratified); burst particles are born at its end.
+    key_a = e;
+    key_b = j;
+    // Rate particles are spread over the step (stratified); burst particles are born at its end
+    // and carry the burst's user value.
     let rate_count = count - min(bitcast<u32>(ps_emitter(e, 7u).w), count);
+    source.user = select(ps_emitter(e, 9u), vec4f(0.0), j < rate_count);
     if (j < rate_count) {
-      u = (f32(j) + r3.x) / f32(rate_count);
+      u = (f32(j) + to_unorm_4d(ps_birth_hash(key_a, key_b, 0x2545f491u)).x) / f32(rate_count);
     }
     source.spawned = false;
-    source.user = vec4f(0.0);
     source.index = j;
+    source.count = count;
   }
   source.emitter = e;
+  source.position = mix(base_from, base_to, u);
+  source.velocity = base_velocity;
+  let r3 = to_unorm_4d(ps_birth_hash(key_a, key_b, 0x2545f491u ^ domain));
 
   let e0 = ps_emitter(e, 0u);
   let e2 = ps_emitter(e, 2u);
@@ -575,8 +701,8 @@ fn emit(@builtin(global_invocation_id) id: vec3u) {
   let e5 = ps_emitter(e, 5u);
   let e6 = ps_emitter(e, 6u);
   let e7 = ps_emitter(e, 7u);
-  let r0 = ps_random(t, 0x68e31da4u);
-  let r1 = ps_random(t, 0xb5297a4du);
+  let r0 = to_unorm_4d(ps_birth_hash(key_a, key_b, 0x68e31da4u ^ domain));
+  let r1 = to_unorm_4d(ps_birth_hash(key_a, key_b, 0xb5297a4du ^ domain));
   let dimension = ps_step.dimension;
 
   let offset = particle_shape_offset(bitcast<u32>(e0.w), e2, e3.xyz, r0.xyz, dimension);
@@ -599,7 +725,7 @@ fn emit(@builtin(global_invocation_id) id: vec3u) {
   p.life = mix(e6.x, e6.y, r0.w);
   p.temperature = select(mix(e6.z, e6.w, r1.w), temperature_override, temperature_override > 0.0);
   p.size = mix(e7.x, e7.y, r3.y) * size_scale;
-  p.seed = pcg_1d(bitcast<u32>(r3.z * 16777216.0) ^ (slot * 0x9e3779b9u));
+  p.seed = ps_birth_hash(key_a, key_b, 0x1b873593u ^ domain).x;
   p.kind = select(bitcast<u32>(e7.z), kind_override, kind_override != 0xffffffffu);
   p.user = source.user;
   p.alive = true;

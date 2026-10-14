@@ -5,9 +5,12 @@
 //
 // RATE. `rate` is particles per second. Each step adds `rate * dt` to a carry and emits its whole
 // part, so the count over any stretch of time is right to within one particle at any frame rate
-// (tests/particles.test.ts checks it). `burst(n)` adds n particles to the next step, all born at the
-// step's end. A rate-0 emitter is a TEMPLATE: GPU events (`ps_spawn` in a hook, or a collider's
-// `spawn`) name it by index and borrow its shape, speeds, life, temperature, size and kind.
+// (tests/particles.test.ts checks it). `burst(n, user?)` adds n particles to the next step, all born
+// at the step's end, and hands `user` (a vec4) to `hook_emit` as `source.user` for each of them
+// (the rate particles get zero). One step carries one burst value per emitter: bursts with the same
+// value add up, and a burst with a different value waits for the next step that has none pending.
+// A rate-0 emitter is a TEMPLATE: GPU events (`ps_spawn` in a hook, or a collider's `spawn`) name
+// it by index and borrow its shape, speeds, life, temperature, size and kind.
 //
 // MOVING EMITTERS. `moveTo(p)` once a frame. The steps of that frame sweep the emitter from where the
 // previous step left it to `p`, and a particle born at fraction u of a step is placed at that
@@ -32,8 +35,12 @@ export const EMITTER_SHAPE_CODE: Readonly<Record<EmitterShape, number>> = {
   disc: 4,
 };
 
-/** Floats per emitter record in the step uniform (nine vec4f). Keep in step with kernels.wgsl. */
-export const EMITTER_FLOATS = 36;
+/** Floats per emitter record in the step uniform (ten vec4f). Keep in step with kernels.wgsl. */
+export const EMITTER_FLOATS = 40;
+
+/** A burst's value for `hook_emit` (`source.user`). */
+export type BurstUser = readonly [number, number, number, number];
+const NO_USER: BurstUser = [0, 0, 0, 0];
 
 export interface EmitterOptions {
   shape?: EmitterShape;
@@ -76,8 +83,12 @@ export interface Emitter extends Required<Omit<EmitterOptions, 'position'>> {
   readonly index: number;
   /** Where the emitter is now (after the latest `moveTo`). */
   readonly position: Vec3;
-  /** Adds `n` particles to the next step, born together at its end. */
-  burst(n: number): void;
+  /**
+   * Adds `n` particles to the next step, born together at its end; `hook_emit` sees `user` as
+   * `source.user` (default zero). A burst whose `user` differs from one already pending goes to
+   * the step after.
+   */
+  burst(n: number, user?: BurstUser): void;
   /** Moves the emitter; the next steps sweep from the old position to this one. */
   moveTo(position: Vec3): void;
   /** Teleports: the next steps start here, with no sweep and no inherited velocity. */
@@ -89,6 +100,10 @@ export interface EmitterState extends Emitter {
   /** Particles owed to the next steps (whole and fractional), in particles. */
   carry: number;
   pendingBurst: number;
+  /** The pending burst's user value. */
+  pendingUser: BurstUser;
+  /** Bursts with another user value, for the steps after the pending one, in order. */
+  laterBursts: { n: number; user: BurstUser }[];
   /** Where the last step ended. */
   stepPosition: [number, number, number];
   target: [number, number, number];
@@ -120,13 +135,28 @@ export function createEmitterState(index: number, options: EmitterOptions): Emit
     enabled: options.enabled ?? true,
     carry: 0,
     pendingBurst: 0,
+    pendingUser: NO_USER,
+    laterBursts: [],
     stepPosition: [...start],
     target: [...start],
     get position() {
       return state.target;
     },
-    burst(n) {
-      if (n > 0) state.pendingBurst += Math.floor(n);
+    burst(n, user = NO_USER) {
+      const count = Math.floor(n);
+      if (!(count > 0)) return;
+      const value: BurstUser = [user[0], user[1], user[2], user[3]];
+      const last = state.laterBursts[state.laterBursts.length - 1];
+      if (state.pendingBurst === 0 && !last) {
+        state.pendingBurst = count;
+        state.pendingUser = value;
+      } else if (!last && sameVec4(value, state.pendingUser)) {
+        state.pendingBurst += count;
+      } else if (last && sameVec4(value, last.user)) {
+        last.n += count;
+      } else {
+        state.laterBursts.push({ n: count, user: value });
+      }
     },
     moveTo(position) {
       state.target[0] = position[0];
@@ -143,6 +173,9 @@ export function createEmitterState(index: number, options: EmitterOptions): Emit
   return state;
 }
 
+const sameVec4 = (a: BurstUser, b: BurstUser): boolean =>
+  a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
+
 const normalize = (v: Vec3): [number, number, number] => {
   const length = Math.hypot(v[0], v[1], v[2]);
   return length > 0 ? [v[0] / length, v[1] / length, v[2] / length] : [0, 1, 0];
@@ -152,25 +185,33 @@ const normalize = (v: Vec3): [number, number, number] => {
 export interface EmitterStep {
   rateCount: number;
   burstCount: number;
+  /** The burst's user value (`source.user` in hook_emit). */
+  burstUser: BurstUser;
 }
 
 /**
  * Advances the carry by one step of `dt` seconds and returns what to emit. Bursts are taken whole on
- * the first step that runs after `burst` was called.
+ * the first step that runs after `burst` was called (a burst with another user value than the
+ * pending one, on the step after).
  */
 export function takeEmitterStep(emitter: EmitterState, dt: number): EmitterStep {
   if (!emitter.enabled) {
     emitter.carry = 0;
     emitter.pendingBurst = 0;
-    return { rateCount: 0, burstCount: 0 };
+    emitter.pendingUser = NO_USER;
+    emitter.laterBursts.length = 0;
+    return { rateCount: 0, burstCount: 0, burstUser: NO_USER };
   }
   emitter.carry += Math.max(0, emitter.rate) * dt;
   // The epsilon lets 60 steps of 1/60 s at 60 per second add up to 60, not 59.
   const rateCount = Math.max(0, Math.floor(emitter.carry + 1e-9));
   emitter.carry = Math.max(0, emitter.carry - rateCount);
   const burstCount = emitter.pendingBurst;
-  emitter.pendingBurst = 0;
-  return { rateCount, burstCount };
+  const burstUser = emitter.pendingUser;
+  const next = emitter.laterBursts.shift();
+  emitter.pendingBurst = next?.n ?? 0;
+  emitter.pendingUser = next?.user ?? NO_USER;
+  return { rateCount, burstCount, burstUser };
 }
 
 /**
@@ -230,4 +271,6 @@ export function packEmitter(
   // e8: sweep velocity, seed
   f32.set(velocity, at + 32);
   u32[at + 35] = seed >>> 0;
+  // e9: the burst's user value
+  f32.set(step.burstUser, at + 36);
 }

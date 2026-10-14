@@ -22,7 +22,7 @@ Counts: about 600 sparks alive at the default (1 800 a second plus 5 300 forked 
 
 Indicative readings, Apple M1 Max, 1920 × 1080, headless Chrome, HUD "GPU" span of one frame including the HDR tail, median of three loads, with other agents on the same GPU: 1.35 ms (1.31 to 1.44) at the default (a later run of the final version: 1.58 ms, 1.08 to 1.63), 1.39 ms (1.19 to 2.07) at the maximum of 8 000 sparks a second. Both are at the HUD's floor of about 1.2 ms; the frame is the bloom tail.
 
-On Dawn with GPU timestamps, at 200 000 sparks a second so the step can be resolved: 50 000 live without forks cost 0.082 ms a step (1.6 ns a particle); with forks, 61 000 live cost 0.62 ms (10 ns a particle). Forking at that rate means thousands of spawn requests a step, and the framework's `plan` kernel walks the request queue in one thread. At the default (about 40 requests a step) it does not show.
+On Dawn with GPU timestamps, at 200 000 sparks a second so the step can be resolved (`PARTICLE_BENCH=1 npx vitest run tests/particles.test.ts -t "spawn requests"`, two runs): 50 000 live without forks cost 0.07 to 0.11 ms a step (1.4 to 2.3 ns a particle); with forks, 67 000 live cost 0.12 to 0.15 ms (1.8 to 2.3 ns a particle). Forking at that rate means thousands of spawn requests a step; the framework used to plan them in one thread and that cost 1.2 ms a step (18 ns a particle), and since it plans them with a prefix sum in one workgroup forking costs about what the extra particles do. At the default (about 40 requests a step) neither shows.
 
 Tier B, provisional: it is under 2 ms on this machine, but the A budget is for an integrated GPU, which has not been measured.
 

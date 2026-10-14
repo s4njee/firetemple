@@ -122,6 +122,12 @@ export interface EffectInstance {
   frame(time: FrameTime, encoder: GPUCommandEncoder, target: GPUTextureView): void;
   /** Release every GPU resource and listener the effect created. */
   destroy(): void;
+  /**
+   * Optional live numbers for the performance HUD, one row each (e.g. `{ live: 12345 }`). Called
+   * after a frame only while the HUD is open; return the same keys every time, and keep it cheap
+   * (no GPU read-back: a particle system's `stats` is already read back a few frames late).
+   */
+  stats?(): Readonly<Record<string, string | number>>;
 }
 
 export interface EffectModule<S extends ParamSchema = ParamSchema> {

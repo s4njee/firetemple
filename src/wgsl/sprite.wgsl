@@ -61,7 +61,8 @@
 //       where the unstretched quad's was, so the whole stretch trails behind (comet). When the
 //       screen velocity is (near) zero the direction is undefined: the quad falls back to the
 //       unstretched camera-facing square with +x to the right. Round shapes cross that fallback
-//       without a pop; sprite_streak turns to face +x, so fade a streak out before it stops.
+//       without a pop; sprite_streak turns to face +x, so blend a streak into a round shape as
+//       the ratio falls towards 1 (the sprite renderer's default `streak` shading does).
 //
 // Sub-pixel sprites
 //   sprite_pixel_clamp(size, pixels_per_unit, min_pixels) -> vec2f

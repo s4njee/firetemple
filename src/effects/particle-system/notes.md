@@ -7,7 +7,8 @@ This is the validation scene of the Epic 7 particle framework (`src/gpu/particle
 ```wgsl
 update   // indirect, one thread per live particle: forces, colliders, cooling, hooks;
          // survivors appended to the other alive list, the dead pushed on the dead stack
-plan     // one thread: this step's births, the spawn queue's children first, clamped to free slots
+plan     // one workgroup: a prefix sum of the spawn requests' child counts; this step's births,
+         // the spawn queue's children first, clamped to free slots
 emit     // indirect, one thread per birth: pop a slot, sample it from its emitter, append it
 finish   // one thread: next step's dispatch arguments, the draw arguments, the statistics
 ```
@@ -24,7 +25,7 @@ Every kernel that touches particles is dispatched indirectly with arguments the 
 
 **Colour.** Each sprite is `blackbody_radiance(T)` times an intensity, so the Newtonian cooling alone takes particles from yellow-white through orange to deep red.
 
-**The live count** is read back from the counters a few frames late, in a small submit of its own, and shown in the label of the sprite pass in the HUD (`sprites (52.4k live)`), relabelled when it moves by 5%.
+**The live count** is read back from the counters a few frames late, in a small submit of its own, and shown in the HUD as a row of its own (the effect's `stats()`: live particles, the pool, children spawned, births dropped).
 
 ## Cost
 
@@ -51,10 +52,10 @@ The default is Tier B. A million particles is at or over the Tier C budget (12 m
 
 - **Mapping a buffer that is still in an unsubmitted encoder.** The first statistics read-back copied the counters into the caller's encoder and mapped the buffer two calls later. Several `step` calls in one command buffer (the benchmark, warm-ups) mapped it before submit: "used in submit while pending map", and the whole command buffer was dropped silently, which showed up as timestamps that were never written. The copy now goes in a small submit of its own.
 - **A collider that spawns children on contact cascades.** Children born on the surface fall back onto it and split again until the pool is full. The scene's split hook spares particles of the children's kind; the collider's own `spawnCount` has no such filter, so give its template an outward speed.
-- **The same buffer cannot be written as storage and read as indirect arguments in one dispatch.** The arguments live in their own buffer, written only by the single-thread `plan` and `finish` kernels.
+- **The same buffer cannot be written as storage and read as indirect arguments in one dispatch.** The arguments live in their own buffer, written only by the `plan` and `finish` kernels, which are dispatched directly.
 - WGSL names: `step` is a built-in function (the uniform is `ps_step`, or every chunk that calls `step()` breaks), and `template` is reserved (the spawn request's field is `emitter`).
 - Dawn quantises timestamps (65 µs steps here): a benchmark unit of one step reads as zero slope. Measure eight steps a unit.
-- The HUD's per-pass rows are per label, so a label that changes every frame would grow a row per frame; it changes only when the count moves by 5%.
+- The HUD's per-pass rows are per label, so a label that changes every frame grows a row per frame. The first version put the live count in the sprite pass's label; it is now an effect stats row, and every pass label is fixed.
 - **Over a light page** the default fountain reads as a saturated orange-yellow cloud with a shape (checked in the browser over the light hero), so `scorecard.lightPage` is `yes`; sparse settings (few, small, cool particles) turn into flecks, as `embers` does.
 - A million particles is a bright cloud: the preset lowers the size and the intensity; at the default intensity the core saturates.
 

@@ -4,6 +4,7 @@ import {
   createComputePass,
   createParticleSystem,
   STEP_SLOTS,
+  type ParticleStepOptions,
   type ParticleSystem,
 } from '../../gpu/particles/index.ts';
 import type { PassProfiler } from '../../gpu/profiler.ts';
@@ -18,7 +19,8 @@ import ribbonShader from './ribbon.wgsl';
 // side):
 //
 //   RIBBONS (createRibbons). Every particle keeps its last `points` positions in a ring buffer of its
-//   own (record.wgsl, run after every simulation step), and a vertex shader expands them into a
+//   own (record.wgsl, run after every simulation step: `system.advance(encoder, delta, ribbons.steps)`
+//   dispatches it inside the steps' own compute pass), and a vertex shader expands them into a
 //   camera-facing strip (ribbon.wgsl). Geometry in world space: sharp at any resolution, right
 //   under camera motion, per-particle in everything (width, colour, length), and gone the moment the
 //   particle dies. It costs `points` * 16 bytes per particle and (points - 1) * 6 vertices per live
@@ -95,7 +97,12 @@ export interface Ribbons {
   readonly history: GPUBuffer;
   /** Bytes of history and heads. */
   readonly bytes: number;
-  /** Records the live particles' positions; call after every step. */
+  /**
+   * Pass to `system.advance` / `step` / `warmup`: records the live particles' positions after every
+   * step, in the steps' own compute pass.
+   */
+  readonly steps: ParticleStepOptions;
+  /** Records the live particles' positions now, in a pass of its own (after a `step` without `steps`). */
   record(encoder: GPUCommandEncoder): void;
   /** Adds the ribbons of the live particles to `target`. */
   draw(
@@ -183,34 +190,37 @@ export function createRibbons(
     ],
   });
 
+  /** Records the particles of alive list `list` into an open compute pass. */
+  function recordInto(pass: GPUComputePassEncoder, list: number): void {
+    step++;
+    const offset = slot * slotBytes;
+    slot = (slot + 1) % STEP_SLOTS;
+    device.queue.writeBuffer(ring, offset, new Uint32Array([capacity, list, points, step]));
+    // Indirect over the live count the step's finish kernel just wrote.
+    recordPass.dispatchIndirect(
+      pass,
+      [
+        { buffer: ring, offset, size: TrailRecord.size },
+        system.positions,
+        system.attributes,
+        system.lists,
+        history,
+        heads,
+      ],
+      system.args,
+      ARGS.draw,
+    );
+  }
+
   return {
     points,
     heads,
     history,
     bytes: capacity * (points * POINT_BYTES + 16),
+    steps: { afterStep: (pass, info) => recordInto(pass, info.list) },
     record(encoder) {
-      step++;
-      const offset = slot * slotBytes;
-      slot = (slot + 1) % STEP_SLOTS;
-      device.queue.writeBuffer(
-        ring,
-        offset,
-        new Uint32Array([capacity, system.list, points, step]),
-      );
       const pass = encoder.beginComputePass({ label: 'trails record' });
-      recordPass.dispatchIndirect(
-        pass,
-        [
-          { buffer: ring, offset, size: TrailRecord.size },
-          system.positions,
-          system.attributes,
-          system.lists,
-          history,
-          heads,
-        ],
-        system.args,
-        ARGS.draw,
-      );
+      recordInto(pass, system.list);
       pass.end();
     },
     draw(encoder, drawOptions) {

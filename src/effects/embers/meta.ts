@@ -11,7 +11,7 @@ export const meta: EffectMeta = {
   scorecard: {
     compute: true,
     mobile: 'untested',
-    flash: 'none',
+    flash: 'low',
     lightPage: 'no',
     features: { required: [] },
     fallback:

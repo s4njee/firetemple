@@ -1,4 +1,3 @@
-import { createFixedStepper } from '../../gpu/loop.ts';
 import {
   ARGS,
   createParticleRenderer,
@@ -116,7 +115,6 @@ export const effect = defineEffect({
     const pointer = createPointerIgnition(canvas, { radius: 0.02 });
     const accumulation = createAccumulation(device, { format: tail.scene.format, profiler });
     let drive: Excitation = createExcitation(params.drive, canvas);
-    const stepper = createFixedStepper(TRAIL_STEP, { maxSteps: 4 });
 
     interface Sim {
       capacity: number;
@@ -269,16 +267,10 @@ export const effect = defineEffect({
       return [cx, 0.5, aspect() / 2, 0.5];
     }
 
-    /** Steps the simulation `steps` times, recording ribbon points after each when asked. */
-    function stepTimes(encoder: GPUCommandEncoder, s: Sim, steps: number, record: boolean): void {
-      for (let k = 0; k < steps; k++) {
-        clock += TRAIL_STEP;
-        if (params.scene === 'sparkler' && pointer.pressed === 0) s.main.moveTo(path(clock));
-        s.system.step(encoder, 1);
-        if (record) ribbons?.record(encoder);
-      }
-    }
-
+    /**
+     * The warm-up: one step at a time, so the sparkler can be moved along its path before each,
+     * recording ribbon points after each (in the step's own pass).
+     */
     function warm(s: Sim): void {
       const seconds = params.scene === 'sparkler' ? 1 : params.scene === 'comets' ? 8 : 5;
       if (params.scene === 'sparkler') s.main.jumpTo(path(clock));
@@ -286,7 +278,11 @@ export const effect = defineEffect({
       while (left > 0) {
         const n = Math.min(left, STEP_SLOTS_PER_SUBMIT);
         const encoder = device.createCommandEncoder({ label: 'particle-trails warm-up' });
-        stepTimes(encoder, s, n, true);
+        for (let k = 0; k < n; k++) {
+          clock += TRAIL_STEP;
+          if (params.scene === 'sparkler') s.main.moveTo(path(clock));
+          s.system.step(encoder, 1, TRAIL_STEP, ribbons?.steps);
+        }
         device.queue.submit([encoder.finish()]);
         left -= n;
       }
@@ -354,8 +350,11 @@ export const effect = defineEffect({
           s.touch.rate = 0;
         }
 
-        const steps = stepper.advance(delta).steps;
-        stepTimes(encoder, s, steps, useRibbons);
+        // Every step of the frame in one pass, ribbon points recorded after each; the sparkler's
+        // emitter sweeps to where the path is at the end of the frame.
+        clock += delta;
+        if (params.scene === 'sparkler' && pointer.pressed === 0) s.main.moveTo(path(clock));
+        s.system.advance(encoder, delta, useRibbons ? ribbons.steps : undefined);
         s.renderer.encode(encoder, delta);
         const view = setCamera();
 

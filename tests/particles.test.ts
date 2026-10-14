@@ -8,6 +8,7 @@ import {
   planeThrough,
   rectFieldMapping,
   type ParticleSnapshot,
+  type ParticleStepInfo,
   type ParticleSystem,
   type ParticleSystemOptions,
 } from '../src/gpu/particles/index.ts';
@@ -48,6 +49,7 @@ interface Live {
   temperature: number;
   size: number;
   kind: number;
+  seed: number;
   user?: [number, number, number, number];
 }
 
@@ -68,6 +70,7 @@ function live(snapshot: ParticleSnapshot): Live[] {
       temperature: a[o]!,
       size: a[o + 1]!,
       kind: bits[o + 3]!,
+      seed: bits[o + 2]!,
       user: snapshot.user
         ? [snapshot.user[o]!, snapshot.user[o + 1]!, snapshot.user[o + 2]!, snapshot.user[o + 3]!]
         : undefined,
@@ -481,6 +484,44 @@ describe('colliders', () => {
     system.destroy();
   });
 
+  it('stop at the first collider that kills: no second spawn where two overlap', async () => {
+    // Two identical floors: a particle that dies on the first must never reach the second.
+    for (const via of ['flags', 'hook'] as const) {
+      const system = await rig({
+        capacity: 1024,
+        fixedStep: 1 / 60,
+        hooks:
+          via === 'hook'
+            ? {
+                code: `fn hook_collide(p: ptr<function, Particle>, hit: ParticleHit) {
+  if ((*p).kind == 0u) {
+    ps_spawn(hit.position + hit.normal * 0.01, vec3f(0.0), 3u, 1u, vec4f(0.0));
+    (*p).alive = false;
+  }
+}`,
+              }
+            : {},
+      });
+      const floor =
+        via === 'flags'
+          ? { ...planeThrough([0, 0, 0], [0, 1, 0]), kill: true, spawnCount: 3, spawnTemplate: 1 }
+          : planeThrough([0, 0, 0], [0, 1, 0]);
+      system.colliders.push(floor, { ...floor });
+      system.forces.gravity = [0, -10, 0];
+      system
+        .addEmitter({ shape: 'box', position: [0, 1, 0], extent: [1, 0.5, 1], life: [100, 100] })
+        .burst(50);
+      // The children leave upwards fast enough never to come back within the test.
+      system.addEmitter({ direction: [0, 1, 0], speed: [30, 30], life: [100, 100], kind: 1 });
+      await run(system, 40);
+      const stats = await system.readStats();
+      expect(stats.hits).toBe(50);
+      expect(stats.spawned).toBe(150);
+      expect(stats.alive).toBe(150);
+      system.destroy();
+    }
+  });
+
   it('bounces with restitution and friction, and supports an SDF from a hook', async () => {
     const system = await rig({
       capacity: 64,
@@ -598,6 +639,254 @@ fn hook_emit(p: ptr<function, Particle>, source: ParticleSource) {
       expect(p.kind).toBe(1);
       expect(p.position[1]).toBeGreaterThanOrEqual(0);
     }
+    system.destroy();
+  });
+
+  // 1 500 parents die in one step, each asking for 1 to 4 children: far more requests than one
+  // thread of the plan's workgroup walks, so the prefix sum is exercised across all 256 runs.
+  const MANY = `fn hook_die(p: Particle) {
+  if (p.kind == 0u) {
+    let n = 1u + (p.seed & 3u);
+    ps_spawn(p.position, p.velocity, n, 1u, vec4f(7.0));
+  }
+}
+fn hook_emit(p: ptr<function, Particle>, source: ParticleSource) {
+  if (source.spawned) {
+    (*p).user = vec4f(source.position.x, source.velocity.y, f32(source.index), f32(source.count));
+  }
+}`;
+  const manyParents = (system: ParticleSystem) => {
+    // Parents rise straight up, so x never changes; they die in their second step.
+    const parents = system.addEmitter({
+      shape: 'segment',
+      extent: [1, 0, 0],
+      speed: [1, 2],
+      life: [0.02, 0.02],
+      kind: 0,
+    });
+    system.addEmitter({ life: [100, 100], kind: 1 });
+    const cpu = system.addEmitter({ life: [100, 100], kind: 2 });
+    return { parents, cpu };
+  };
+  const childCount = (p: Live) => 1 + (p.seed & 3);
+  // A request is known by its parent's x and vertical speed (each alone could repeat; the speed
+  // may move by an ulp in the parent's last step).
+  const requestKey = (x: number, vy: number) => `${x},${vy.toFixed(4)}`;
+
+  it('plans thousands of requests exactly: every child, numbered within its request', async () => {
+    const system = await rig({
+      capacity: 8192,
+      queueCapacity: 2048,
+      userData: true,
+      hooks: { code: MANY },
+    });
+    const { parents } = manyParents(system);
+    parents.burst(1500);
+    await run(system, 2);
+    const before = live(await system.read());
+    expect(before.length).toBe(1500);
+    const expected = new Map(
+      before.map((p) => [requestKey(p.position[0], p.velocity[1]), childCount(p)]),
+    );
+    expect(expected.size).toBe(1500);
+    const total = [...expected.values()].reduce((sum, n) => sum + n, 0);
+    await expectValid(system.device, () => run(system, 1));
+    const stats = await system.readStats();
+    expect(stats.spawned).toBe(total);
+    expect(stats.droppedEmits).toBe(0);
+    const children = live(await system.read());
+    expect(children.length).toBe(total);
+    // hook_emit saw each request's position and velocity (the parent's) and its count.
+    const byRequest = new Map<string, number[]>();
+    for (const c of children) {
+      const [x, vy, index, count] = c.user!;
+      const key = requestKey(x, vy);
+      expect(count).toBe(expected.get(key));
+      byRequest.set(key, [...(byRequest.get(key) ?? []), index]);
+    }
+    expect(byRequest.size).toBe(1500);
+    for (const [key, indices] of byRequest) {
+      expect(indices.sort((a, b) => a - b)).toEqual(
+        Array.from({ length: expected.get(key)! }, (_, i) => i),
+      );
+    }
+    system.destroy();
+  });
+
+  it('gives children priority over CPU emission and never exceeds the dead stack', async () => {
+    const capacity = 2000;
+    const system = await rig({
+      capacity,
+      queueCapacity: 2048,
+      userData: true,
+      hooks: { code: MANY },
+    });
+    const { parents, cpu } = manyParents(system);
+    parents.burst(1500);
+    await run(system, 2);
+    const total = live(await system.read()).reduce((sum, p) => sum + childCount(p), 0);
+    expect(total).toBeGreaterThan(capacity);
+    // The parents all die in the next step and 100 CPU particles are due in it too.
+    cpu.burst(100);
+    await run(system, 1);
+    const snapshot = await system.read();
+    const { stats } = snapshot;
+    expect(stats.alive).toBe(capacity);
+    expect(stats.dead).toBe(0);
+    expect(stats.spawned).toBe(capacity);
+    expect(stats.droppedEmits).toBe(total + 100 - capacity);
+    const all = [...snapshot.alive, ...snapshot.dead].sort((a, b) => a - b);
+    expect(all).toEqual(Array.from({ length: capacity }, (_, i) => i));
+    expect(live(snapshot).filter((p) => p.kind !== 1)).toEqual([]);
+    system.destroy();
+  });
+
+  it('hands a burst its user value, one value a step, in order', async () => {
+    const system = await rig({ capacity: 64, userData: true });
+    const e = system.addEmitter({ life: [100, 100], rate: 60 });
+    e.burst(3, [1, 2, 3, 4]);
+    e.burst(2, [5, 6, 7, 8]);
+    e.burst(1, [5, 6, 7, 8]);
+    e.burst(4, [1, 2, 3, 4]);
+    const users: string[][] = [];
+    for (let k = 0; k < 4; k++) {
+      await run(system, 1);
+      const snapshot = await system.read();
+      users.push(
+        live(snapshot)
+          .filter((p) => p.age === 0)
+          .map((p) => p.user!.join(','))
+          .sort(),
+      );
+    }
+    // Step 1: the first value's three; step 2: the other value's three; step 3: the first value's
+    // four. Rate particles (one a step, born before the step's end) are not counted by age 0.
+    expect(users[0]).toEqual(['1,2,3,4', '1,2,3,4', '1,2,3,4']);
+    expect(users[1]).toEqual(['5,6,7,8', '5,6,7,8', '5,6,7,8']);
+    expect(users[2]).toEqual(Array(4).fill('1,2,3,4'));
+    expect(users[3]).toEqual([]);
+    const rate = live(await system.read()).filter((p) => p.user!.every((u) => u === 0));
+    expect(rate.length).toBe(4);
+    system.destroy();
+  });
+});
+
+// --- Determinism ---------------------------------------------------------------------------------
+
+describe('determinism', () => {
+  it('replays the same particles from the same seed, whatever order the threads ran in', async () => {
+    const hooks = {
+      code: `fn hook_die(p: Particle) {
+  if (p.kind == 0u) {
+    ps_spawn(p.position, p.velocity, 2u + (p.seed & 3u), 1u, vec4f(1.0, 0.0, 0.0, 0.0));
+    ps_spawn(p.position, -p.velocity, 1u, 1u, vec4f(2.0, 0.0, 0.0, 0.0));
+  }
+}
+fn hook_collide(p: ptr<function, Particle>, hit: ParticleHit) {
+  if ((*p).kind == 0u && hit.impact > 0.5) {
+    ps_spawn(hit.position + hit.normal * 0.01, (*p).velocity, 3u, 1u, vec4f(3.0, 0.0, 0.0, 0.0));
+    (*p).alive = false;
+  }
+}
+fn hook_emit(p: ptr<function, Particle>, source: ParticleSource) {
+  if (source.spawned) {
+    (*p).user = vec4f(source.user.x, f32(source.index), f32(source.count), 0.0);
+  }
+}`,
+    };
+    const once = async () => {
+      const system = await rig({
+        capacity: 8192,
+        queueCapacity: 1024,
+        dimension: 2,
+        userData: true,
+        hooks,
+        seed: 21,
+      });
+      system.forces.gravity = [0, -3, 0];
+      system.forces.turbulence = '2d';
+      system.forces.turbulenceStrength = 0.5;
+      system.heat.cooling = 'newton';
+      system.heat.rate = 0.5;
+      system.colliders.push({ ...planeThrough([0, -0.4, 0], [0, 1, 0]), restitution: 0.5 });
+      system.addEmitter({
+        shape: 'box',
+        extent: [0.5, 0.2, 0],
+        spread: 1,
+        speed: [0.2, 1],
+        life: [0.1, 0.6],
+        temperature: [1500, 2500],
+        rate: 600,
+        kind: 0,
+      });
+      system.addEmitter({ spread: Math.PI, speed: [0.5, 1], life: [0.2, 0.5], kind: 1 });
+      const bursts = system.addEmitter({ shape: 'sphere', radius: 0.2, life: [0.3, 0.9], kind: 0 });
+      for (let round = 0; round < 10; round++) {
+        bursts.burst(40, [round, 0, 0, 0]);
+        await run(system, 20);
+      }
+      const snapshot = await system.read();
+      const bits = new Uint32Array(snapshot.attributes.buffer);
+      const f = (x: number) => x.toFixed(5).replace(/^-(0\.0+)$/, '$1');
+      const states = live(snapshot)
+        .map((p) =>
+          [...p.position, p.age, ...p.velocity, p.life, p.temperature, p.size, ...p.user!]
+            .map(f)
+            .concat([String(p.kind), String(bits[p.slot * 4 + 2])])
+            .join(' '),
+        )
+        .sort();
+      const stats = snapshot.stats;
+      system.destroy();
+      return { states, stats };
+    };
+    const a = await once();
+    const b = await once();
+    // A real run: births, deaths, collisions and children from both hooks.
+    expect(a.stats.steps).toBe(200);
+    expect(a.stats.spawned).toBeGreaterThan(500);
+    expect(a.stats.died).toBeGreaterThan(1000);
+    expect(a.stats.hits).toBeGreaterThan(0);
+    expect(a.stats.droppedEmits + a.stats.droppedSpawns).toBe(0);
+    expect(b.stats).toEqual(a.stats);
+    expect(b.states).toEqual(a.states);
+  });
+});
+
+// --- Steps ---------------------------------------------------------------------------------------
+
+describe('after-step callback', () => {
+  it('runs once per step in the same pass, with that step’s list and uniform slot', async () => {
+    const system = await rig({ capacity: 64, fixedStep: 1 / 60, maxSteps: 8 });
+    system.addEmitter({ rate: 600, life: [10, 10] });
+    const { device } = system;
+    const seen: { index: number; steps: number; list: number; offset: number; time: number }[] = [];
+    const afterStep = (_pass: GPUComputePassEncoder, s: ParticleStepInfo) => {
+      seen.push({
+        index: s.index,
+        steps: s.steps,
+        list: s.list,
+        offset: s.uniform.offset ?? 0,
+        time: s.time,
+      });
+    };
+    let encoder = device.createCommandEncoder();
+    system.step(encoder, 5, undefined, { afterStep });
+    device.queue.submit([encoder.finish()]);
+    expect(seen.map((s) => s.index)).toEqual([0, 1, 2, 3, 4]);
+    expect(seen.every((s) => s.steps === 5)).toBe(true);
+    // The list alternates, and the last one is where the particles are now.
+    for (let k = 1; k < 5; k++) expect(seen[k]!.list).toBe(1 - seen[k - 1]!.list);
+    expect(seen[4]!.list).toBe(system.list);
+    expect(new Set(seen.map((s) => s.offset)).size).toBe(5);
+    expect(seen[4]!.time).toBeCloseTo(5 / 60, 9);
+    seen.length = 0;
+    encoder = device.createCommandEncoder();
+    const steps = system.advance(encoder, 3.5 / 60, { afterStep });
+    device.queue.submit([encoder.finish()]);
+    expect(steps).toBe(3);
+    expect(seen.length).toBe(3);
+    expect((await system.readStats()).steps).toBe(8);
     system.destroy();
   });
 });
@@ -855,6 +1144,66 @@ describe.runIf(process.env.PARTICLE_BENCH)('cost', () => {
       }
     }
     console.log(`particle step (+ 1/8 of a sprite write):\n${rows.join('\n')}`);
+    bench.destroy();
+  });
+
+  // Thousands of spawn requests a step: the sparkler forking at 200 000 sparks a second and the
+  // spark shower splitting at 20 000, each against itself with the GPU events off. What the
+  // difference costs is the spawn planning (and the emit kernel's search of the requests).
+  it('plans thousands of spawn requests a step', { timeout: 600_000 }, async () => {
+    const { createBenchDevice } = await import('./bench.ts');
+    const sparkler = await import('../src/effects/sparkler/sparkler.ts');
+    const shower = await import('../src/effects/spark-shower/shower.ts');
+    const bench = await createBenchDevice();
+    const rows: string[] = [];
+    const measure = async (name: string, system: ParticleSystem) => {
+      system.warmup(1.5, 1 / 60);
+      const steps = 8;
+      const result = await bench.measure((encoder) => system.step(encoder, steps));
+      const stats = await system.readStats();
+      rows.push(
+        `${name.padEnd(28)} live ${String(stats.alive).padStart(7)}  ` +
+          `${(result.slopeMs / steps).toFixed(3)} ms per step  ` +
+          `(${((result.slopeMs / steps / Math.max(stats.alive, 1)) * 1e6).toFixed(2)} ns a particle, ` +
+          `dropped spawns ${stats.droppedSpawns}, ${result.metric})`,
+      );
+      system.destroy();
+    };
+    for (const forks of [false, true]) {
+      const sim = sparkler.createSparklerSim(bench.device, {
+        capacity: 131072,
+        queueCapacity: 16384,
+        profiler: bench.profiler,
+      });
+      sparkler.applySparkler(sim, {
+        ...sparkler.DEFAULT_SPARKLER,
+        rate: 200000,
+        forkChance: forks ? sparkler.DEFAULT_SPARKLER.forkChance : 0,
+      });
+      sim.tip.jumpTo([0.8, 0.5, 0]);
+      await measure(`sparkler 200k/s, forks ${forks ? 'on' : 'off'}`, sim.system);
+    }
+    for (const split of [false, true]) {
+      const sim = shower.createShowerSim(bench.device, {
+        capacity: 131072,
+        queueCapacity: 4096,
+        profiler: bench.profiler,
+      });
+      const settings = { ...shower.DEFAULT_SHOWER, rate: 20000, children: split ? 3 : 0 };
+      shower.applyShower(sim, settings);
+      sim.source.jumpTo([0.3, 0.6, 0]);
+      shower.setShowerColliders(sim, {
+        boxes: [0.4, 0.8, 1.2].map((x) => ({
+          type: 'box' as const,
+          center: [x, 0.3, 0] as const,
+          half: [0.12, 0.05, 1] as const,
+        })),
+        restitution: settings.restitution,
+        friction: settings.friction,
+      });
+      await measure(`spark-shower 20k/s, split ${split ? 'on' : 'off'}`, sim.system);
+    }
+    console.log(`spawn planning (one step):\n${rows.join('\n')}`);
     bench.destroy();
   });
 });

@@ -1,7 +1,8 @@
 // The GPU particle framework (Epic 7, story 7.1). Import from here.
 //
 //   system.ts      createParticleSystem: the pool (dead stack, alive lists, indirect args), fixed
-//                  steps in one compute pass, emitters, forces, colliders, heat, hooks, GPU spawning,
+//                  steps in one compute pass (with an `afterStep` callback for per-step kernels),
+//                  emitters, forces, colliders, heat, hooks, GPU spawning, repeatable randomness,
 //                  statistics. Read its header first.
 //   kernels.wgsl   update / plan / emit / finish / draw_sprites, and the hook contract
 //   emitter.ts     Emitter options (shapes, rate, bursts, moving emitters, templates)

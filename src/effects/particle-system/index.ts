@@ -49,7 +49,7 @@ import outlineShader from './outline.wgsl';
 // GPU-spawned children (on death and on impact, through hooks), every force, every collider. `count`
 // is the pool's capacity, 1 024 to 1 048 576, and the emission rate follows it so the pool stays
 // about `fill` full: the particle scale study (7.10) sweeps it. The live count, read back from the
-// GPU a few frames late, is in the label of the sprite pass in the HUD.
+// GPU a few frames late, is a row of its own in the HUD (`stats()`).
 //
 // 2D is the overlay space (canvas heights, origin bottom-left, `overlayCamera`); 3D is a world with
 // the same numbers, drawn with the forward renderer's camera and soft depth against its meshes.
@@ -151,13 +151,6 @@ function bakeField(device: GPUDevice): GPUTexture {
     FIELD_SIZE,
   ]);
   return texture;
-}
-
-/** "12.3k" style, two to three significant figures, for the HUD label. */
-function shortCount(n: number): string {
-  if (n < 1000) return String(n);
-  if (n < 1e6) return `${(n / 1000).toFixed(n < 1e4 ? 2 : n < 1e5 ? 1 : 0)}k`;
-  return `${(n / 1e6).toFixed(2)}M`;
 }
 
 export const effect = defineEffect({
@@ -364,8 +357,6 @@ export const effect = defineEffect({
     let height = 1;
     let angle = 0;
     let burstClock = 0;
-    let liveLabel = 'sprites';
-    let labelled = -1;
 
     const centerX = () => (params.space === '3d' ? 0 : width / height / 2);
 
@@ -592,14 +583,6 @@ export const effect = defineEffect({
         system.advance(encoder, time.delta);
         renderer.encode(encoder, time.delta);
 
-        // The live count goes into the sprite pass's label: the HUD lists passes by label.
-        // Relabelled only when the count moves by 5%, so the HUD does not grow a row per frame.
-        const alive = system.stats.alive;
-        if (system.stats.steps > 0 && Math.abs(alive - labelled) > 0.05 * Math.max(labelled, 1)) {
-          labelled = alive;
-          liveLabel = `sprites (${shortCount(alive)} live)`;
-        }
-
         if (space3d && orbit) {
           const state = orbit.update(time.delta);
           const aspect = width / height;
@@ -626,13 +609,13 @@ export const effect = defineEffect({
           renderer.draw(encoder, {
             target: tail.scene.view,
             depth: depth.view,
-            timestampWrites: profiler.pass(liveLabel),
+            timestampWrites: profiler.pass('sprites'),
           });
         } else {
           renderer.draw(encoder, {
             target: tail.scene.view,
             clear: { r: 0, g: 0, b: 0, a: 0 },
-            timestampWrites: profiler.pass(liveLabel),
+            timestampWrites: profiler.pass('sprites'),
           });
           const cx = centerX();
           outlines.set({
@@ -657,6 +640,17 @@ export const effect = defineEffect({
           }
         }
         tail.encode(encoder, target, time, params, profiler);
+      },
+
+      stats() {
+        // Read back from the GPU a few frames late, in the HUD's own rows.
+        const stats = sim?.system.stats;
+        return {
+          'live particles': stats?.alive ?? 0,
+          pool: sim?.system.capacity ?? 0,
+          'spawned (total)': stats?.spawned ?? 0,
+          'dropped births': (stats?.droppedEmits ?? 0) + (stats?.droppedSpawns ?? 0),
+        };
       },
 
       destroy() {

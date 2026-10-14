@@ -107,8 +107,8 @@ export function createSparklerSim(device: GPUDevice, options: SparklerSimOptions
     label: options.label ?? 'sparkler',
   });
   const tip = system.addEmitter({ shape: 'sphere', spread: Math.PI, kind: 0 });
-  // Forked children: no speed of their own, the parent's whole velocity (hook_emit turns it).
-  const fork = system.addEmitter({ shape: 'point', inherit: 1, rate: 0 });
+  // Forked children: hook_emit turns the request's velocity (the parent's) into theirs.
+  const fork = system.addEmitter({ shape: 'point', rate: 0 });
   return { system, tip, fork };
 }
 
@@ -139,7 +139,7 @@ export function applySparkler(sim: SparklerSim, s: SparklerSettings): void {
   tip.rate = s.rate;
 
   fork.speed = [0, 0];
-  fork.inherit = 1;
+  fork.inherit = 0;
   fork.life = s.life;
   fork.size = s.size;
   fork.temperature = s.temperature;

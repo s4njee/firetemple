@@ -74,6 +74,11 @@ export const STUDY_SWEEPS: Readonly<Record<string, readonly StudyConfig[]>> = {
     ...sweep('particle-system', 'count', [16384, 65536, 262144, 1048576], { fill: 0.95 }),
     ...sweep('particle-system', 'count', [65536, 262144, 1048576], { space: '3d', fill: 0.95 }),
     ...sweep('embers', 'count', [2500, 10000, 40000, 200000]),
+    // 7.4: the particle flame against its count (the 4.1 noise flame is in the defaults).
+    ...sweep('particle-flame', 'count', [500, 2500, 10000]),
+    // 7.7: ribbons against accumulation as the particle count grows.
+    ...sweep('particle-trails', 'count', [1000, 10000, 100000], { method: 'ribbons' }),
+    ...sweep('particle-trails', 'count', [1000, 10000, 100000], { method: 'accumulation' }),
     // 7.9: the four blending modes, and the sort methods, at the default and a dense count.
     ...sweep('particle-blending', 'mode', ['additive', 'unsorted', 'sorted', 'oit'], {
       count: 2048,

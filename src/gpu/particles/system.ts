@@ -30,6 +30,8 @@ import kernels from './kernels.wgsl';
  *   // every frame:
  *   sparks.moveTo(tip);                         // a moving emitter leaves no gaps
  *   system.advance(encoder, time.delta);        // fixed steps, one compute pass
+ *   // (or `advance(encoder, delta, { afterStep(pass, step) { ... } })` to run a kernel of your own
+ *   //  after every step, in the same pass)
  *   renderer.encode(encoder, time.delta);       // one sprite instance per live particle
  *   renderer.draw(encoder, { target: tail.scene.view, clear: { r: 0, g: 0, b: 0, a: 0 } });
  *
@@ -53,14 +55,22 @@ import kernels from './kernels.wgsl';
  * live particles cost 0.07 to 0.13 ms per step whether the pool holds 65 536, 262 144 or 1 048 576;
  * 250 000 cost about 0.2 ms and 1 000 000 about 0.65 ms (0.74 with 2D curl noise). The capacity costs
  * memory (48 bytes of state and 12 of lists a slot, 64 and 12 with `userData`), not time. The fixed
- * overhead is two single-thread dispatches a step (plan, finish), which the HUD cannot resolve.
+ * overhead is two small dispatches a step (plan: one workgroup; finish: one thread), which the HUD
+ * cannot resolve. Spawn requests are planned by a prefix sum in that one workgroup (each of 256
+ * threads sums a contiguous run of requests, then a workgroup scan): the sparkler forking at
+ * 200 000 sparks a second (thousands of requests a step, 66 000 live) costs 0.12 to 0.15 ms a step
+ * against 0.07 to 0.11 with forks off; the earlier single-thread walk of the queue cost 1.2 ms
+ * (`-t "spawn requests"` in the same bench). A queue of tens of thousands of requests still plans
+ * in one dispatch.
  *
  * EMISSION. CPU emitters (`addEmitter`, at most MAX_EMITTERS) say how many particles each step; the
- * GPU samples them (emitter.ts). GPU EVENTS spawn with no CPU round trip: a hook calls
- * `ps_spawn(position, velocity, count, emitter, user)` (or a collider has `spawnCount`), which appends
- * a request to the spawn queue with an atomic; the same step's emit pass gives the requests' children
- * priority over CPU emission. A request names an emitter as its TEMPLATE (often one with rate 0).
- * If the pool is full, emission is clamped and counted (`stats.droppedEmits`); if the queue is full,
+ * GPU samples them (emitter.ts). `burst(n, user)` hands a vec4 to `hook_emit` with the burst. GPU
+ * EVENTS spawn with no CPU round trip: a hook calls `ps_spawn(position, velocity, count, emitter,
+ * user)` (or a collider has `spawnCount`), which appends a request to the spawn queue with an
+ * atomic; the same step's emit pass gives the requests' children priority over CPU emission. A
+ * request names an emitter as its TEMPLATE (often one with rate 0). `hook_emit` sees the request's
+ * `position`, `velocity`, `count`, `user` and the child's `index` in its `ParticleSource`. If the
+ * pool is full, emission is clamped and counted (`stats.droppedEmits`); if the queue is full,
  * requests are dropped and counted (`stats.droppedSpawns`).
  *
  * TIME. `advance(encoder, delta)` runs whole steps of `fixedStep` from an accumulator
@@ -71,8 +81,19 @@ import kernels from './kernels.wgsl';
  * slots): steps encoded before one submit never share parameters, so at most STEP_SLOTS steps may be
  * encoded per submit (`warmup` submits in chunks).
  *
- * RANDOMNESS is a hash of (emission index, step counter, seed): nothing random is drawn on the CPU
- * per particle, and the same seed replays the same run.
+ * AFTER EACH STEP. `advance`, `step` and `warmup` take `{ afterStep(pass, step) }`: it is called
+ * once per step, after the step's last dispatch, with the open compute pass (dispatch into it; do
+ * not end it) and `step` = { index in this call, the alive list that now holds the particles, the
+ * step's ParticleStep uniform binding (its own ring slot, so a kernel built from `system.source`
+ * can bind it at binding 0), the simulated time at the end of the step, dt }. Per-step records
+ * (ribbon trails: src/effects/particle-trails/) cost one dispatch a step instead of a pass a step,
+ * and the renderer's extrapolation still works because the steps come from `advance`.
+ *
+ * RANDOMNESS is a hash of (what the birth is, step counter, seed), never of the slot or of the
+ * order threads reach an atomic (kernels.wgsl, DETERMINISM): nothing random is drawn on the CPU per
+ * particle, and the same seed replays the same run, particle for particle (as a multiset; the slots
+ * and the list order differ). Runs with a full pool or a full queue are the exception: which
+ * births are dropped then depends on the order.
  *
  * HOOKS (kernels.wgsl lists them) are WGSL spliced into the kernels at creation: `hooks.code` may
  * define any of hook_force, hook_update, hook_collide, hook_die, hook_emit, hook_sdf, hook_sprite;
@@ -116,8 +137,8 @@ const COUNTERS = 16;
 /** Byte offsets in the args buffer; keep in step with kernels.wgsl. */
 export const ARGS = { update: 0, emit: 12, draw: 24, indirect: 36 } as const;
 const ARGS_BYTES = 64;
-/** Bytes per spawn request. */
-const SPAWN_BYTES = 64;
+/** Bytes per spawn request (`ParticleSpawn` in kernels.wgsl). */
+const SPAWN_BYTES = 80;
 
 /** The per-step uniform block (`ParticleStep` in kernels.wgsl). */
 export const ParticleStepUniform = defineUniformStruct('ParticleStep', {
@@ -296,6 +317,30 @@ export interface ParticleSnapshot {
   user?: Float32Array;
 }
 
+/** One step, as `afterStep` sees it. */
+export interface ParticleStepInfo {
+  /** Which step of this call, 0 first. */
+  index: number;
+  /** Steps this call runs. */
+  steps: number;
+  /** The alive list that holds the live particles after this step (0 or 1). */
+  list: number;
+  /** This step's `ParticleStep` uniform (its own ring slot), for a kernel built from `source`. */
+  uniform: GPUBufferBinding;
+  /** Simulation seconds at the end of this step (unwrapped). */
+  time: number;
+  dt: number;
+}
+
+export interface ParticleStepOptions {
+  /**
+   * Called after every step, with the step's compute pass still open: dispatch kernels of your own
+   * into it (reading `system.args` for an indirect dispatch over the live particles is fine). Do
+   * not end the pass.
+   */
+  afterStep?(pass: GPUComputePassEncoder, step: ParticleStepInfo): void;
+}
+
 export interface ParticleSystem {
   readonly device: GPUDevice;
   readonly capacity: number;
@@ -341,14 +386,19 @@ export interface ParticleSystem {
   /** Sets the external velocity texture `forces.field` reads (a 1x1 zero texture until then). */
   setField(view: GPUTextureView | undefined): void;
   /** Runs the whole fixed steps `delta` seconds add up to; returns how many. */
-  advance(encoder: GPUCommandEncoder, delta: number): number;
+  advance(encoder: GPUCommandEncoder, delta: number, options?: ParticleStepOptions): number;
   /** Runs exactly `steps` steps of `dt` seconds (default `fixedStep`), whatever the clock says. */
-  step(encoder: GPUCommandEncoder, steps?: number, dt?: number): void;
+  step(
+    encoder: GPUCommandEncoder,
+    steps?: number,
+    dt?: number,
+    options?: ParticleStepOptions,
+  ): void;
   /**
    * Simulates `seconds` right now in steps of `dt` (default 1/30 s) in its own submits, so a scene
    * starts full. Emitters stay where they are.
    */
-  warmup(seconds: number, dt?: number): void;
+  warmup(seconds: number, dt?: number, options?: ParticleStepOptions): void;
   /** Kills every particle (all slots back on the dead stack); keeps emitters and settings. */
   reset(): void;
   /** Waits for the GPU and returns exact statistics. */
@@ -446,7 +496,7 @@ export function createParticleSystem(options: ParticleSystemOptions): ParticleSy
       workgroupSize,
     });
   const update = kernel('update', 64);
-  const plan = kernel('plan', 1);
+  const plan = kernel('plan', 256);
   const emit = kernel('emit', 64);
   const finish = kernel('finish', 1);
 
@@ -636,7 +686,12 @@ export function createParticleSystem(options: ParticleSystemOptions): ParticleSy
     return { buffer: ring, offset, size: ParticleStepUniform.size };
   }
 
-  function encodeSteps(encoder: GPUCommandEncoder, steps: number, dt: number): void {
+  function encodeSteps(
+    encoder: GPUCommandEncoder,
+    steps: number,
+    dt: number,
+    options: ParticleStepOptions = {},
+  ): void {
     if (steps <= 0) return;
     if (steps > STEP_SLOTS) {
       throw new RangeError(`${label}: at most ${STEP_SLOTS} steps per submit, asked for ${steps}`);
@@ -674,6 +729,7 @@ export function createParticleSystem(options: ParticleSystemOptions): ParticleSy
       list = 1 - list;
       time += dt;
       stepIndex++;
+      options.afterStep?.(pass, { index: k, steps, list, uniform, time, dt });
     }
     pass.end();
     // The steps of this call swept every emitter to its target.
@@ -758,7 +814,7 @@ export function createParticleSystem(options: ParticleSystemOptions): ParticleSy
     setField(view) {
       field = view ?? zeroField.createView();
     },
-    advance(encoder, delta) {
+    advance(encoder, delta, stepOptions) {
       const key = `${params.fixedStep}|${params.maxSteps}`;
       if (key !== stepperKey) {
         stepper = createFixedStepper(params.fixedStep, { maxSteps: params.maxSteps });
@@ -767,19 +823,19 @@ export function createParticleSystem(options: ParticleSystemOptions): ParticleSy
       requestStats();
       const result = stepper.advance(delta);
       alpha = result.alpha;
-      encodeSteps(encoder, result.steps, params.fixedStep);
+      encodeSteps(encoder, result.steps, params.fixedStep, stepOptions);
       return result.steps;
     },
-    step(encoder, steps = 1, dt = params.fixedStep) {
+    step(encoder, steps = 1, dt = params.fixedStep, stepOptions) {
       requestStats();
-      encodeSteps(encoder, Math.floor(steps), dt);
+      encodeSteps(encoder, Math.floor(steps), dt, stepOptions);
     },
-    warmup(seconds, dt = 1 / 30) {
+    warmup(seconds, dt = 1 / 30, stepOptions) {
       let left = Math.round(seconds / dt);
       while (left > 0) {
         const n = Math.min(left, STEP_SLOTS);
         const encoder = device.createCommandEncoder({ label: `${label} warm-up` });
-        encodeSteps(encoder, n, dt);
+        encodeSteps(encoder, n, dt, stepOptions);
         device.queue.submit([encoder.finish()]);
         left -= n;
       }

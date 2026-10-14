@@ -8,10 +8,10 @@
 // children (three, one time in `three`) of generation kind + 1 through ps_spawn and dies. A spark of
 // generation `generations` never forks, so the tree is finite: at most 3^generations leaves.
 //
-// THE CHILDREN (hook_emit). Born where the parent died, heading off either side of its direction
-// (the third straight on) by about `fan`, at `speed` times its speed and a little hotter (the burst
-// flares), living a share (`life min` to `life max`) of what the parent had left: children are always
-// shorter-lived than their parent.
+// THE CHILDREN (hook_emit). Born where the parent died (the request's position), heading off either
+// side of its direction (the request's velocity; the third straight on) by about `fan`, at `speed`
+// times its speed and a little hotter (the burst flares), living a share (`life min` to `life max`)
+// of what the parent had left: children are always shorter-lived than their parent.
 //
 //   ps_step.user[0] = (chance, generations, fan (rad), speed factor)
 //   ps_step.user[1] = (at min, at max, life min, life max)       shares, 0..1
@@ -59,9 +59,9 @@ fn hook_emit(p: ptr<function, Particle>, source: ParticleSource) {
   let fork = ps_step.user[0];
   let timing = ps_step.user[1];
   let r = particle_random((*p).seed, 0x2c1b3c6du);
-  // The template has no speed of its own and inherits the parent's whole velocity.
-  let base = (*p).position - (*p).velocity * (*p).age;
-  let v = (*p).velocity.xy;
+  // Born where the parent forked (the request's position), off the parent's velocity.
+  let base = source.position;
+  let v = source.velocity.xy;
   let len = length(v);
   let dir = select(vec2f(0.0, 1.0), v / max(len, 1e-6), len > 1e-5);
   // Child 0 to one side, child 1 to the other, child 2 straight on; each a little off.

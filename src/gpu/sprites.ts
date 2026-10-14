@@ -123,6 +123,9 @@ export const SpriteSettingsUniform = defineUniformStruct('SpriteSettings', {
 /**
  * The shading used when no `shade` is given: the instance colour times its alpha, shaped by
  * `settings.shape`. `ember` and `streak` push their cores towards white, as overexposed light does.
+ * `streak` is a round dot at rest and blends into the streak as the stretch ratio grows from 1 to
+ * 3 (a resting quad has no direction and would face +x as a comet); at a ratio of 3 or more it is
+ * the plain streak.
  * A replacement is any WGSL that defines `fn shade_sprite(s: SpriteSample) -> vec3f` and returns
  * linear radiance; it may `#include` library chunks (pass them in the source's `chunks`).
  */
@@ -143,7 +146,8 @@ fn shade_sprite(s: SpriteSample) -> vec3f {
       return mix(base, vec3f(peak), 0.6 * ember.y) * ember.x;
     }
     case 3u: {
-      let streak = sprite_streak(s.p, 0.5, 0.7);
+      let moving = clamp((s.ratio - 1.0) * 0.5, 0.0, 1.0);
+      let streak = mix(sprite_gaussian(s.p, 5.0), sprite_streak(s.p, 0.5, 0.7), moving);
       return mix(base, vec3f(peak), 0.6 * streak * streak) * streak;
     }
     default: {

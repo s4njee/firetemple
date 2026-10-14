@@ -138,9 +138,9 @@ export function createShowerSim(device: GPUDevice, options: ShowerSimOptions): S
   });
   const source = system.addEmitter({ shape: 'point', kind: 0 });
   const hammer = system.addEmitter({ shape: 'segment', kind: 0 });
-  // The template split children are sampled from: no speed of its own, the parent's whole rebound
-  // (hook_emit turns and scales it), temperature and kind from the request.
-  const child = system.addEmitter({ shape: 'point', inherit: 1, rate: 0 });
+  // The template split children are sampled from: hook_emit sets their velocity from the request's
+  // (the parent's rebound); temperature and kind come from the request.
+  const child = system.addEmitter({ shape: 'point', rate: 0 });
   return { system, source, hammer, child };
 }
 
@@ -177,7 +177,7 @@ export function applyShower(sim: ShowerSim, s: ShowerSettings): void {
   hammer.rate = 0;
 
   child.speed = [0, 0];
-  child.inherit = 1;
+  child.inherit = 0;
   child.life = [s.life[0] * 0.35, s.life[1] * 0.5];
   child.size = s.size;
   child.temperature = s.temperature;

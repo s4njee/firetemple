@@ -407,6 +407,32 @@ describe('particle trails', () => {
       expect(ribbon[k - 1]![3]! - ribbon[k]![3]!).toBeCloseTo(TRAIL_STEP, 5);
     ribbons.destroy();
     system.destroy();
+
+    // The same 13 steps in ONE compute pass, the points recorded by the system's after-step
+    // callback, give the same ribbon.
+    const again = createTrailSystem(device, { capacity: 8 });
+    again.forces.gravity = [0, -1.5, 0];
+    again
+      .addEmitter({
+        position: [0.2, 0.3, 0],
+        direction: [0.6, 0.8, 0],
+        speed: [0.5, 0.5],
+        life: [10, 10],
+        size: [0.01, 0.01],
+      })
+      .burst(1);
+    const inline = createRibbons(again, { points: 8 });
+    const encoder = device.createCommandEncoder();
+    again.step(encoder, 13, undefined, inline.steps);
+    device.queue.submit([encoder.finish()]);
+    const [only] = (await again.read()).alive;
+    const same = await ribbonOf(inline, device, only!);
+    expect(same).toHaveLength(8);
+    same.forEach((point, k) => {
+      for (let c = 0; c < 4; c++) expect(point[c]).toBeCloseTo(ribbon[k]![c]!, 5);
+    });
+    inline.destroy();
+    again.destroy();
   });
 
   it('drops a dead particle’s ribbon and never joins a recycled slot to the old path', async () => {

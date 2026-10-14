@@ -62,6 +62,8 @@ export interface FrameStats {
   dpr: number;
   passes: readonly PassTiming[];
   gpuMs: number | undefined;
+  /** The effect's own live numbers (`EffectInstance.stats`), when it has any. */
+  effect?: Readonly<Record<string, string | number>>;
 }
 
 export interface EffectHost {
@@ -148,6 +150,7 @@ export function createEffectHost(
       ...size,
       passes: profiler.latest,
       gpuMs: profiler.latestFrameMs,
+      effect: instance.stats?.(),
     };
     for (const listener of [...statsListeners]) listener(stats);
   });

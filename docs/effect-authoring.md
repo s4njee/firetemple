@@ -27,7 +27,10 @@ directory; nothing else needs registering. `meta.epic` is the epic number in pla
 - `resize` is called before the first frame and whenever the drawing buffer changes. Size-dependent
   targets are (re)created there.
 - `destroy` releases every GPU object and listener the effect made.
-- Give every pass `timestampWrites: profiler.pass('label')` so the HUD can time it.
+- Give every pass `timestampWrites: profiler.pass('label')` so the HUD can time it. Keep labels
+  fixed: the HUD has a row per label.
+- Optionally return `stats()` too: `{ name: value }` the HUD shows as rows of its own while it is
+  open (a particle system's live count, say). It is called after a frame; keep it cheap.
 - Use `time.delta` to advance your own phase (see hello) so a `speed` parameter never makes the
   picture jump. Simulations step with `createFixedStepper` from `src/gpu/loop.ts`.
 - Colours in `params` are linear RGB.
@@ -273,8 +276,10 @@ renderer.draw(encoder, { target: tail.scene.view, clear: { r: 0, g: 0, b: 0, a: 
   bottom-left, y up; pointer and igniter uv go through `overlayPoint`). A 3D one passes the forward
   renderer's `view.camera.buffer` and a `depth` view to `draw` for soft particles.
 - **Emitters** (`emitter.ts`): point, segment, box, sphere shell, disc/ring; `rate` per second with a
-  fractional carry, `burst(n)`, `moveTo` for a moving emitter, at most eight per system. A rate-0
-  emitter is a *template* for GPU-spawned children.
+  fractional carry, `burst(n, user?)`, `moveTo` for a moving emitter, at most eight per system. A
+  burst's `user` vec4 reaches `hook_emit` as `source.user` (one value per emitter per step: a burst
+  with another value waits for the next step). A rate-0 emitter is a *template* for GPU-spawned
+  children.
 - **Forces and heat** (`forces.ts`): gravity, linear and quadratic drag towards `wind`, buoyancy per
   1000 K above ambient, curl turbulence (`'2d'`, `'3d'`), up to four attractors or vortices, an
   external velocity texture (`system.setField(fluid.fieldsView)` with `overlayFieldMapping(aspect)`
@@ -282,23 +287,57 @@ renderer.draw(encoder, { target: tail.scene.view, clear: { r: 0, g: 0, b: 0, a: 
   temperature.
 - **Colliders** (`colliders.ts`): plane, sphere, box (solid or container) and an SDF from
   `hook_sdf`, tested on the segment a particle moved along, so nothing tunnels. Per collider:
-  restitution, friction, `kill`, `cool`, `spawnCount` children from a template.
+  restitution, friction, `kill`, `cool`, `spawnCount` children from a template. Once a collider
+  (or `hook_collide`) has killed a particle, the colliders after it are not tested in that
+  sub-step, so a corner where two meet spawns once.
 - **Hooks**: `createParticleSystem({ hooks: { code, chunks } })` splices WGSL into the kernels.
   Define any of `hook_force`, `hook_update`, `hook_collide`, `hook_die`, `hook_emit`, `hook_sdf`,
   `hook_sprite` (signatures in `kernels.wgsl`); the rest get empty defaults. Read the four
   `system.params.user` vec4s as `ps_step.user[i]` (and `renderer.style.user` as `ps_draw.user[i]`
   in `hook_sprite`). `userData: true` adds a free vec4 per particle (`p.user`).
 - **GPU spawning**: from `hook_update`, `hook_collide` or `hook_die`, `ps_spawn(position, velocity,
-  count, template, user)` appends a request with an atomic; the same step's emit pass gives its
-  children priority over CPU emission. No CPU round trip. `hook_emit` sees `source.spawned` and the
-  request's `user`.
+  count, template, user)` (or `ps_spawn_with`, which also overrides temperature, size and kind)
+  appends a request with an atomic; the same step's emit pass gives its children priority over CPU
+  emission, never more than the dead stack holds. No CPU round trip. `hook_emit`'s
+  `ParticleSource` has `spawned`, the request's `position` (unmoved) and `velocity` (before the
+  template's `inherit`), its `count`, its `user`, and the child's `index` in it: build a child
+  from those rather than from a speed-0 `inherit: 1` template or by undoing the emit pass's motion.
+  For CPU emission `position` is the emitter's centre at the birth (along its sweep), `velocity`
+  its sweep velocity, `user` the burst's. The plan is a prefix sum in one workgroup, so thousands
+  of requests a step cost about what their children do (the sparkler forking at 200 000 sparks a
+  second: 0.12 to 0.15 ms a step, against 1.2 ms with the old single-thread walk).
+- **Repeatable runs**: every random number and every particle's `seed` is a hash of what the
+  birth is (emitter and index this step; a child's request seed, itself from its parent's seed,
+  and its index), the step and the system seed, never the slot or the order of an atomic. The same
+  seed and inputs give the same particles (`tests/particles.test.ts`), so flash measurements and
+  pictures repeat; only a full pool or queue (which births are dropped) is order dependent. Hooks
+  should keep to the same rule: random from `p.seed` and `ps_step.step_index`, never from a slot or
+  a list position.
+- **After each step**: `system.advance(encoder, delta, { afterStep(pass, step) { ... } })` (also
+  `step`, `warmup`) calls back after every step with the step's compute pass still open and
+  `step.list` (the alive list now holding the particles), `step.uniform` (its own `ParticleStep`
+  ring slot), `index`, `time`, `dt`: dispatch a per-step kernel there (ribbon history in
+  `particle-trails`) instead of `step(encoder, 1)` per step, which costs a pass a step and loses
+  the renderer's extrapolation.
 - **Colour**: the renderer's default is `blackbody_radiance(T, style.tRef, style.gamma) * tint *
   intensity`, with per-particle twinkle capped at 4 Hz, a fade in and out, and a size-over-life
-  curve. `sprites.settings` is the shared sprite renderer's (shape, stretch, pixel floor).
+  curve. `sprites.settings` is the shared sprite renderer's (shape, stretch, pixel floor); its
+  `streak` shape blends into a round dot as a sprite slows, so a spark at rest is not a comet
+  facing +x.
+- **Per kind** (the intended recipes, not missing features): the field coupling and the sprite
+  stretch are one setting a system, so a kind that needs another one does it in a hook. Coupling:
+  set the system's to one kind's and add the difference in `hook_force`,
+  `(ps_field(p.position) - p.velocity) * extra` ('drag' mode; `ps_field` is the mapped field
+  velocity at a point). Stretch: `hook_sprite` scales the velocity it hands the renderer
+  (`(*s).velocity = p.velocity * share`), which is the stretch multiplier per particle (the
+  sprite instance has no room for another number). `fire-jet` does both.
 - **Start full**: `system.warmup(seconds)` simulates in its own submits; call it on the first frame
   after `resize`, so a reduced-motion still looks right.
-- **Statistics**: `system.stats` (live count and running totals, a few frames late, for a HUD
-  label); `await system.readStats()` and `await system.read()` are exact, for tests.
+- **Statistics**: `system.stats` (live count and running totals, a few frames late);
+  `await system.readStats()` and `await system.read()` are exact, for tests. Show the live count
+  through the effect instance's optional `stats()` (rows in the HUD, `particle-system` and
+  `embers`), never in a pass label: the HUD has a row per label, and a label that changes every
+  frame grows it.
 
 Pitfalls found building it:
 
@@ -318,6 +357,17 @@ Pitfalls found building it:
   at all. Measure several steps a unit (`PARTICLE_BENCH=1 npx vitest run tests/particles.test.ts -t cost`).
 - Sub-pixel sprites need the sprite renderer's pixel floor (`minPixels`), and an orthographic camera
   needs the eye at a view distance of 1 for that floor to be right (`orthographicCamera` does it).
+- A test that draws one sub-pixel sprite should put it on a pixel centre and fix its size: on the
+  edge between two rows it lights neither centre, and a size drawn from a range changes with the
+  random numbers.
+- A GPU division is a reciprocal and a multiply: a velocity that should come through a step
+  unchanged can move by an ulp. Compare to 5 decimals, never bit for bit across a step.
+
+Not built yet (future work): real two-way coupling with a fluid (a particle-to-grid splat with
+fixed-point atomics, WebGPU having no float atomics, turned into a force texture and chained into
+the fluid's forces hook; `fire-jet` has a CPU mean-field stand-in), a sprite pipeline that writes
+coverage (alpha) for smoke over the page in `coverage` overlay mode (sprites write alpha 0 today),
+and curl turbulence that scrolls with a rise velocity (`particle-flame` does it in `hook_force`).
 
 ## Reading the HUD honestly
 

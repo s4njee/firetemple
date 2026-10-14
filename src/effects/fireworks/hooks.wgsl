@@ -306,8 +306,8 @@ fn hook_emit(p: ptr<function, Particle>, source: ParticleSource) {
     (*p).size = select(0.0026, 0.0036, t == FW_PALM);
     return;
   }
-  // The template has speed 0 and inherit 1: the velocity is the parent's, exactly.
-  let parent = (*p).velocity;
+  // The request's velocity: the parent's, exactly (or the share of it the request passed on).
+  let parent = source.velocity;
   (*p).temperature = 2100.0 + 300.0 * r.w;
   if (role == FW_TAIL) {
     (*p).velocity = parent + fw_sphere(r.xy) * 0.05;

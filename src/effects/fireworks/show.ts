@@ -223,8 +223,8 @@ export function createFireworksSystem(
     label: 'fireworks',
   });
   const launcher = system.addEmitter({ shape: 'point', rate: 0, kind: 0 });
-  // The template: no speed of its own and the parent's velocity in full; hook_emit does the rest.
-  system.addEmitter({ shape: 'point', rate: 0, speed: [0, 0], inherit: 1, spread: 0 });
+  // The template: no speed of its own; hook_emit builds every child's velocity from the request's.
+  system.addEmitter({ shape: 'point', rate: 0, speed: [0, 0], spread: 0 });
   return { system, launcher };
 }
 

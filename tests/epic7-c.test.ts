@@ -232,9 +232,13 @@ describe('spark shower', () => {
     camera.upload();
     const streak = async (speed: number) => {
       const sim = createShowerSim(device, { capacity: 16 });
-      applyShower(sim, calm({ gravity: 0, generations: 0, speed: [speed, speed], aim: 0 }));
+      // A fixed size (the one the look's stretch is computed for), not a random draw from the range.
+      const size = [0.0021, 0.0021] as const;
+      applyShower(sim, calm({ gravity: 0, generations: 0, speed: [speed, speed], aim: 0, size }));
       setShowerColliders(sim, { floor: false, restitution: 0.4, friction: 0 });
-      sim.source.jumpTo([0.4, 0.5, 0]);
+      // On the middle of a pixel row, not on the edge between two, where a sub-pixel-wide spark
+      // lights neither row's centre.
+      sim.source.jumpTo([0.4, 0.5 + 0.5 / H, 0]);
       sim.source.burst(1);
       await run(sim.system, 2);
       const renderer = createShowerRenderer(sim, camera.buffer, 'rgba8unorm');

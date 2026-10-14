@@ -6,8 +6,10 @@
 // kind + 1, born at the contact point; the parent dies. A generation equal to `generations` never
 // splits, so a shower can never cascade: every spark descends from at most `generations` splits.
 // The children are cooler (`heat` times the parent's temperature) and smaller (`size`), and fly off
-// in a fan of half-angle `fan` around the parent's rebound, at `speed` times its rebound speed, never
-// into the surface (hook_emit).
+// in a fan of half-angle `fan` around the parent's rebound (the request's velocity, which hook_emit
+// reads as `source.velocity`), at `speed` times its rebound speed, never into the surface.
+// The framework stops testing colliders once one has killed the spark, so a spark that splits where
+// two colliders meet splits once.
 //
 //   ps_step.user[0] = (children, chance, generations, min impact speed)
 //   ps_step.user[1] = (heat factor, speed factor, fan half-angle (rad), size factor)
@@ -61,8 +63,7 @@ fn hook_sdf(q: vec3f) -> f32 {
 
 fn hook_collide(p: ptr<function, Particle>, hit: ParticleHit) {
   let split = ps_step.user[0];
-  // A spark already split by an earlier collider in this sub-step is gone: no second split.
-  if (!(*p).alive || f32((*p).kind) >= split.z || hit.impact < split.w) {
+  if (f32((*p).kind) >= split.z || hit.impact < split.w) {
     return;
   }
   if (ps_random((*p).seed, 0x51ed270bu).x >= split.y) {
@@ -70,7 +71,8 @@ fn hook_collide(p: ptr<function, Particle>, hit: ParticleHit) {
   }
   let child = ps_step.user[1];
   let n = u32(split.x + 0.5);
-  // The rebound and the surface normal go to the children through the request's `user`.
+  // The surface normal goes to the children through the request's `user`; the rebound is the
+  // request's velocity.
   let ok = ps_spawn_with(
     (*p).position,
     (*p).velocity,
@@ -92,9 +94,9 @@ fn hook_emit(p: ptr<function, Particle>, source: ParticleSource) {
   }
   let child = ps_step.user[1];
   let r = particle_random((*p).seed, 0x2c1b3c6du);
-  // The template has no speed of its own and inherits the whole rebound.
-  let base = (*p).position - (*p).velocity * (*p).age;
-  let rebound = (*p).velocity.xy;
+  // Born at the contact (the request's position) and turned off the parent's rebound.
+  let base = source.position;
+  let rebound = source.velocity.xy;
   let normal = source.user.xy;
   let len = length(rebound);
   var dir = select(normal, rebound / max(len, 1e-6), len > 1e-4);

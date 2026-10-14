@@ -259,6 +259,9 @@ export function mountHud(container: HTMLElement, host: EffectHost, shell: ShellC
   let startedAt = performance.now();
   let passKey = '';
   const passRows = new Map<string, HTMLElement>();
+  let effectStats: Readonly<Record<string, string | number>> | undefined;
+  let effectKey = '';
+  const effectRows = new Map<string, HTMLElement>();
   let detailsDevice: GPUDevice | undefined;
 
   // Timing costs a little GPU time, so it only runs while this panel is open.
@@ -290,6 +293,9 @@ export function mountHud(container: HTMLElement, host: EffectHost, shell: ShellC
   const gpuValue = row(list, 'GPU');
   const passList = el('div', 'ft-hud__passes');
   list.append(passList);
+  // The effect's own numbers (EffectInstance.stats), e.g. a particle system's live count.
+  const effectList = el('div', 'ft-hud__passes');
+  list.append(effectList);
   const budgetValue = row(list, 'Budget');
   const status = el('span', 'ft-chip ft-hud__status');
   const budgetText = el('span', '');
@@ -403,11 +409,13 @@ export function mountHud(container: HTMLElement, host: EffectHost, shell: ShellC
     if (stats.frameMs > 0) frames.push(now, stats.frameMs);
     cpu.push(now, stats.cpuMs);
     gpu.push(now, stats.passes, stats.gpuMs);
+    effectStats = stats.effect;
   });
   const stopLoad = host.onLoad((loaded) => {
     tier = loaded.effect.meta.tier;
     // A rebuilt effect may label its passes differently, and its old timings no longer apply.
     gpu.clear();
+    effectStats = undefined;
     startedAt = performance.now();
   });
 
@@ -426,6 +434,22 @@ export function mountHud(container: HTMLElement, host: EffectHost, shell: ShellC
     for (const pass of passes) {
       const value = passRows.get(pass.label);
       if (value) setText(value, `${formatMs(pass.mean)} ms`);
+    }
+  }
+
+  /** One row per key of the effect's stats, rebuilt only when the keys change. */
+  function syncEffectStats(values: Readonly<Record<string, string | number>> | undefined) {
+    const entries = Object.entries(values ?? {});
+    const key = entries.map(([label]) => label).join('\n');
+    if (key !== effectKey) {
+      effectKey = key;
+      effectList.replaceChildren();
+      effectRows.clear();
+      for (const [label] of entries) effectRows.set(label, row(effectList, label));
+    }
+    for (const [label, value] of entries) {
+      const node = effectRows.get(label);
+      if (node) setText(node, typeof value === 'number' ? value.toLocaleString('en-US') : value);
     }
   }
 
@@ -458,6 +482,7 @@ export function mountHud(container: HTMLElement, host: EffectHost, shell: ShellC
       live && frameSummary ? `${formatMs(frameSummary.p95)} / ${formatMs(frameSummary.max)}` : '—',
     );
     setText(cpuValue, cpuSummary && live ? `${formatMs(cpuSummary.mean)} ms` : '—');
+    syncEffectStats(live ? effectStats : undefined);
 
     // GPU
     const supported = profiler?.supported ?? false;
