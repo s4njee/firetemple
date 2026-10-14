@@ -1,14 +1,43 @@
 {
-  "name": "firetemple",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@mk7s/firetemple",
+  "version": "0.1.0",
   "type": "module",
+  "description": "A research gallery of fire-looking WebGPU effects with live demos, readable source, notes and practicality scorecards.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s4njee/firetemple.git"
+  },
+  "homepage": "https://github.com/s4njee/firetemple",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "sideEffects": false,
+  "files": [
+    "lib",
+    "types"
+  ],
+  "exports": {
+    ".": {
+      "types": "./types/lib/index.d.ts",
+      "import": "./lib/index.js"
+    },
+    "./effects/*": {
+      "types": "./types/effects/*/index.d.ts",
+      "import": "./lib/effects/*/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite",
     "build": "npm run typecheck && vite build && node scripts/check-bundle.mjs",
     "prebuild": "npm run registry",
     "registry": "node scripts/registry.mjs",
-    "build:lib": "vite build --config vite.lib.config.ts",
+    "clean:types": "node -e \"require('node:fs').rmSync('types', { recursive: true, force: true })\"",
+    "build:lib": "vite build --config vite.lib.config.ts && npm run clean:types && tsc -p tsconfig.lib.json && node scripts/rewrite-dts.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
     "lint": "eslint .",
@@ -42,12 +71,5 @@
     "shiki": "^4.5.0",
     "tweakpane": "^4.0.5",
     "wgpu-matrix": "^3.4.2"
-  },
-  "description": "A research gallery of fire-looking WebGPU effects with live demos, readable source, notes and practicality scorecards.",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/s4njee/firetemple.git"
-  },
-  "homepage": "https://github.com/s4njee/firetemple"
+  }
 }

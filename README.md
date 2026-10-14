@@ -28,12 +28,18 @@ readable.
 
 ## Use one effect
 
+The package is published as `@mk7s/firetemple`:
+
+```sh
+npm install @mk7s/firetemple @mk7s/hologpu-temple-core
+```
+
 Every effect is a self-contained ES module with a declared contract: metadata, a
 parameter schema, presets, and a `create` that returns `{ resize, frame, destroy }`.
-The gallery shell owns the `GPUDevice`, the command encoder and the target view:
+Import it from its subpath and drive it from a `GPUDevice` you own:
 
 ```ts
-import candle from './src/effects/candle/index.ts';
+import candle from '@mk7s/firetemple/effects/candle';
 
 const effect = await candle.create({ device, format, canvas, params, profiler });
 effect.resize(width, height, dpr);
@@ -43,9 +49,18 @@ effect.frame({ time, delta }, encoder, target);
 effect.destroy();
 ```
 
-A public library entry point is being added as part of the
-[holofx](https://github.com/s4njee/holofx) work (story 3.3); today the mounting code
-lives in `src/shell`. See the per-effect `notes.md` for technique, cost and
+Or let the host own the loop; it creates no DOM and imports no gallery code:
+
+```ts
+import { createGpuSession, mount } from '@mk7s/firetemple';
+import candle from '@mk7s/firetemple/effects/candle';
+
+const session = await createGpuSession();
+const host = mount(session, canvas, candle);
+// later: host.destroy();
+```
+
+Both entries ship with types. See the per-effect `notes.md` for technique, cost and
 fallbacks.
 
 The deployed site uses `npm run deploy`, which uploads to a fixed Cloudflare Pages

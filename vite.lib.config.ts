@@ -14,7 +14,7 @@ const effectEntries = Object.fromEntries(
       existsSync(fileURLToPath(new URL(`./src/effects/${name}/index.ts`, import.meta.url))),
     )
     .map((name) => [
-      `effects/${name}`,
+      `effects/${name}/index`,
       fileURLToPath(new URL(`./src/effects/${name}/index.ts`, import.meta.url)),
     ]),
 );
