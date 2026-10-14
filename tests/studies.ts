@@ -81,6 +81,8 @@ export const STUDY_SWEEPS: Readonly<Record<string, readonly StudyConfig[]>> = {
     ...sweep('particle-blending', 'mode', ['additive', 'unsorted', 'sorted', 'oit'], {
       count: 32768,
     }),
-    ...sweep('particle-blending', 'sort', ['radix', 'radix16', 'bitonic', 'temporal'], { count: 32768 }),
+    ...sweep('particle-blending', 'sort', ['radix', 'radix16', 'bitonic', 'temporal'], {
+      count: 32768,
+    }),
   ],
 };
