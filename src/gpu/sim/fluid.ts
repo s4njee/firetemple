@@ -106,10 +106,17 @@ import { createObstacleMask, type ObstacleMask } from './obstacles.ts';
 //     temperature above ignition -> burn rate -> fuel down, temperature and soot up) goes there. It
 //     writes EVERY dye texel. `hooks.forces` remains for any force that is not linear in the dye.
 //   - `dyeLimit` clamps every channel to +-dyeLimit (at most 256): keep quantities normalised.
+// MIXED EDGES (Fire Temple story 6.2). `boundary` applies to all four edges, but a fire wants a floor with
+// open sides and top: `closedEdges: ['bottom']` with `boundary: 'open'` makes those edges walls (blocked
+// faces, solid ghost cells, clamped dye, a wall on every multigrid level, no confinement fade) and keeps
+// the rest open. A corner beyond an open and a closed edge counts as open. With the default (none) the
+// kernels take exactly the `open` path; with all four closed they reproduce `wall` bit for bit (tested).
 // Order within a step: forces (incl. buoyancy from the dye of the previous step) -> hooks.forces ->
 // hooks.divergence -> projection -> dye advection with dissipation -> hooks.dye.
 
 export type FluidBoundary = 'wall' | 'open' | 'wrap';
+/** An edge of the grid, for `FluidParams.closedEdges`. */
+export type FluidEdge = 'left' | 'right' | 'top' | 'bottom';
 export type FluidPressureSolver = 'sor' | 'jacobi' | 'multigrid';
 /** How the velocity is reconstructed between its faces when it carries the dye; see `FluidParams.dyeVelocityFilter`. */
 export type FluidVelocityFilter = 'bilinear' | 'hardware-bilinear' | 'bspline' | 'catmull-rom';
@@ -219,6 +226,13 @@ export interface FluidParams {
   buoyancyDirection: readonly [number, number];
   /** What the grid edge does: `wall` closed, free-slip; `open` flow leaves (and clear water enters); `wrap` periodic. */
   boundary: FluidBoundary;
+  /**
+   * With the `open` boundary only: edges that are walls instead (free-slip, nothing leaves, dye is not
+   * cleared there), e.g. `['bottom']` for a fire on a floor with open sides and top. Default none. The
+   * other boundaries ignore it. A closed edge still leaves the domain open elsewhere, so a divergence
+   * source stays solvable as long as one edge is open.
+   */
+  closedEdges: readonly FluidEdge[];
   /** Largest distance a parcel travels in one step, in cells. Also caps velocity at maxCfl / (dt * cells per height). Default 6. */
   maxCfl: number;
   /** Largest dye value (any channel). Default 64. */
@@ -264,6 +278,7 @@ export const DEFAULT_FLUID_PARAMS: Readonly<FluidParams> = {
   buoyancyWeights: [0, 0, 0, 1],
   buoyancyDirection: [0, -1],
   boundary: 'wall',
+  closedEdges: [],
   maxCfl: 6,
   dyeLimit: 64,
   dyeOnly: false,
@@ -516,6 +531,7 @@ export const FluidUniforms = defineUniformStruct('FluidUniforms', {
   dye_decay: 'vec4f',
   buoy_w: 'vec4f',
   mg_ratio: 'f32',
+  wall_edges: 'u32',
 });
 
 // --- Pipelines, cached per device -------------------------------------------------------------------
@@ -723,6 +739,17 @@ export const halfToFloat: (bits: number) => number = fromHalf;
 
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
 const finiteOr = (x: number, fallback: number) => (Number.isFinite(x) ? x : fallback);
+
+/** `EDGE_*` in fluid-core.wgsl. */
+const EDGE_BITS: Readonly<Record<FluidEdge, number>> = { left: 1, right: 2, top: 4, bottom: 8 };
+
+/** The `wall_edges` mask of fluid-core.wgsl: closed edges of the `open` boundary, 0 otherwise. */
+function wallEdges(params: FluidParams): number {
+  if (params.boundary !== 'open') return 0;
+  let mask = 0;
+  for (const edge of params.closedEdges ?? []) mask |= EDGE_BITS[edge] ?? 0;
+  return mask;
+}
 
 /** The per-step decay factor of each dye channel for `FluidParams.dyeDissipation`. */
 function dyeDecay(
@@ -1209,6 +1236,7 @@ export function createFluid(options: FluidOptions): Fluid {
       dye_filter: DYE_FILTER_KIND[params.dyeVelocityFilter] ?? 0,
       mg_sweeps: multigridCoarseSweeps(),
       mg_ratio: 1,
+      wall_edges: wallEdges(params),
       buoy_w: [0, 1, 2, 3].map((c) =>
         finiteOr(params.buoyancyWeights?.[c] ?? (c === 3 ? 1 : 0), 0),
       ) as [number, number, number, number],
@@ -1346,6 +1374,7 @@ export function createFluid(options: FluidOptions): Fluid {
         mg_sweeps: multigridCoarseSweeps(),
         // Fine cells per cell of this level, for the open boundary (air_ghost in fluid-core.wgsl).
         mg_ratio: 2 ** index,
+        wall_edges: wallEdges(params),
       });
       level.uniforms?.upload();
     });

@@ -169,7 +169,13 @@ fn open_edge_fade(c: vec2i) -> f32 {
     return 1.0;
   }
   let g = vec2i(P.grid);
-  let d = min(min(c.x, c.y), min(g.x - 1 - c.x, g.y - 1 - c.y));
+  // A closed edge (P.wall_edges) is a wall: it does not count.
+  let far = 1048576;
+  let left = select(c.x, far, (P.wall_edges & EDGE_LEFT) != 0u);
+  let top = select(c.y, far, (P.wall_edges & EDGE_TOP) != 0u);
+  let right = select(g.x - 1 - c.x, far, (P.wall_edges & EDGE_RIGHT) != 0u);
+  let bottom = select(g.y - 1 - c.y, far, (P.wall_edges & EDGE_BOTTOM) != 0u);
+  let d = min(min(left, top), min(right, bottom));
   return clamp(f32(d) / OPEN_EDGE_CELLS, 0.0, 1.0);
 }
 

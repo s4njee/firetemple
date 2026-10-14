@@ -120,7 +120,7 @@ fn cs_mg_mask(@builtin(global_invocation_id) id: vec3u) {
 fn mg_coarse_tap(k: vec2i, coarse: vec2i) -> vec2f {
   var q = k;
   if (k.x < 0 || k.y < 0 || k.x >= coarse.x || k.y >= coarse.y) {
-    if (P.boundary == BOUNDARY_OPEN) {
+    if (P.boundary == BOUNDARY_OPEN && !beyond_wall(k, coarse)) {
       let inside = clamp(k, vec2i(0), coarse - vec2i(1));
       if (P.solid != 0u && textureLoad(coarse_mask, inside, 0).r >= 0.5) {
         return vec2f(0.0, 1.0);

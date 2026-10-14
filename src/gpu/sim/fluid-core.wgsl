@@ -17,8 +17,8 @@
 // at short wavelengths), and a solid face is exactly zero, so nothing leaks through a one-cell wall.
 //
 // CELLS AND FACES have a class. A cell is FLUID, SOLID (obstacle mask >= 0.5, or outside the domain with
-// the `wall` boundary) or AIR (outside the domain with the `open` boundary: pressure fixed at 0, flow
-// may leave). `wrap` maps outside cells back inside. A face is FREE (both sides fluid or air), BLOCKED
+// the `wall` boundary, or beyond a closed edge of `open`, see EDGE_*) or AIR (outside the domain with the
+// `open` boundary: pressure fixed at 0, flow may leave). `wrap` maps outside cells back inside. A face is FREE (both sides fluid or air), BLOCKED
 // (exactly one side solid: its velocity is held at 0, it lies on a surface) or INSIDE (both sides solid:
 // meaningless, ignored by every interpolation).
 //
@@ -43,8 +43,28 @@ const FACE_INSIDE: u32 = 2u;
 
 const WORKGROUP_SIDE: u32 = 16u;
 
+// Closed edges of the `open` boundary (`P.wall_edges`, a mask of these; Fire Temple, for a fire on a
+// floor with open sides and top). An outside cell that lies beyond closed edges only is SOLID, as with
+// `wall`; one beyond any open edge is AIR (so a corner below an open side is air). With the mask 0,
+// the default, every rule below is the plain `open` one, bit for bit.
+const EDGE_LEFT: u32 = 1u;
+const EDGE_RIGHT: u32 = 2u;
+const EDGE_TOP: u32 = 4u;
+const EDGE_BOTTOM: u32 = 8u;
+
 fn wrap_index(i: i32, n: i32) -> i32 {
   return ((i % n) + n) % n;
+}
+
+// The edges of a `size` grid that the index c lies beyond, as a mask (0 inside).
+fn edges_beyond(c: vec2i, size: vec2i) -> u32 {
+  return select(0u, EDGE_LEFT, c.x < 0) | select(0u, EDGE_RIGHT, c.x >= size.x)
+       | select(0u, EDGE_TOP, c.y < 0) | select(0u, EDGE_BOTTOM, c.y >= size.y);
+}
+
+// With the `open` boundary: whether an index outside a `size` grid lies behind closed edges only.
+fn beyond_wall(c: vec2i, size: vec2i) -> bool {
+  return P.wall_edges != 0u && (edges_beyond(c, size) & ~P.wall_edges) == 0u;
 }
 
 // 0 for NaN and +-Inf, x otherwise. Tests the exponent bits because `x != x` may be folded away.
@@ -66,7 +86,7 @@ fn cell_class(c: vec2i) -> u32 {
       return CELL_SOLID;
     }
     if (P.boundary == BOUNDARY_OPEN) {
-      return CELL_AIR;
+      return select(CELL_AIR, CELL_SOLID, beyond_wall(c, g));
     }
     q = vec2i(wrap_index(c.x, g.x), wrap_index(c.y, g.y));
   }
@@ -115,6 +135,15 @@ fn face_state(axis: u32, f: vec2i) -> u32 {
       let g = vec2i(P.grid);
       let on_edge = select(f.y == 0 || f.y == g.y, f.x == 0 || f.x == g.x, axis == 0u);
       return select(FACE_FREE, FACE_BLOCKED, on_edge);
+    }
+    if (P.boundary == BOUNDARY_OPEN && P.wall_edges != 0u) {
+      // Open with some edges closed: a face on a closed edge is blocked.
+      let g = vec2i(P.grid);
+      var edge = select(0u, EDGE_TOP, f.y == 0) | select(0u, EDGE_BOTTOM, f.y == g.y);
+      if (axis == 0u) {
+        edge = select(0u, EDGE_LEFT, f.x == 0) | select(0u, EDGE_RIGHT, f.x == g.x);
+      }
+      return select(FACE_FREE, FACE_BLOCKED, (edge & P.wall_edges) != 0u);
     }
     return FACE_FREE;
   }
@@ -362,13 +391,13 @@ fn dye_to_sim(q: vec2f) -> vec2f {
   return q * vec2f(P.grid) / vec2f(P.dye_size);
 }
 
-// A dye texel as (value, weight). Outside the domain: clamped for `wall`, wrapped for `wrap`, clear
-// water (zero) for `open`. Texels in solid cells have weight 0.
+// A dye texel as (value, weight). Outside the domain: clamped for `wall` (and beyond a closed edge of
+// `open`), wrapped for `wrap`, clear water (zero) for `open`. Texels in solid cells have weight 0.
 fn dye_tap(tex: texture_2d<f32>, t: vec2i) -> DyeTap {
   let d = vec2i(P.dye_size);
   var q = t;
   if (t.x < 0 || t.y < 0 || t.x >= d.x || t.y >= d.y) {
-    if (P.boundary == BOUNDARY_OPEN) {
+    if (P.boundary == BOUNDARY_OPEN && !beyond_wall(t, d)) {
       return DyeTap(vec4f(0.0), 1.0);
     }
     if (P.boundary == BOUNDARY_WRAP) {

@@ -626,6 +626,104 @@ describe('open boundaries (full solver)', () => {
   });
 });
 
+// Fire Temple story 6.2: a floor under open sides and top.
+describe('closed edges of the open boundary', () => {
+  /** A busy run: a pushed, buoyant blob with confinement and the multigrid solver. */
+  async function busyRun(device: GPUDevice, params: Partial<FluidParams>) {
+    const fluid = create(
+      device,
+      { vorticity: 6, buoyancy: 1.5, pressureSolver: 'multigrid', ...params },
+      48,
+      96,
+      1.5,
+    );
+    fluid.setDye(gaussian(0.4, 0.75, 0.08, 1.5));
+    fluid.addForce([0.3, 0.8], [0.6, 0.85], 0.08, [1.2, 0.8]);
+    await submit(device, (e) => fluid.advance(e, 24));
+    const v = await readVelocity(device, fluid);
+    const dye = await readDye(device, fluid);
+    fluid.destroy();
+    return { v, dye };
+  }
+
+  it('with every edge closed reproduces the wall boundary bit for bit', async () => {
+    const device = await getTestDevice();
+    await expectValid(device, async () => {
+      const wall = await busyRun(device, { boundary: 'wall' });
+      const closed = await busyRun(device, {
+        boundary: 'open',
+        closedEdges: ['left', 'right', 'top', 'bottom'],
+      });
+      expect(maxAbs(wall.v.data)).toBeGreaterThan(0.05);
+      expect(Array.from(closed.v.data)).toEqual(Array.from(wall.v.data));
+      expect(Array.from(closed.dye.data)).toEqual(Array.from(wall.dye.data));
+    });
+  });
+
+  it('a floor holds what is pushed down onto it, where an open bottom lets it out', async () => {
+    const device = await getTestDevice();
+    const kept: Record<string, number> = {};
+    for (const floor of [false, true]) {
+      const fluid = create(device, {
+        boundary: 'open',
+        closedEdges: floor ? ['bottom'] : [],
+        pressureSolver: 'multigrid',
+      });
+      fluid.setDye(gaussian(0.5, 0.75, 0.06, 2));
+      const start = blobStats(await readDye(device, fluid)).total;
+      for (let k = 0; k < 6; k++) {
+        fluid.addForce([0.5, 0.6], [0.5, 0.9], 0.08, [0, 1]);
+        await submit(device, (e) => fluid.advance(e, 6));
+      }
+      const v = await readVelocity(device, fluid);
+      kept[String(floor)] = blobStats(await readDye(device, fluid)).total / start;
+      if (floor) {
+        // Nothing crosses the floor: the faces on the bottom edge are exactly zero.
+        for (let i = 0; i < v.width; i++) expect(v.v(i, v.height)).toBe(0);
+      } else {
+        let out = 0;
+        for (let i = 0; i < v.width; i++) out = Math.max(out, v.v(i, v.height));
+        expect(out).toBeGreaterThan(0.05);
+      }
+      fluid.destroy();
+    }
+    // Measured: 0.93 kept over a floor, 0.02 through an open bottom.
+    expect(kept.true!).toBeGreaterThan(0.8);
+    expect(kept.false!).toBeLessThan(0.3);
+  });
+
+  it('solves a divergence source on the floor: the gas spreads along it and rises, and stays bounded', async () => {
+    const device = await getTestDevice();
+    await expectValid(device, async () => {
+      for (const solver of ['jacobi', 'multigrid'] as const) {
+        const fluid = create(device, {
+          boundary: 'open',
+          closedEdges: ['bottom'],
+          pressureSolver: solver,
+          pressureIterations: 60,
+          vorticity: 8,
+          velocityDissipation: 0.5,
+        });
+        fluid.setDivergenceSource((x, y) => (Math.hypot(x - 0.5, y - 0.94) < 0.08 ? 2 : 0));
+        await submit(device, (e) => fluid.advance(e, 240));
+        const v = await readVelocity(device, fluid);
+        expect(allFinite(v.data)).toBe(true);
+        for (let i = 0; i < v.width; i++) expect(v.v(i, v.height)).toBe(0);
+        // Above the source the flow goes up (v < 0); along the floor beside it, outward.
+        const j = Math.floor(0.85 * v.height);
+        const mid = Math.floor(0.5 * v.width);
+        expect(v.v(mid, j)).toBeLessThan(-0.01);
+        const row = v.height - 2;
+        expect(v.u(Math.floor(0.62 * v.width), row)).toBeGreaterThan(0.005);
+        expect(v.u(Math.floor(0.38 * v.width), row)).toBeLessThan(-0.005);
+        // Four seconds in, nothing has run away (the speed cap is 6 cells a step, 5.6 here).
+        expect(maxAbs(v.data)).toBeLessThan(2);
+        fluid.destroy();
+      }
+    });
+  });
+});
+
 // --- Energy, conservation, detail ------------------------------------------------------------------------------------
 
 describe('energy and forces', () => {
