@@ -1,11 +1,13 @@
-// Run after `vite build`. Two jobs:
+// Run after `vite build`. Three jobs:
 //
 //   1. Fail if any WGSL reached the first page load. Shaders belong to the effect that uses them
 //      (see vite-plugin-wgsl.ts); Water Temple's shared library grew into one 70 kB eager chunk.
 //   2. Report what each effect costs to download: its own lazy chunk plus every chunk it pulls in
 //      that the page had not already loaded. `--json <file>` writes the table for the cost studies.
+//   3. Enforce the committed gzip budget (`bundle-budget.json`) for the eager bundle and each
+//      effect. `--update-budget` rewrites it from the current build (M4 story 4.8).
 //
-//   node scripts/check-bundle.mjs [--dist dist] [--json docs/bundle-sizes.json]
+//   node scripts/check-bundle.mjs [--dist dist] [--json docs/bundle-sizes.json] [--update-budget]
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -18,6 +20,8 @@ const option = (name, fallback) => {
 };
 const dist = option('--dist', 'dist');
 const jsonPath = option('--json', undefined);
+const budgetPath = option('--budget', 'bundle-budget.json');
+const updateBudget = args.includes('--update-budget');
 
 const manifestPath = join(dist, '.vite', 'manifest.json');
 if (!existsSync(manifestPath)) {
@@ -118,6 +122,46 @@ if (jsonPath) {
   };
   writeFileSync(jsonPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(`\nwrote ${jsonPath}`);
+}
+
+// --- 3. Bundle budgets ---------------------------------------------------------------------------
+
+const currentEager = eagerSize.gzip;
+
+if (updateBudget) {
+  writeFileSync(
+    budgetPath,
+    `${JSON.stringify(
+      {
+        $comment:
+          'Eager and per-effect gzip ceilings from scripts/check-bundle.mjs. Regenerate with `node scripts/check-bundle.mjs --update-budget` after `vite build`.',
+        eager: currentEager,
+        effects: Object.fromEntries(effects.map((effect) => [effect.id, effect.gzip])),
+      },
+      null,
+      2,
+    )}\n`,
+  );
+  console.log(`\nwrote ${budgetPath}`);
+} else if (existsSync(budgetPath)) {
+  const budget = JSON.parse(readFileSync(budgetPath, 'utf8'));
+  const over = [];
+  if (typeof budget.eager === 'number' && currentEager > budget.eager)
+    over.push(`eager: ${kb(currentEager)} > ${kb(budget.eager)}`);
+  for (const effect of effects) {
+    const limit = budget.effects?.[effect.id];
+    // A new effect with no ceiling is allowed until the budget is regenerated; an existing
+    // ceiling is enforced.
+    if (limit && effect.gzip > limit) over.push(`${effect.id}: ${kb(effect.gzip)} > ${kb(limit)}`);
+  }
+  if (over.length > 0) {
+    console.error(
+      `\ncheck-bundle: over the bundle budget:\n  ${over.join('\n  ')}\n` +
+        'Shrink the effect, or raise its ceiling in bundle-budget.json if the growth is intended.',
+    );
+    process.exit(1);
+  }
+  console.log(`\nbundle budgets pass (eager + ${effects.length} effects)`);
 }
 
 if (offenders.length > 0) {
