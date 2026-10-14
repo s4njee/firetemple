@@ -40,7 +40,12 @@ fn combust_quantise(v: f32, u: f32) -> f32 {
   // below 2^-14. Built from the exponent bits, so it is an exact power of two.
   let exponent = max((bitcast<u32>(max(v, 0.0)) >> 23u) & 0xffu, 113u);
   let ulp = bitcast<f32>((exponent - 10u) << 23u);
-  return floor(v / ulp + u) * ulp;
+  // Round up with probability equal to the remainder. Comparing u with the remainder, rather than
+  // flooring v / ulp + u, keeps a value that is already a half float exactly where it is: the sum
+  // rounds up to the next integer when u is within a float step of 1.
+  let x = v / ulp;
+  let below = floor(x);
+  return (below + select(0.0, 1.0, u < x - below)) * ulp;
 }
 
 // How fast fuel reacts at temperature t, as a multiple of k.
