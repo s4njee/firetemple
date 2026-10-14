@@ -69,4 +69,18 @@ export const STUDY_SWEEPS: Readonly<Record<string, readonly StudyConfig[]>> = {
     ...sweep('fire-fluid', 'resolution', ['96', '128', '160', '192']),
     ...sweep('fire-3d', 'grid', ['32', '48', '64']),
   ],
+  '7': [
+    // 7.10: particle count against frame time. `count` is the pool; `fill` keeps it that full.
+    ...sweep('particle-system', 'count', [16384, 65536, 262144, 1048576], { fill: 0.95 }),
+    ...sweep('particle-system', 'count', [65536, 262144, 1048576], { space: '3d', fill: 0.95 }),
+    ...sweep('embers', 'count', [2500, 10000, 40000, 200000]),
+    // 7.9: the four blending modes, and the sort methods, at the default and a dense count.
+    ...sweep('particle-blending', 'mode', ['additive', 'unsorted', 'sorted', 'oit'], {
+      count: 2048,
+    }),
+    ...sweep('particle-blending', 'mode', ['additive', 'unsorted', 'sorted', 'oit'], {
+      count: 32768,
+    }),
+    ...sweep('particle-blending', 'sort', ['radix', 'radix16', 'bitonic', 'temporal'], { count: 32768 }),
+  ],
 };

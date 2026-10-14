@@ -1,0 +1,61 @@
+## How it works
+
+A grinder, welding or forge shower as real particles on the Epic 7 framework (`src/gpu/particles/`). Each spark is a slot in a GPU pool with a position, velocity, age, temperature and generation, stepped 60 times a second; nothing about a spark is computed on the CPU. Everything is in the 2D overlay space (canvas heights, origin bottom-left), and `shower.ts` holds the particle system apart from the page so the tests drive the same code.
+
+**Throw, flight and colour.** A point emitter throws sparks in a fan (`aim`, `spread`) at 0.72 to 1.28 times `speed`. The framework integrates gravity and quadratic drag towards still air (`drag`, per canvas height), so a fast spark loses speed quickly and a slow one keeps it, which gives the long flat start and the steep fall of a real grinder arc. Temperature cools exactly (Newton, `cooling`) from `temperature` ± 200 K; colour is `blackbody_radiance(T)`, so white-yellow at the wheel, orange in flight, deep red on the floor. A spark dies at the end of its life or below 950 K.
+
+**Streaks.** A spark is drawn as a motion-blurred streak: the sprite renderer stretches each quad along its on-screen velocity, and `stretchFor` turns an exposure time (`shutter`, 45 ms by default) into its stretch so the streak is about speed × exposure long, trailing behind the spark. Radiance is divided by the whole stretch (`stretchDim` 1), so a streak keeps the light of the spark that made it, as a camera exposure does. `shade.wgsl` blends `sprite_streak` (a bright head and a narrowing tail) into a round dot as the stretch falls towards 1, so a spark that stops on a surface does not turn into a comet facing +x.
+
+**Colliders.** A floor plane at 3% of the height; the forge preset's anvil, a union of exact distances (`hook_sdf` in `hooks.wgsl`, drawn by `scene.wgsl` from the same field) under the framework's sphere-traced `sdf` collider; and up to six boxes. The boxes are the page's own marked elements (`trackDomRects(canvas)`, converted by `boxFromRect`), or three stand-in cards when there is no marked DOM (the bare canvas, thumbnails, tests), which `scene.wgsl` then draws as dim plates. An element that contains the source is left out, so a grinder placed over a card throws over it rather than from inside a solid. While page elements are the solids the canvas is raised above its siblings (as `fire-obstacles` and `dom-fuel` do), so sparks land on and skid off the cards instead of vanishing behind them. Collisions are tested on the segment each spark moved along, so nothing tunnels through a thin card.
+
+**Splitting** (`hook_collide`). A spark that hits anything faster than 0.35 heights/s splits, with probability `split chance`, into exactly `children per split` sparks of the next generation, and dies. The request carries the surface normal; `hook_emit` turns each child into a fan of ±43° round the parent's rebound at 45 to 100% of 0.75 times its speed, mirrored out of the surface if it pointed in, 82% of the parent's temperature and 70% of its size. The generation is the particle's `kind`; generation `generations` never splits, so the tree is finite (at most `children + children²` descendants a spark at the default of two) and a pile of resting sparks cannot cascade. Children are born in the same step's emit pass, with no CPU round trip.
+
+**Pointer, drive, start.** Through the shared igniters (`createPointerIgnition`, hover reported at half strength): the source follows the pointer (a grinder you aim) and drifts back home a second after it leaves; a press bites harder (1.8 times the rate), and with the anvil it is a hammer strike. Left alone, the source wanders, the aim sways ±4° and the pressure breathes ±12%, all slower than 0.3 Hz, so the shower is never mechanical and never still. `drive` (scroll or audio) adds up to 60% of the calm rate, never speed. The first frame runs up to 2.5 s of simulation in its own submits, so a still frame under reduced motion is mid-shower.
+
+**Against `sparks` (4.9).** The stateless sparks find each spark per pixel from a hash: no state, the same cost at any density, but a spark is confined to its lane and its age is its distance. Here a spark has a history, so it can do the three things a lane cannot: land on something (the floor, an anvil, the page's real cards, which can move), lose energy there and keep going (bounce, skid, slide off an edge and fall as a curtain), and become several (splitting). It also follows a moving source exactly, under the pointer. What that adds in numbers, at the default: 2 800 sparks are alive without splitting and 6 000 with it (4 070 children a second from 1 400 sparks a second): more than half of what is on screen near the cards and the floor exists because something hit something.
+
+## Cost
+
+GPU time: not measured yet with the benchmark harness (`npm run study`); the scorecard has no `gpuMs`.
+
+Counts: 1 400 sparks a second at the default, about 6 000 alive with splitting (2 800 without); pool 65 536 (sized for the highest rate the controls, a press and the drive can ask for at once; 7 MB of state, list and sprite instances), cost follows the live count, not the pool. The hot spot is one CPU-written sprite; the backdrop (`scene.wgsl`) is one fullscreen pass that only runs when there is something to draw in it (stand-in cards, the anvil): over a page the sparks clear the target themselves.
+
+Indicative readings, Apple M1 Max, 1920 × 1080, headless Chrome, HUD "GPU" span of one frame including the HDR tail, median of three loads, with other agents using the same GPU. These are at or near the HUD's floor of about 1.2 ms, so they cannot rank one setting against another:
+
+| Setting                                                                     |                  Frame |
+| --------------------------------------------------------------------------- | ---------------------: |
+| `sparks` (4.9), grinder preset                                              | 1.57 ms (1.47 to 1.90) |
+| default, 1 400/s (a later run of the final version: 1.76 ms, 1.69 to 1.83)  | 1.30 ms (1.14 to 2.11) |
+| 1 900/s (about the 4.9 grinder’s lit area, 4.1% of the frame, interpolated) | 1.41 ms (1.37 to 1.50) |
+| 4 000/s (maximum)                                                           | 1.84 ms (1.78 to 2.08) |
+| no splitting / no page boxes                                                | 1.88 / 2.07 ms (noise) |
+
+On-screen density, as the share of a 960 × 540 frame whose red byte is over 60 (mean of ten frames after 3 s, headless): the 4.9 grinder 4.1% and welding spray 7.4%; this effect 1.9% at 700 sparks a second, 3.2% at the default 1 400, so about 1 900 for the 4.9 grinder’s density. Without splitting the default lights 3.8% (whole sparks stay bigger and hotter), and with no cards 5.0% (nothing cuts the arcs short).
+
+What collisions and splitting cost, measured on Dawn with GPU timestamps (one more unit of eight steps in a command buffer, `tests/bench.ts`), at 20 000 sparks a second so the step is long enough to resolve: about 35 000 live sparks cost 0.052 ms a step with no colliders or the floor alone, 0.063 ms with the floor and the three stand-in cards (+20% per particle); with splitting on, 63 000 live sparks cost 0.21 ms a step, 3.3 ns a particle against 1.8: the spawn requests go through the framework's single-thread `plan` loop and the emit kernel's search, so many simultaneous impacts cost more than the extra particles alone. At the default rate the step is a few hundredths of a millisecond; the frame is the bloom and the sprite fill.
+
+At equal on-screen density the two read the same in Chrome; the difference is what scales. `sparks` costs the same with ten sparks or a thousand and grows with the pixel count; this effect grows with the live count (sparks a second times life, times what splitting adds) and barely with the pixels. Tier B, provisional: it is under 2 ms on this machine, but the A budget is for an integrated GPU, which has not been measured.
+
+Bundle: not measured.
+
+## Pitfalls
+
+- **What makes a spark shower flash, and how this one avoids it.** It is not the source glow (kept steady) or a whole-frame pulse: it is shot noise in the densest cells. Near the wheel every spark of the stream passes through the same few cells of the analyser's grid; each crosses one in about two frames, so a cell holds a few dozen bright sparks and their number varies by about the square root of that from frame to frame. The first default (700 sparks a second at intensity 5, a 22 ms exposure, the stretch dimmed by its square root) had three cells near the source swinging four to six times a second, an area of 18 500 CSS px² against the threshold of 21 824. What fixed it: twice the sparks at about half the light each (the mean is kept, the swing falls by √2), and a longer exposure with the light conserved along the streak (`stretchDim` 1, 45 ms): a streak lies across a cell for several frames, which is a temporal low-pass filter on the cell's brightness. A longer exposure that added light (stretch dimmed by its square root only) made it worse (24 700 px², `high`). All four presets now measure `low` with no flashing area (peak cell 1 to 3 flashes a second; the forge hammer's bursts are one a strike at 0.75 Hz).
+- **Dark pages only.** Over the light page the shower reads as pale orange ink lines: the shape is there, the heat is not. `scorecard.lightPage` is `no`.
+- Resting sparks touch their surface every step (157 000 contacts a second at the default); only impacts faster than 0.35 heights/s may split, which is also what stops a pile from splitting forever. The generation limit is the hard guarantee.
+- A spark that splits on one collider in a sub-step could meet a second collider in the same sub-step; `hook_collide` returns at once for a spark already killed, or it would split twice.
+- The framework's `ParticleSource.index` and the request's `user` are all `hook_emit` knows of a child's parent, so the rebound direction and the normal travel in the request's `user`.
+- Boxes are axis-aligned and square-cornered: a card's rounded corner is a sharp one to a spark, and a rotated element is its bounding box (`trackDomRects`). At most six elements collide (eight colliders a system, minus the floor and the anvil).
+- On a canvas narrower than 16:10 speeds and gravity scale with the width (and quadratic drag inversely), which scales every arc and keeps its timing; without it a phone showed only the first third of the arc.
+- The pool is sized for a press and full drive at once, so pressing never rebuilds it; changing `rate` across a power of two does, with a new warm-up.
+
+## When to use it
+
+A grinder, welder or forge on a dark page where the sparks should touch the page: land on the cards, skid off their edges, pour off a heading; or a cursor that throws sparks wherever it is aimed. Tier B (provisional). Reach for `sparks` (4.9) when nothing needs to collide and a fixed cost whatever the density matters more, and keep either small where the audience is unknown. Do not use it on a light page.
+
+## References
+
+- [docs/effect-authoring.md](../../../docs/effect-authoring.md), "Particles": the framework, its hooks and GPU spawning.
+- I. Quilez, [2D distance functions](https://iquilezles.org/articles/distfunctions2d/): the box and the uneven capsule of the anvil.
+- `src/wgsl/blackbody.wgsl` (story 3.1) and `src/wgsl/sprite.wgsl` (story 3.9): the colour of a cooling spark and the streak shape.
+- W3C, [Understanding SC 2.3.1: Three Flashes or Below Threshold](https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold.html), and `tests/flash.ts`.
